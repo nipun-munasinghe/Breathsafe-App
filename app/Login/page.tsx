@@ -2,26 +2,46 @@
 import React from "react";
 import Image from "next/image";
 import Button from "@/component/Button";
-import { FaGoogle, FaFacebookF, FaApple } from "react-icons/fa";
+import {
+  FaGoogle,
+  FaFacebookF,
+  FaApple
+} from "react-icons/fa";
 
 const page = () => {
   return (
     <div className="flex justify-center items-center bg-emerald-950 h-screen">
       {/* Image Section */}
-      <div className="flex items-center justify-center  bg-gray-100 bg-gradient-to-br from-green-100 to-orange-100 rounded-4xl">
-        <div className=" p-8">
+      <div className="flex items-center justify-center p-8 bg-gray-100 bg-gradient-to-br from-green-100 to-orange-100 rounded-tl-4xl rounded-br-4xl ">
+        <div className="flex flex-col p-10   rounded-tl-4xl rounded-bl-4xl">
+          <div className="">
+            <h1 className="text-3xl font-bold mb-6  text-emerald-950">
+              Welcome Back !
+            </h1>
+            <h1 className="text-lg font-normal mb-8  text-gray-600 ">
+              Access your{" "}
+              <span className="text-lime-600 text-lg font-semibold">Breath Safe</span>{" "}
+              dashboard to monitor air quality <br /> and ensure a healthier
+              environment.
+            </h1>
+          </div>
           <Image
             src="/login-image.png"
             width={500}
             height={1300}
             alt="Login Image"
+            className="-ml-8"
           />
+
+          <p className="text-md opacity-70 text-gray-600 mt-12">
+            &copy; 2025 HealthLanka. All rights reserved.
+          </p>
         </div>
 
         {/* SignIn Heading */}
-        <div className="p-8 rounded-3xl">
-          <h1 className="text-4xl text-blue-gray-900 font-semibold">Sign In</h1>
-          <h1 className="text-lg font-normal text-gray-600 mt-2">
+        <div className="p-7 rounded-tr-4xl rounded-br-4xl">
+          <h1 className="text-4xl text-blue-gray-900 mb-0 font-semibold">Sign In</h1>
+          <h1 className="text-lg font-normal text-gray-600 mt-6">
             Access to your account to continue
           </h1>
 
