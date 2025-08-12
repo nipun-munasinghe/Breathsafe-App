@@ -7,6 +7,11 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+const albertSans = Geist({
+  variable: "--font-albert-sans",
+  subsets: ["latin"],
+});
+
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -25,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${albertSans.variable} antialiased`}
       >
         {children}
       </body>
