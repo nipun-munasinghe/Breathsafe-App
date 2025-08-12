@@ -20,7 +20,7 @@ const page = () => {
             </h1>
             <h1 className="text-lg font-normal mb-8  text-gray-600 ">
               Access your{" "}
-              <span className="text-lime-600 text-lg font-semibold">Breath Safe</span>{" "}
+              <span className="text-lime-600 text-lg font-semibold">BreathSafe</span>{" "}
               dashboard to monitor air quality <br /> and ensure a healthier
               environment.
             </h1>
@@ -34,7 +34,7 @@ const page = () => {
           />
 
           <p className="text-md opacity-70 text-gray-600 mt-12">
-            &copy; 2025 HealthLanka. All rights reserved.
+            &copy; 2025 BreathSafe. All rights reserved.
           </p>
         </div>
 
@@ -90,7 +90,7 @@ const page = () => {
                 </a>
               </div>
             </div>
-            <Button onClick={() => {}} name="Sign In" />
+            <Button onClick={() => { }} name="Sign In" />
           </form>
 
           {/* Divider */}
