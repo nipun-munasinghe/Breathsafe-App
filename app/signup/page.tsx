@@ -27,7 +27,7 @@ const Page = () => {
 
   return (
     <div className="flex justify-center items-center bg-emerald-950 h-screen px-4">
-      <div className="flex items-center justify-center gap-10 p-8 bg-gradient-to-br from-green-100 to-orange-100 rounded-3xl shadow-2xl animate-fade-in">
+      <div className="flex items-center justify-center gap-10 pt-6 pb-6 pl-10 pr-10 bg-gradient-to-br from-green-100 to-orange-100 rounded-3xl shadow-2xl animate-fade-in">
         
         {/* Left Section - Form */}
         <div className="animate-slide-in-left">
@@ -44,6 +44,7 @@ const Page = () => {
                   id="firstName"
                   placeholder="First Name"
                   className="border p-3 rounded-md focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
+                  required
                 />
               </div>
               <div className="flex flex-col flex-1 space-y-2">
@@ -53,6 +54,7 @@ const Page = () => {
                   id="lastName"
                   placeholder="Last Name"
                   className="border p-3 rounded-md focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
+                  required
                 />
               </div>
             </div>
@@ -65,6 +67,7 @@ const Page = () => {
                 id="email"
                 placeholder="Enter your email"
                 className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
+                required
               />
             </div>
 
@@ -77,6 +80,7 @@ const Page = () => {
                 placeholder="Enter your password"
                 onKeyUp={handlePasswordChecker}
                 className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
+                required
               />
             </div>
 
@@ -89,6 +93,7 @@ const Page = () => {
                 placeholder="Confirm your password"
                 onKeyUp={handlePasswordChecker}
                 className="border p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
+                required
               />
             </div>
 

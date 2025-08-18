@@ -10,7 +10,6 @@ const page = () => {
     <div className="flex justify-center items-center bg-emerald-950 h-screen">
       {/* Main Container */}
       <div className="flex items-center justify-center p-8 bg-gradient-to-br from-green-100 to-orange-100 rounded-tl-4xl rounded-br-4xl shadow-2xl animate-fade-in">
-        
         {/* Left Section */}
         <div className="flex flex-col p-10 rounded-tr-[2.5rem] rounded-br-[2.5rem] animate-slide-in-left">
           <div>
@@ -19,20 +18,20 @@ const page = () => {
             </h1>
             <h1 className="text-lg font-normal mb-8 mt-4 text-gray-600">
               Access your{" "}
-              <span className="text-lime-600 text-lg font-semibold">BreathSafe</span>{" "}
+              <span className="text-lime-600 text-lg font-semibold">
+                BreathSafe
+              </span>{" "}
               dashboard to monitor air quality <br /> and ensure a healthier
               environment.
             </h1>
           </div>
-
-          <Image
-            src="/login-image.png"
-            width={400}
-            height={400}
-            alt="Login Image"
-            className="-ml-8 transform transition duration-500 hover:scale-105 animate-fade-in-up"
-          />
-
+            <Image
+              src="/login-image.png"
+              width={400}
+              height={400}
+              alt="Login Image"
+              className="-ml-8 transform transition duration-500 hover:scale-105 animate-fade-in-up"
+            />
           <p className="text-md opacity-70 text-gray-600 mt-12">
             &copy; 2025 BreathSafe. All rights reserved.
           </p>
@@ -40,9 +39,7 @@ const page = () => {
 
         {/* Right Section */}
         <div className="p-7 rounded-tr-4xl rounded-br-4xl animate-slide-in-right">
-          <h1 className="text-4xl text-gray-900 mb-0 font-semibold">
-            Sign In
-          </h1>
+          <h1 className="text-4xl text-gray-900 mb-0 font-semibold">Sign In</h1>
           <h1 className="text-lg font-normal text-gray-600 mt-6">
             Access your account to continue
           </h1>
@@ -76,7 +73,10 @@ const page = () => {
             <div className="flex justify-between items-center mb-4 mt-6">
               <div className="flex items-center">
                 <input type="checkbox" id="rememberMe" />
-                <label htmlFor="rememberMe" className="text-sm text-gray-500 ml-2">
+                <label
+                  htmlFor="rememberMe"
+                  className="text-sm text-gray-500 ml-2"
+                >
                   Remember Me
                 </label>
               </div>
