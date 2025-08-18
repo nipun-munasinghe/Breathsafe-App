@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { use } from "react";
+import React from "react";
 import Button from "@/component/Button";
 import { useEffect, useState } from "react";
 
