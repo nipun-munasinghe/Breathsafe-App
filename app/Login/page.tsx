@@ -5,100 +5,96 @@ import Button from "@/component/Button";
 import Link from "next/link";
 import { FaGoogle, FaFacebookF, FaApple } from "react-icons/fa";
 
-const page = () => {
+const Page = () => {
   return (
-    <div className="flex justify-center items-center bg-emerald-950 h-screen">
+    <div className="flex justify-center bg-emerald-950 min-h-screen py-12 px-4">
       {/* Main Container */}
-      <div className="flex items-center justify-center p-8 bg-gradient-to-br from-green-100 to-orange-100 rounded-tl-4xl rounded-br-4xl shadow-2xl animate-fade-in">
+      <div className="flex flex-col lg:flex-row items-center justify-center w-full max-w-6xl bg-gradient-to-br from-green-100 to-orange-100 rounded-3xl shadow-2xl overflow-hidden animate-fade-in">
+        
         {/* Left Section */}
-        <div className="flex flex-col p-10 rounded-tr-[2.5rem] rounded-br-[2.5rem] animate-slide-in-left">
-          <div>
-            <h1 className="text-3xl font-bold mb-6 text-emerald-950">
-              Welcome Back !
-            </h1>
-            <h1 className="text-lg font-normal mb-8 mt-4 text-gray-600">
-              Access your{" "}
-              <span className="text-lime-600 text-lg font-semibold">
-                BreathSafe
-              </span>{" "}
-              dashboard to monitor air quality <br /> and ensure a healthier
-              environment.
-            </h1>
-          </div>
+        <div className="flex flex-col items-center lg:items-start p-6 lg:p-10 w-full lg:w-1/2">
+          <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-emerald-950 text-center lg:text-left">
+            Welcome Back!
+          </h1>
+          <p className="text-sm lg:text-lg font-normal mb-6 text-gray-600 text-center lg:text-left">
+            Access your{" "}
+            <span className="text-lime-600 font-semibold">BreathSafe</span> dashboard to monitor air quality and ensure a healthier environment.
+          </p>
+
+          {/* Image only on desktop */}
+          <div className="hidden lg:block mt-4 lg:mt-0">
             <Image
               src="/login-image.png"
               width={400}
               height={400}
               alt="Login Image"
-              className="-ml-8 transform transition duration-500 hover:scale-105 animate-fade-in-up"
+              className="transform transition duration-500 hover:scale-105 animate-fade-in-up"
             />
-          <p className="text-md opacity-70 text-gray-600 mt-12">
+          </div>
+
+          {/* Right reserved text only on desktop */}
+          <p className="text-xs lg:text-md opacity-70 text-gray-600 mt-6 hidden lg:block text-center lg:text-left">
             &copy; 2025 BreathSafe. All rights reserved.
           </p>
         </div>
 
         {/* Right Section */}
-        <div className="p-7 rounded-tr-4xl rounded-br-4xl animate-slide-in-right">
-          <h1 className="text-4xl text-gray-900 mb-0 font-semibold">Sign In</h1>
-          <h1 className="text-lg font-normal text-gray-600 mt-6">
-            Access your account to continue
+        <div className="p-6 lg:p-8 mt-8 lg:mt-0 w-full lg:w-1/2">
+          <h1 className="text-2xl lg:text-4xl text-gray-900 font-semibold text-center lg:text-left">
+            Sign In
           </h1>
+          <p className="text-sm lg:text-lg font-normal text-gray-600 mt-4 lg:mt-6 text-center lg:text-left">
+            Access your account to continue
+          </p>
 
           {/* Sign-in Form */}
-          <form action="post" className="animate-fade-in-up">
-            <div className="flex flex-col mb-6 mt-6">
-              <label htmlFor="email" className="font-normal text-lg">
+          <form action="post" className="animate-fade-in-up mt-6 flex flex-col gap-4">
+            <div className="flex flex-col">
+              <label htmlFor="email" className="font-normal text-sm lg:text-lg mb-1">
                 Email
               </label>
               <input
                 type="email"
                 id="email"
-                className="border p-3 rounded-md w-96 focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition duration-300"
+                className="border p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition duration-300"
                 placeholder="Enter your email"
               />
             </div>
 
-            <div className="flex flex-col mb-6 mt-6">
-              <label htmlFor="password" className="font-normal text-lg">
+            <div className="flex flex-col">
+              <label htmlFor="password" className="font-normal text-sm lg:text-lg mb-1">
                 Password
               </label>
               <input
                 type="password"
                 id="password"
-                className="border p-3 rounded-md w-96 focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition duration-300"
+                className="border p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition duration-300"
                 placeholder="Enter your password"
               />
             </div>
 
-            <div className="flex justify-between items-center mb-4 mt-6">
-              <div className="flex items-center">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center mb-2 sm:mb-0">
                 <input type="checkbox" id="rememberMe" />
-                <label
-                  htmlFor="rememberMe"
-                  className="text-sm text-gray-500 ml-2"
-                >
+                <label htmlFor="rememberMe" className="text-sm text-gray-500 ml-2">
                   Remember Me
                 </label>
               </div>
-              <div>
-                <a
-                  href="#"
-                  className="text-sm text-gray-500 hover:text-emerald-950 transition-colors duration-200"
-                >
-                  Forget Password?
-                </a>
-              </div>
+              <a
+                href="#"
+                className="text-sm text-gray-500 hover:text-emerald-950 transition-colors duration-200"
+              >
+                Forget Password?
+              </a>
             </div>
 
-            <div>
-              <Button onClick={() => {}} name="Sign In" />
-            </div>
+            <Button onClick={() => {}} name="Sign In" />
           </form>
 
           {/* Divider */}
-          <div className="flex items-center my-6 animate-fade-in-up">
+          <div className="flex items-center my-4 animate-fade-in-up">
             <hr className="flex-grow border-gray-500" />
-            <span className="mx-4 text-gray-500 text-sm">or continue with</span>
+            <span className="mx-2 text-gray-500 text-sm">or continue with</span>
             <hr className="flex-grow border-gray-500" />
           </div>
 
@@ -131,4 +127,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
