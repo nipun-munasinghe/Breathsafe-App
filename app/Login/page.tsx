@@ -16,7 +16,7 @@ const Page = () => {
           <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-emerald-950 text-center lg:text-left">
             Welcome Back!
           </h1>
-          <p className="text-sm lg:text-lg font-normal mb-6 text-gray-600 text-center lg:text-left">
+          <p className="text-sm lg:text-lg font-normal mb-6 text-gray-500 text-center lg:text-left">
             Access your{" "}
             <span className="text-lime-600 font-semibold">BreathSafe</span> dashboard to monitor air quality and ensure a healthier environment.
           </p>
@@ -33,7 +33,7 @@ const Page = () => {
           </div>
 
           {/* Right reserved text only on desktop */}
-          <p className="text-xs lg:text-md opacity-70 text-gray-600 mt-6 hidden lg:block text-center lg:text-left">
+          <p className="text-xs lg:text-md opacity-70 text-gray-500 mt-6 hidden lg:block text-center lg:text-left">
             &copy; 2025 BreathSafe. All rights reserved.
           </p>
         </div>
@@ -43,7 +43,7 @@ const Page = () => {
           <h1 className="text-2xl lg:text-4xl text-gray-900 font-semibold text-center lg:text-left">
             Sign In
           </h1>
-          <p className="text-sm lg:text-lg font-normal text-gray-600 mt-4 lg:mt-6 text-center lg:text-left">
+          <p className="text-sm lg:text-lg font-normal text-gray-500 mt-4 lg:mt-6 text-center lg:text-left">
             Access your account to continue
           </p>
 
@@ -116,7 +116,7 @@ const Page = () => {
             Don&apos;t have an account?{" "}
             <Link
               href="/signup"
-              className="font-medium text-gray-600 hover:text-emerald-950 transition-colors duration-200"
+              className="font-medium text-gray-500 hover:text-emerald-950 transition-colors duration-200"
             >
               Create an account
             </Link>

@@ -31,18 +31,18 @@ const Page = () => {
         {/* Left Section - Form */}
         <div className="flex flex-col w-full lg:w-1/2 p-6 lg:p-10 animate-slide-in-left">
           <div className="lg:hidden sm:visible">
-            <h1 className="text-center text-3xl font-bold text-gray-900 lg:hidden sm:visible">
+            <h1 className="text-center text-3xl font-bold text-blue-gray-900 lg:hidden sm:visible">
               Welcome to Our Platform
             </h1>
-            <p className="text-center lg:text-lg text-gray-600 mt-2">
+            <p className="text-center lg:text-lg text-gray-500 mt-2">
               Create your account to get started
             </p>
           </div>
           <div className="hidden lg:block">
-            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
+            <h1 className="text-3xl lg:text-4xl font-bold text-blue-gray-900">
               Sign Up
             </h1>
-            <p className="text-base lg:text-lg text-gray-600 mt-2">
+            <p className="text-base lg:text-lg text-gray-500 mt-2">
               Create your account to get started
             </p>
           </div>
@@ -52,7 +52,7 @@ const Page = () => {
               <div className="flex flex-col flex-1">
                 <label
                   htmlFor="firstName"
-                  className="text-gray-700 text-sm lg:text-lg"
+                  className="text-gray-500 text-sm lg:text-lg"
                 >
                   First Name
                 </label>
@@ -67,7 +67,7 @@ const Page = () => {
               <div className="flex flex-col flex-1">
                 <label
                   htmlFor="lastName"
-                  className="text-gray-700 text-sm lg:text-lg"
+                  className="text-gray-500 text-sm lg:text-lg"
                 >
                   Last Name
                 </label>
@@ -85,7 +85,7 @@ const Page = () => {
             <div className="flex flex-col mt-3 mb-0">
               <label
                 htmlFor="email"
-                className="text-gray-700 text-sm lg:text-lg"
+                className="text-gray-500 text-sm lg:text-lg"
               >
                 Email
               </label>
@@ -102,7 +102,7 @@ const Page = () => {
             <div className="flex flex-col mt-3 mb-0">
               <label
                 htmlFor="password"
-                className="text-gray-700 text-sm lg:text-lg"
+                className="text-gray-500 text-sm lg:text-lg"
               >
                 Password
               </label>
@@ -120,7 +120,7 @@ const Page = () => {
             <div className="flex flex-col mt-3 mb-0">
               <label
                 htmlFor="confirmPassword"
-                className="text-gray-700 text-sm lg:text-lg"
+                className="text-gray-500 text-sm lg:text-lg"
               >
                 Confirm Password
               </label>
@@ -158,11 +158,11 @@ const Page = () => {
           </div>
 
           {/* Redirect */}
-          <p className="text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-gray-500">
             Already have an account?{" "}
             <Link
               href="/login"
-              className="font-medium text-gray-600 hover:text-emerald-950 transition-colors duration-200"
+              className="font-medium text-gray-500 hover:text-emerald-950 transition-colors duration-200"
             >
               Login
             </Link>
@@ -190,11 +190,11 @@ const Page = () => {
 
           {/* Stats */}
           <div className="flex gap-6 mt-6">
-            <div className="flex flex-col items-center text-gray-700 font-semibold p-6 bg-white/30 backdrop-blur-xl rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl animate-fade-in-up">
+            <div className="flex flex-col items-center text-gray-500 font-semibold p-6 bg-white/30 backdrop-blur-xl rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl animate-fade-in-up">
               <h1 className="text-2xl font-bold">10K+</h1>
               <p className="text-base">Active Users</p>
             </div>
-            <div className="flex flex-col items-center text-gray-700 font-semibold p-6 bg-white/30 backdrop-blur-xl rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl animate-fade-in-up delay-200">
+            <div className="flex flex-col items-center text-gray-500 font-semibold p-6 bg-white/30 backdrop-blur-xl rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl animate-fade-in-up delay-200">
               <h1 className="text-2xl font-bold">250+</h1>
               <p className="text-base">Active Sensors</p>
             </div>
