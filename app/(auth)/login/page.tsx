@@ -116,7 +116,7 @@ const Page = () => {
           <p className="mt-6 text-center text-sm text-gray-500">
             Don&apos;t have an account?{" "}
             <Link
-              href="/signup"
+              href="/register"
               className="font-medium text-gray-500 hover:text-emerald-950 transition-colors duration-200"
             >
               Create an account
