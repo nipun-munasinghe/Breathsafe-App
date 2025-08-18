@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import Button from "@/component/Button";
+import Button from "@/components/Button";
 import Link from "next/link";
 import { FaGoogle, FaFacebookF, FaApple } from "react-icons/fa";
 

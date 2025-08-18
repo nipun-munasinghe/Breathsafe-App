@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import Button from "@/component/Button";
+import Button from "@/components/Button";
 
 const Page = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -142,7 +142,7 @@ const Page = () => {
               </label>
             </div>
 
-            <Button onClick={() => {}} name="Register" />
+            <Button onClick={() => { }} name="Register" />
 
             {/* Error Message */}
             {errorMessage && (
@@ -161,7 +161,7 @@ const Page = () => {
           <p className="text-center text-sm text-gray-500">
             Already have an account?{" "}
             <Link
-              href="/login"
+              href="/signin"
               className="font-medium text-gray-500 hover:text-emerald-950 transition-colors duration-200"
             >
               Login
