@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, School, Factory, Building2, Users, Zap } from "lucide-react";
+import { Home, School, Factory, Building2, Zap } from "lucide-react";
 
 const useCases = [
   {
