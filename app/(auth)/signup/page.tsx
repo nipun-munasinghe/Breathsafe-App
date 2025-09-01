@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import { registerUser } from "../../../service/userApi";
 
@@ -198,7 +198,7 @@ const Page = () => {
               </label>
             </div>
 
-            <Button onClick={() => {}} name="Register" type="submit" />
+            <Button onClick={() => {}} name="Register" type="submit"/>
 
             {/* Error Message */}
             {errorMessage && (
