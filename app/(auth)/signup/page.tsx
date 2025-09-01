@@ -2,11 +2,20 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Button from "@/components/Button";
+import { registerUser } from "../../../service/userApi";
+
+interface User {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
 
 const Page = () => {
   const [errorMessage, setErrorMessage] = useState("");
+  const [userData, setUserData] = useState<User>({firstName: "", lastName: "", email: "", password: ""});
 
   const handlePasswordChecker = () => {
     const password = document.getElementById("password") as HTMLInputElement;
@@ -18,6 +27,25 @@ const Page = () => {
       setErrorMessage("");
     } else {
       setErrorMessage("Password does not match");
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+) => {
+    const { name, value } = e.target;
+    setUserData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleSubmission = async (e:React.FormEvent) => {
+    e.preventDefault();
+    try{
+      await registerUser(userData);
+      console.log(userData);
+
+    }catch(error){
+      console.error("Error registering user:", error);
     }
   };
 
@@ -46,7 +74,7 @@ const Page = () => {
               Create your account to get started
             </p>
           </div>
-          <form className="mt-4 space-y-5 animate-fade-in-up">
+          <form className="mt-4 space-y-5 animate-fade-in-up" onSubmit={handleSubmission}>
             {/* First & Last Name */}
             <div className="flex flex-col sm:flex-row gap-4 mb-0">
               <div className="flex flex-col flex-1">
@@ -59,7 +87,10 @@ const Page = () => {
                 <input
                   type="text"
                   id="firstName"
+                  name="firstName"
                   placeholder="First Name"
+                  value={userData.firstName}
+                  onChange={handleChange}
                   className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                   required
                 />
@@ -74,7 +105,10 @@ const Page = () => {
                 <input
                   type="text"
                   id="lastName"
+                  name="lastName"
                   placeholder="Last Name"
+                  value={userData.lastName}
+                  onChange={handleChange}
                   className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                   required
                 />
@@ -92,7 +126,10 @@ const Page = () => {
               <input
                 type="email"
                 id="email"
+                name="email"
                 placeholder="Enter your email"
+                value={userData.email}
+                onChange={handleChange}
                 className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                 required
               />
@@ -109,7 +146,10 @@ const Page = () => {
               <input
                 type="password"
                 id="password"
+                name="password"
                 placeholder="Enter your password"
+                value={userData.password}
+                onChange={handleChange}
                 onKeyUp={handlePasswordChecker}
                 className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                 required
@@ -142,7 +182,7 @@ const Page = () => {
               </label>
             </div>
 
-            <Button onClick={() => { }} name="Register" />
+            <Button onClick={() => {}} name="Register" />
 
             {/* Error Message */}
             {errorMessage && (
