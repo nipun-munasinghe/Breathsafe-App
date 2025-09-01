@@ -7,15 +7,17 @@ import Button from "@/components/Button";
 import { registerUser } from "../../../service/userApi";
 
 interface User {
+  userName: string;
   firstName: string;
   lastName: string;
   email: string;
   password: string;
+  role: string;
 }
 
 const Page = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [userData, setUserData] = useState<User>({firstName: "", lastName: "", email: "", password: ""});
+  const [userData, setUserData] = useState<User>({userName: "", firstName: "", lastName: "", email: "", password: "", role: "USER"});
 
   const handlePasswordChecker = () => {
     const password = document.getElementById("password") as HTMLInputElement;
@@ -30,24 +32,17 @@ const Page = () => {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-) => {
-    const { name, value } = e.target;
-    setUserData((prevData) => ({ ...prevData, [name]: value }));
-  };
+  const handleSubmission = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    await registerUser(userData);
+    console.log("Registered:", userData);
+  } catch (error) {
+    console.error("Error registering user:", error);
+    console.log("Registered:", userData);
+  }
+};
 
-  const handleSubmission = async (e:React.FormEvent) => {
-    e.preventDefault();
-    try{
-      await registerUser(userData);
-      console.log(userData);
-
-    }catch(error){
-      console.error("Error registering user:", error);
-    }
-  };
 
   useEffect(() => {
     handlePasswordChecker();
@@ -74,7 +69,7 @@ const Page = () => {
               Create your account to get started
             </p>
           </div>
-          <form className="mt-4 space-y-5 animate-fade-in-up" onSubmit={handleSubmission}>
+          <form className="mt-4 space-y-5 animate-fade-in-up" onSubmit={handleSubmission} action="POST">
             {/* First & Last Name */}
             <div className="flex flex-col sm:flex-row gap-4 mb-0">
               <div className="flex flex-col flex-1">
@@ -90,7 +85,7 @@ const Page = () => {
                   name="firstName"
                   placeholder="First Name"
                   value={userData.firstName}
-                  onChange={handleChange}
+                  onChange={(e) => setUserData({ ...userData, firstName: e.target.value })}
                   className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                   required
                 />
@@ -108,12 +103,33 @@ const Page = () => {
                   name="lastName"
                   placeholder="Last Name"
                   value={userData.lastName}
-                  onChange={handleChange}
+                  onChange={(e) => setUserData({ ...userData, lastName: e.target.value })}
                   className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                   required
                 />
               </div>
             </div>
+
+            {/* Username */}
+            <div className="flex flex-col mt-3 mb-0">
+              <label
+                htmlFor="email"
+                className="text-gray-500 text-sm lg:text-lg"
+              >
+                Username
+              </label>
+              <input
+                type="text"
+                id="userName"
+                name="userName"
+                placeholder="Enter your Username"
+                value={userData.userName}
+                onChange={(e) => setUserData({ ...userData, userName: e.target.value })}
+                className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
+                required
+              />
+            </div>
+
 
             {/* Email */}
             <div className="flex flex-col mt-3 mb-0">
@@ -129,7 +145,7 @@ const Page = () => {
                 name="email"
                 placeholder="Enter your email"
                 value={userData.email}
-                onChange={handleChange}
+                onChange={(e) => setUserData({ ...userData, email: e.target.value })}
                 className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                 required
               />
@@ -149,7 +165,7 @@ const Page = () => {
                 name="password"
                 placeholder="Enter your password"
                 value={userData.password}
-                onChange={handleChange}
+                onChange={(e) => setUserData({ ...userData, password: e.target.value })}
                 onKeyUp={handlePasswordChecker}
                 className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                 required
@@ -182,7 +198,7 @@ const Page = () => {
               </label>
             </div>
 
-            <Button onClick={() => {}} name="Register" />
+            <Button onClick={() => {}} name="Register" type="submit" />
 
             {/* Error Message */}
             {errorMessage && (
