@@ -1,10 +1,20 @@
 
-import Link from "next/link";
+import CallToActionSection from "@/components/home/CallToActionSection";
+import FAQSection from "@/components/home/FAQSection";
+import FeaturesSection from "@/components/home/FeaturesSection";
+import HeroSection from "@/components/home/HeroSection";
+import HowItWorksSection from "@/components/home/HowItWorksSection";
+import UseCasesSection from "@/components/home/UseCasesSection";
 
 export default function Home() {
   return (
-    <Link href="/signin">
-      Go to Sign In
-    </Link>
+    <>
+      <HeroSection />
+      <FeaturesSection />
+      <CallToActionSection />
+      <HowItWorksSection />
+      <UseCasesSection />
+      <FAQSection />
+    </>
   );
 }
