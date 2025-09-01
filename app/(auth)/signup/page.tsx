@@ -7,7 +7,7 @@ import Button from "@/components/Button";
 import { registerUser } from "../../../service/userApi";
 
 interface User {
-  userName: string;
+  username: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -17,7 +17,7 @@ interface User {
 
 const Page = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [userData, setUserData] = useState<User>({userName: "", firstName: "", lastName: "", email: "", password: "", role: "USER"});
+  const [userData, setUserData] = useState<User>({username: "", firstName: "", lastName: "", email: "", password: "", role: "USER"});
 
   const handlePasswordChecker = () => {
     const password = document.getElementById("password") as HTMLInputElement;
@@ -123,8 +123,8 @@ const Page = () => {
                 id="userName"
                 name="userName"
                 placeholder="Enter your Username"
-                value={userData.userName}
-                onChange={(e) => setUserData({ ...userData, userName: e.target.value })}
+                value={userData.username}
+                onChange={(e) => setUserData({ ...userData, username: e.target.value })}
                 className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                 required
               />
