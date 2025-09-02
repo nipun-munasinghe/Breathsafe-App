@@ -96,7 +96,7 @@ function AuthButtons({
       )}
     >
       <Link
-        href="/auth/login"
+        href="/signin"
         onClick={onItemClick}
         className={cx(
           baseLink,
@@ -108,7 +108,7 @@ function AuthButtons({
         Sign in
       </Link>
       <Link
-        href="/auth/register"
+        href="/signup"
         onClick={onItemClick}
         className={cx(
           baseLink,
