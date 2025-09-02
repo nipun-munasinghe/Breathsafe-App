@@ -4,20 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Button from "@/components/Button";
-import { registerUser } from "../../../service/userApi";
-
-interface User {
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  role: string;
-}
+import { registerUser } from "@/service/userApi";
+import { UserData } from "@/types/user/types";
 
 const Page = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [userData, setUserData] = useState<User>({username: "", firstName: "", lastName: "", email: "", password: "", role: "USER"});
+  const [userData, setUserData] = useState<UserData>({username: "", firstName: "", lastName: "", email: "", password: "", role: "USER"});
 
   const handlePasswordChecker = () => {
     const password = document.getElementById("password") as HTMLInputElement;
@@ -36,10 +28,8 @@ const Page = () => {
   e.preventDefault();
   try {
     await registerUser(userData);
-    console.log("Registered:", userData);
   } catch (error) {
-    console.error("Error registering user:", error);
-    console.log("Registered:", userData);
+      console.error("Error registering user:", error);
   }
 };
 

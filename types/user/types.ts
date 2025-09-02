@@ -1,6 +1,6 @@
 
 
-interface createUserData{
+export type UserData = {
   username: string;
   firstName: string;
   lastName: string;
