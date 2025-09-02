@@ -1,11 +1,48 @@
 "use client";
 import React from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Button from "@/components/Button";
 import Link from "next/link";
 import { FaGoogle, FaFacebookF, FaApple } from "react-icons/fa";
+import { userValidation } from "@/service/userApi";
+
+interface FormData {
+  username: string;
+  password: string;
+}
 
 const Page = () => {
+
+  const [formData, setFormData] = useState<FormData>({
+    username: "",
+    password: "",
+  });
+  const router = useRouter();
+  const [message, setMessage] = useState<string>("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try{
+      const user = await userValidation(formData);
+      if(user){
+        setMessage("Login successful!");
+        console.log(user);
+        console.log(message);
+        router.push("/home");
+      } else {
+        setMessage("Invalid email or password.");
+        console.log(message);
+      }
+    } catch (error) {
+      setMessage("An error occurred. Please try again." + error);
+    }
+  }
+
+
+
   return (
     <div className="flex justify-center bg-emerald-950 min-h-screen py-12 px-4">
       {/* Main Container */}
@@ -48,16 +85,19 @@ const Page = () => {
           </p>
 
           {/* Sign-in Form */}
-          <form action="post" className="animate-fade-in-up mt-6 flex flex-col gap-4">
+          <form action="post" className="animate-fade-in-up mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col">
               <label htmlFor="email" className="font-normal text-sm lg:text-lg mb-1">
                 Email
               </label>
               <input
-                type="email"
-                id="email"
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 className="border p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition duration-300"
-                placeholder="Enter your email"
+                placeholder="Enter your username"
               />
             </div>
 
@@ -68,6 +108,9 @@ const Page = () => {
               <input
                 type="password"
                 id="password"
+                name="password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="border p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition duration-300"
                 placeholder="Enter your password"
               />
@@ -88,7 +131,7 @@ const Page = () => {
               </a>
             </div>
 
-            <Button onClick={() => {}} name="Sign In" />
+            <Button onClick={() => {}} name="Sign In" type="submit" />
           </form>
 
           {/* Divider */}

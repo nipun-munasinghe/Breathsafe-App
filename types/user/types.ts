@@ -1,3 +1,4 @@
+import { userValidation } from "@/service/userApi";
 
 
 export type UserData = {
@@ -7,4 +8,9 @@ export type UserData = {
   email: string;
   password: string;
   role: string;
+}
+
+export type userLogin = {
+  username: string;
+  password: string;
 }
