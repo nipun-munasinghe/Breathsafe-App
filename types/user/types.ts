@@ -1,6 +1,3 @@
-import { userValidation } from "@/service/userApi";
-
-
 export type UserData = {
   username: string;
   firstName: string;
@@ -13,4 +10,13 @@ export type UserData = {
 export type userLogin = {
   username: string;
   password: string;
+}
+
+export type loggedInUser = {
+  userId: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
 }

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import Button from "@/components/Button";
+import Button from "@/components/common/Button";
 import { registerUser } from "@/service/userApi";
 import { UserData } from "@/types/user/types";
 

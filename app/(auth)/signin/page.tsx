@@ -3,10 +3,11 @@ import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Button from "@/components/Button";
+import Button from "@/components/common/Button";
 import Link from "next/link";
 import { FaGoogle, FaFacebookF, FaApple } from "react-icons/fa";
-import { userValidation } from "@/service/userApi";
+import { loginUser } from "@/service/userApi";
+import { useAuthStore } from "@/store/authStore"
 
 interface FormData {
   username: string;
@@ -14,6 +15,8 @@ interface FormData {
 }
 
 const Page = () => {
+
+  const login = useAuthStore((s) => s.login);
 
   const [formData, setFormData] = useState<FormData>({
     username: "",
@@ -26,8 +29,10 @@ const Page = () => {
     e.preventDefault();
 
     try{
-      const user = await userValidation(formData);
+      const user = await loginUser(formData);
       if(user){
+        const { token, user } = user.data;
+        login(token, user);
         setMessage("Login successful!");
         console.log(user);
         console.log(message);
