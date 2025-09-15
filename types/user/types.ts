@@ -20,3 +20,7 @@ export type loggedInUser = {
   email: string;
   role: string;
 }
+
+export type LoginResponse = {
+    token: string;
+} & loggedInUser;

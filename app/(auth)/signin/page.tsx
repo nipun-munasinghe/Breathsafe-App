@@ -28,22 +28,24 @@ const Page = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try{
-      const user = await loginUser(formData);
-      if(user){
-        const { token, user } = user.data;
-        login(token, user);
-        setMessage("Login successful!");
-        console.log(user);
-        console.log(message);
-        router.push("/home");
-      } else {
-        setMessage("Invalid email or password.");
-        console.log(message);
+      try {
+          const response = await loginUser(formData);
+
+          if (response) {
+              const { token, ...userData } = response;
+              login(token, userData);
+              setMessage("Login successful!");
+              console.log(userData);
+              console.log(message);
+              router.push("/");
+          } else {
+              setMessage("Invalid email or password.");
+              console.log(message);
+          }
+      } catch (err) {
+          setMessage("Something went wrong.");
+          console.error(err);
       }
-    } catch (error) {
-      setMessage("An error occurred. Please try again." + error);
-    }
   }
 
 
