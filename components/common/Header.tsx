@@ -29,10 +29,8 @@ function fullName(u: loggedInUser | null) {
   const name = [u.firstName, u.lastName].filter(Boolean).join(" ").trim();
   return name || u.username || "User";
 }
-function avatarFromUser(u: loggedInUser | null) {
-  // TODO: Implement logic to extract avatar from user object when available.
-  // Example: return u?.avatar || u?.avatarUrl || null;
-  return u && (u.avatar || u.avatarUrl || null);
+function avatarFromUser(_u: loggedInUser | null) {
+  return null;
 }
 
 function NotificationsButton({ solid }: { solid: boolean }) {
@@ -265,7 +263,7 @@ export default function Header() {
 
   React.useEffect(() => {
     initialize();
-  }, [initialize]);
+  }, []);
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
