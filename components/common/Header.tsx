@@ -30,7 +30,7 @@ function fullName(u: loggedInUser | null) {
   return name || u.username || "User";
 }
 
-/** A loose structural shape for common avatar fields found in various auth providers. */
+/** Common avatar fields we might get from different auth providers */
 type Avatarish = {
   avatarUrl?: string | null;
   image?: string | null;
@@ -38,10 +38,10 @@ type Avatarish = {
   photoURL?: string | null;
 };
 
-/** Attempts to derive an avatar URL from the user object, or returns null. */
+/** Attempts to derive an avatar URL from the user, or returns null. */
 function avatarFromUser(u: loggedInUser | null): string | null {
   if (!u) return null;
-  const v = u as unknown as Avatarish; // avoid `any` while allowing structural access
+  const v = u as unknown as Avatarish;
   return v.avatarUrl ?? v.image ?? v.avatar ?? v.photoURL ?? null;
 }
 
@@ -268,16 +268,11 @@ export default function Header() {
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const isInitialized = useAuthStore((s) => s.isInitialized);
   const logout = useAuthStore((s) => s.logout);
-  const initialize = useAuthStore((s) => s.initialize);
 
   const [open, setOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
 
-  // Include `initialize` in deps to satisfy react-hooks/exhaustive-deps
-  React.useEffect(() => {
-    initialize();
-  }, [initialize]);
-
+  // Scroll shadow / solid header
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -285,12 +280,22 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const solid = scrolled;
-
+  // Sign out helper + global event hook
   const handleSignOut = React.useCallback(() => {
     logout();
     router.push("/signin");
   }, [logout, router]);
+
+  const onAppSignOut = React.useCallback(() => {
+    handleSignOut();
+  }, [handleSignOut]);
+
+  React.useEffect(() => {
+    window.addEventListener("app:signout", onAppSignOut);
+    return () => window.removeEventListener("app:signout", onAppSignOut);
+  }, [onAppSignOut]);
+
+  const solid = scrolled;
 
   return (
     <header
