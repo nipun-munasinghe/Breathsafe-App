@@ -263,7 +263,7 @@ export default function Header() {
 
   React.useEffect(() => {
     initialize();
-  }, []);
+  }, [initialize]);
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
