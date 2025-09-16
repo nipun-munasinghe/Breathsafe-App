@@ -29,8 +29,20 @@ function fullName(u: loggedInUser | null) {
   const name = [u.firstName, u.lastName].filter(Boolean).join(" ").trim();
   return name || u.username || "User";
 }
-function avatarFromUser(_u: loggedInUser | null) {
-  return null;
+
+/** A loose structural shape for common avatar fields found in various auth providers. */
+type Avatarish = {
+  avatarUrl?: string | null;
+  image?: string | null;
+  avatar?: string | null;
+  photoURL?: string | null;
+};
+
+/** Attempts to derive an avatar URL from the user object, or returns null. */
+function avatarFromUser(u: loggedInUser | null): string | null {
+  if (!u) return null;
+  const v = u as unknown as Avatarish; // avoid `any` while allowing structural access
+  return v.avatarUrl ?? v.image ?? v.avatar ?? v.photoURL ?? null;
 }
 
 function NotificationsButton({ solid }: { solid: boolean }) {
@@ -261,9 +273,10 @@ export default function Header() {
   const [open, setOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
 
+  // Include `initialize` in deps to satisfy react-hooks/exhaustive-deps
   React.useEffect(() => {
     initialize();
-  }, []);
+  }, [initialize]);
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
