@@ -45,6 +45,7 @@ export default function CreateRequest() {
                 ToastUtils.success("request Submitted.");
             } catch (error) {
                 ToastUtils.error("Submission failed. Try again!");
+                console.log(error);
             } finally {
                 setIsSubmitting(false);
             }
@@ -131,7 +132,7 @@ export default function CreateRequest() {
                                         <div className="flex-1">
                                             <h4 className="font-semibold text-slate-900 mb-1">Select Location</h4>
                                             <p className="text-sm text-gray-600 leading-relaxed">Choose the exact spot
-                                                where you'd like a sensor installed</p>
+                                                where you&apos;d like a sensor installed</p>
                                         </div>
                                     </div>
 
