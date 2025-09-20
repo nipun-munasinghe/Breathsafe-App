@@ -12,10 +12,11 @@ export type userLogin = {
   password: string;
 }
 
-export type apiResponse = {
+export type apiResponse<T = any> = {
     success: boolean;
-    data: any;
-}
+    data?: T;
+    error?: string;
+};
 
 export type loggedInUser = {
   userId: string;

@@ -6,12 +6,12 @@ export const registerUser = async (userData: UserData) => {
     try {
        await publicAxios.post('/auth/register', userData);
        ToastUtils.success("Registration successful!");
-    } catch (error: unknown) {
+    } catch (error: any) {
         ToastUtils.error("Registration failed. Please try again." + error);
     }
 };
 
-export const loginUser = async (user: userLogin): Promise<apiResponse | null> => {
+export const loginUser = async (user: userLogin): Promise<apiResponse<LoginResponse> | null> => {
     try {
         const response = await publicAxios.post<LoginResponse>("/auth/login", user);
         ToastUtils.success("Login successful!");
