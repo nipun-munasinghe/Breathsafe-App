@@ -16,7 +16,7 @@ export const loginUser = async (user: userLogin): Promise<apiResponse | null> =>
         const response = await publicAxios.post<LoginResponse>("/auth/login", user);
         ToastUtils.success("Login successful!");
         return { success: true, data: response.data };
-    } catch (error: unknown) {
+    } catch (error: any) {
         ToastUtils.error("Login failed. " + error.response.data.message);
         return { success: false, error: error.response.data.message };
     }
