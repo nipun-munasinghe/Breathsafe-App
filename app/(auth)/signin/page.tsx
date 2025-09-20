@@ -29,14 +29,11 @@ const Page = () => {
     e.preventDefault();
 
       try {
-          const response = await loginUser(formData);
+          const result = await loginUser(formData);
 
-          if (response) {
-              const { token, ...userData } = response;
+          if (result?.success && result.data) {
+              const { token, ...userData } = result.data;
               login(token, userData);
-              setMessage("Login successful!");
-              console.log(userData);
-              console.log(message);
               router.push("/");
           } else {
               setMessage("Invalid email or password.");
