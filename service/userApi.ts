@@ -1,6 +1,7 @@
-import {apiResponse, LoginResponse, UserData, userLogin} from "@/types/user/types";
+import {LoginResponse, UserData, userLogin} from "@/types/user/types";
 import ToastUtils from "@/utils/toastUtils";
 import publicAxios from "@/lib/publicAxios";
+import {apiResponse} from "@/types/common";
 
 export const registerUser = async (userData: UserData) => {
     try {

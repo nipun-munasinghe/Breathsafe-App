@@ -12,12 +12,6 @@ export type userLogin = {
   password: string;
 }
 
-export type apiResponse<T = any> = {
-    success: boolean;
-    data?: T;
-    error?: string;
-};
-
 export type loggedInUser = {
   userId: string;
   username: string;
