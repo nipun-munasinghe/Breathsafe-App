@@ -15,7 +15,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/sensors", label: "Sensors" },
   { href: "/analytics", label: "Analytics" },
-  { href: "/support", label: "Support" },
+  { href: "/create-request", label: "Request Sensor" },
 ];
 
 function cx(...classes: Array<string | false | null | undefined>) {
@@ -300,7 +300,7 @@ export default function Header() {
   return (
     <header
       className={cx(
-        "fixed inset-x-0 top-0 z-50 w-full transition-colors",
+        "fixed inset-x-0 top-0 z-2000 w-full transition-colors",
         solid
           ? "bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 shadow-xl"
           : "bg-transparent"
