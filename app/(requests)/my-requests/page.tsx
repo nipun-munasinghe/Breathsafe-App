@@ -7,10 +7,10 @@ import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import {ProtectedRoute} from "@/components/common/protectedRoute";
 import {CommunityRequest} from "@/types/request";
-import {RequestCard} from "@/components/communityRequests/RequestCard";
-import {FilterBar} from "@/components/communityRequests/FilterBar";
+import {RequestCard} from "@/components/requests/RequestCard";
+import {FilterBar} from "@/components/requests/FilterBar";
 import {getMyRequests} from "@/service/requestApi";
-import {ViewRequestModal} from "@/components/communityRequests/ViewRequestModel";
+import {ViewRequestModal} from "@/components/requests/ViewRequestModel";
 
 export default function MyRequests() {
     const router = useRouter();

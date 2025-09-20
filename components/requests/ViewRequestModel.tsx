@@ -10,8 +10,9 @@ import {
     MessageSquare,
     Radar, User, X
 } from "lucide-react";
-import {StatusBadge} from "@/components/communityRequests/StatusBadge";
+import {StatusBadge} from "@/components/requests/StatusBadge";
 import React from "react";
+import MapSelector from "@/components/requests/MapSelector";
 
 export const ViewRequestModal: React.FC<{
     request: CommunityRequest | null;
@@ -112,11 +113,12 @@ export const ViewRequestModal: React.FC<{
 
                         {/* Mini Map Placeholder */}
                         <div className="mt-4 bg-gradient-to-br from-green-100 to-orange-100 rounded-lg h-48 flex items-center justify-center border-2 border-dashed border-gray-300">
-                            <div className="text-center">
-                                <MapPin className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                <p className="text-gray-500 font-medium">Map Preview</p>
-                                <p className="text-gray-400 text-sm">Click coordinates to view in maps</p>
-                            </div>
+                            <MapSelector
+                                onLocationSelect={() => {}}
+                                selectedLat={request.latitude || undefined}
+                                selectedLng={request.longitude || undefined}
+                                className="w-full h-full"
+                            />
                         </div>
                     </div>
 

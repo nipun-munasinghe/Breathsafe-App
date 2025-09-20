@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {CommunityRequest} from "@/types/request";
 import {Calendar, Edit3, Eye, MapPin, MessageCircle, MessageSquare, Radar, Trash2} from "lucide-react";
-import {StatusBadge} from "@/components/communityRequests/StatusBadge"
+import {StatusBadge} from "@/components/requests/StatusBadge"
 import {deleteRequest} from "@/service/requestApi";
 import ToastUtils from "@/utils/toastUtils";
 

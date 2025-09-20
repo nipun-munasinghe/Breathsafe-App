@@ -10,8 +10,9 @@ import {ProtectedRoute} from "@/components/common/protectedRoute";
 import {CommunityRequestData, validationSchema} from "@/types/request";
 import {createRequest} from "@/service/requestApi";
 import ToastUtils from "@/utils/toastUtils";
+import {useRouter} from "next/navigation";
 
-const MapSelector = dynamic(() => import('@/components/communityRequests/MapSelector'), {
+const MapSelector = dynamic(() => import('@/components/requests/MapSelector'), {
     ssr: false,
     loading: () => (
         <div
@@ -27,6 +28,7 @@ const MapSelector = dynamic(() => import('@/components/communityRequests/MapSele
 
 export default function CreateRequest() {
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const router = useRouter();
 
     const formik = useFormik<CommunityRequestData>({
         initialValues: {
@@ -41,8 +43,9 @@ export default function CreateRequest() {
 
             try {
                 await createRequest(values);
-                await new Promise(resolve => setTimeout(resolve, 500)); // Mock delay
                 ToastUtils.success("request Submitted.");
+                await new Promise(resolve => setTimeout(resolve, 500));
+                router.replace('/my-requests');
             } catch (error) {
                 ToastUtils.error("Submission failed. Try again!");
                 console.log(error);
