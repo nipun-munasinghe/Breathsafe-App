@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Menu, X, Bell, ChevronDown, LogOut, UserRound, Settings } from "lucide-react";
+import {Menu, X, Bell, ChevronDown, LogOut, UserRound, Users} from "lucide-react";
 
 import { useAuthStore } from "@/store/authStore";
 import type { loggedInUser } from "@/types/user/types";
@@ -241,9 +241,9 @@ function UserMenu({
             <UserRound className="h-4 w-4" />
             Profile
           </MenuLink>
-          <MenuLink href="/settings" onSelect={() => setOpen(false)}>
-            <Settings className="h-4 w-4" />
-            Settings
+          <MenuLink href="/my-requests" onSelect={() => setOpen(false)}>
+            <Users className="h-4 w-4" />
+              My Requests
           </MenuLink>
           <MenuButton
             onClick={() => {
@@ -421,9 +421,9 @@ export default function Header() {
                   <UserRound className="h-4 w-4" />
                   Profile
                 </MenuLink>
-                <MenuLink href="/settings" onSelect={() => setOpen(false)}>
-                  <Settings className="h-4 w-4" />
-                  Settings
+                <MenuLink href="/my-requests" onSelect={() => setOpen(false)}>
+                  <Users className="h-4 w-4" />
+                  My Requests
                 </MenuLink>
                 <MenuButton
                   onClick={() => {

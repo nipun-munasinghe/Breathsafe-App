@@ -24,3 +24,23 @@ export const validationSchema = Yup.object({
         .min(30, 'Justification must be at least 30 characters')
         .max(150, 'Justification cannot exceed 150 characters')
 });
+
+export interface CommunityRequest {
+    id: number;
+    requestedLocation: string;
+    latitude: number;
+    longitude: number;
+    justification: string;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    adminComments: string | null;
+    approvedAt: string | null;
+    rejectedAt: string | null;
+    createdAt: string;
+    updatedAt: string;
+    requesterId: number;
+    requesterName: string;
+    approvedById: number | null;
+    approvedByName: string | null;
+    sensorId: number | null;
+    sensorName: string | null;
+}
