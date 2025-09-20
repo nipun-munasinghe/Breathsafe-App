@@ -12,6 +12,11 @@ export type userLogin = {
   password: string;
 }
 
+export type apiResponse = {
+    success: boolean;
+    data: any;
+}
+
 export type loggedInUser = {
   userId: string;
   username: string;
