@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Menu, X, Bell, ChevronDown, LogOut, UserRound, Settings } from "lucide-react";
+import {Menu, X, Bell, ChevronDown, LogOut, UserRound, Users} from "lucide-react";
 
 import { useAuthStore } from "@/store/authStore";
 import type { loggedInUser } from "@/types/user/types";
@@ -15,7 +15,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/sensors", label: "Sensors" },
   { href: "/analytics", label: "Analytics" },
-  { href: "/support", label: "Support" },
+  { href: "/create-request", label: "Request Sensor" },
 ];
 
 function cx(...classes: Array<string | false | null | undefined>) {
@@ -241,9 +241,9 @@ function UserMenu({
             <UserRound className="h-4 w-4" />
             Profile
           </MenuLink>
-          <MenuLink href="/settings" onSelect={() => setOpen(false)}>
-            <Settings className="h-4 w-4" />
-            Settings
+          <MenuLink href="/my-requests" onSelect={() => setOpen(false)}>
+            <Users className="h-4 w-4" />
+              My Requests
           </MenuLink>
           <MenuButton
             onClick={() => {
@@ -300,7 +300,7 @@ export default function Header() {
   return (
     <header
       className={cx(
-        "fixed inset-x-0 top-0 z-50 w-full transition-colors",
+        "fixed inset-x-0 top-0 z-2000 w-full transition-colors",
         solid
           ? "bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 shadow-xl"
           : "bg-transparent"
@@ -421,9 +421,9 @@ export default function Header() {
                   <UserRound className="h-4 w-4" />
                   Profile
                 </MenuLink>
-                <MenuLink href="/settings" onSelect={() => setOpen(false)}>
-                  <Settings className="h-4 w-4" />
-                  Settings
+                <MenuLink href="/my-requests" onSelect={() => setOpen(false)}>
+                  <Users className="h-4 w-4" />
+                  My Requests
                 </MenuLink>
                 <MenuButton
                   onClick={() => {
