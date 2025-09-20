@@ -31,7 +31,7 @@ const Page = () => {
       try {
           const result = await loginUser(formData);
 
-          if (result?.success) {
+          if (result?.success && result.data) {
               const { token, ...userData } = result.data;
               login(token, userData);
               router.push("/");
