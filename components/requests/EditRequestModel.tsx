@@ -67,7 +67,7 @@ export const EditRequestModal: React.FC<{
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-5000">
             <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[95vh] overflow-y-auto">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 rounded-t-2xl">
+                <div className="bg-gradient-to-r from-lime-600 to-emerald-600 p-6 rounded-t-2xl">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center text-white">
                             <Edit3 className="w-6 h-6 mr-3" />
@@ -86,9 +86,9 @@ export const EditRequestModal: React.FC<{
                     </div>
 
                     {hasChanges && (
-                        <div className="mt-4 p-3 bg-yellow-100 bg-opacity-20 border border-yellow-300 border-opacity-30 rounded-lg">
-                            <div className="flex items-center text-yellow-100 text-sm">
-                                <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+                        <div className="mt-4 p-3 bg-orange-500/90 border border-orange-600 rounded-lg shadow-lg">
+                            <div className="flex items-center text-white font-medium text-sm">
+                                <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0 text-white" />
                                 You have unsaved changes
                             </div>
                         </div>
@@ -278,7 +278,7 @@ export const EditRequestModal: React.FC<{
                                     formik.handleSubmit();
                                 }}
                                 disabled={!hasChanges || !formik.isValid || isSubmitting}
-                                className="px-6 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                                className="px-6 py-2 bg-lime-600 text-white hover:bg-emerald-950 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                             >
                                 {isSubmitting ? (
                                     <>
