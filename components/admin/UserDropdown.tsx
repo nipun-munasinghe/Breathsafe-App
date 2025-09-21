@@ -31,7 +31,11 @@ const UserDropdown: React.FC = () => {
                 ref={btnDropdownRef}
                 onClick={(e) => {
                     e.preventDefault();
-                    dropdownPopoverShow ? closeDropdownPopover() : openDropdownPopover();
+                    if (dropdownPopoverShow) {
+                        closeDropdownPopover();
+                    } else {
+                        openDropdownPopover();
+                    }
                 }}
             >
                 <div className="items-center flex">
