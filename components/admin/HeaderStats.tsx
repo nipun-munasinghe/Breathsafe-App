@@ -22,8 +22,8 @@ const HeaderStats: React.FC = () => {
                                     statPercent="3.48"
                                     statPercentColor="text-emerald-500"
                                     statDescripiron="Since last month"
-                                    statIconName="far fa-chart-bar"
-                                    statIconColor="bg-red-500"
+                                    statIconName="BarChart3"
+                                    statIconColor="bg-emerald-950"
                                 />
                             </div>
 
@@ -35,21 +35,21 @@ const HeaderStats: React.FC = () => {
                                     statPercent="3.48"
                                     statPercentColor="text-red-500"
                                     statDescripiron="Since last week"
-                                    statIconName="fas fa-chart-pie"
+                                    statIconName="Users"
                                     statIconColor="bg-orange-500"
                                 />
                             </div>
 
                             <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                                 <CardStats
-                                    statSubtitle="SALES"
+                                    statSubtitle="SENSORS"
                                     statTitle="924"
                                     statArrow="down"
                                     statPercent="1.10"
                                     statPercentColor="text-orange-500"
                                     statDescripiron="Since yesterday"
-                                    statIconName="fas fa-users"
-                                    statIconColor="bg-pink-500"
+                                    statIconName="Activity"
+                                    statIconColor="bg-gray-500"
                                 />
                             </div>
 
@@ -61,8 +61,8 @@ const HeaderStats: React.FC = () => {
                                     statPercent="12"
                                     statPercentColor="text-emerald-500"
                                     statDescripiron="Since last month"
-                                    statIconName="fas fa-percent"
-                                    statIconColor="bg-lightBlue-500"
+                                    statIconName="Gauge"
+                                    statIconColor="bg-lime-600"
                                 />
                             </div>
                         </div>

@@ -69,7 +69,7 @@ const Sidebar: React.FC = () => {
                                         className="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
                                         href="/"
                                     >
-                                        Notus React
+                                        BreathSafe
                                     </Link>
                                 </div>
                                 <div className="w-6/12 flex justify-end">
@@ -100,7 +100,7 @@ const Sidebar: React.FC = () => {
 
                         {/* Admin Layout Pages */}
                         <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-                            Admin Layout Pages
+                            Activity Overview
                         </h6>
                         <ul className="md:flex-col md:min-w-full flex flex-col list-none">
                             <li className="items-center">
@@ -120,46 +120,6 @@ const Sidebar: React.FC = () => {
                                         }`}
                                     ></i>{" "}
                                     Dashboard
-                                </Link>
-                            </li>
-
-                            <li className="items-center">
-                                <Link
-                                    className={`text-xs uppercase py-3 font-bold block ${
-                                        isActive("/admin/settings")
-                                            ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500"
-                                    }`}
-                                    href="/admin/settings"
-                                >
-                                    <i
-                                        className={`fas fa-tools mr-2 text-sm ${
-                                            isActive("/admin/settings")
-                                                ? "opacity-75"
-                                                : "text-blueGray-300"
-                                        }`}
-                                    ></i>{" "}
-                                    Settings
-                                </Link>
-                            </li>
-
-                            <li className="items-center">
-                                <Link
-                                    className={`text-xs uppercase py-3 font-bold block ${
-                                        isActive("/admin/tables")
-                                            ? "text-lightBlue-500 hover:text-lightBlue-600"
-                                            : "text-blueGray-700 hover:text-blueGray-500"
-                                    }`}
-                                    href="/admin/tables"
-                                >
-                                    <i
-                                        className={`fas fa-table mr-2 text-sm ${
-                                            isActive("/admin/tables")
-                                                ? "opacity-75"
-                                                : "text-blueGray-300"
-                                        }`}
-                                    ></i>{" "}
-                                    Tables
                                 </Link>
                             </li>
 
@@ -189,26 +149,26 @@ const Sidebar: React.FC = () => {
 
                         {/* Auth Layout Pages */}
                         <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-                            Auth Layout Pages
+                            Request Management
                         </h6>
                         <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
                             <li className="items-center">
                                 <Link
                                     className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                                    href="/auth/login"
+                                    href="/admin/new-requests"
                                 >
                                     <i className="fas fa-fingerprint text-blueGray-400 mr-2 text-sm"></i>{" "}
-                                    Login
+                                    New Requests
                                 </Link>
                             </li>
 
                             <li className="items-center">
                                 <Link
                                     className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                                    href="/auth/register"
+                                    href="/"
                                 >
                                     <i className="fas fa-clipboard-list text-blueGray-300 mr-2 text-sm"></i>{" "}
-                                    Register
+                                    Approved Requests
                                 </Link>
                             </li>
                         </ul>
@@ -218,7 +178,7 @@ const Sidebar: React.FC = () => {
 
                         {/* No Layout Pages */}
                         <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
-                            No Layout Pages
+                            Sensor Management
                         </h6>
                         <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
                             <li className="items-center">
@@ -227,7 +187,7 @@ const Sidebar: React.FC = () => {
                                     href="/landing"
                                 >
                                     <i className="fas fa-newspaper text-blueGray-400 mr-2 text-sm"></i>{" "}
-                                    Landing Page
+                                    Create Sensor
                                 </Link>
                             </li>
 
@@ -237,7 +197,7 @@ const Sidebar: React.FC = () => {
                                     href="/profile"
                                 >
                                     <i className="fas fa-user-circle text-blueGray-400 mr-2 text-sm"></i>{" "}
-                                    Profile Page
+                                    Sensor List
                                 </Link>
                             </li>
                         </ul>
