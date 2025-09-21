@@ -21,7 +21,7 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
 
         if (!isLoggedIn) {
             console.log('not logged in');
-            router.replace('/login');
+            router.replace('/signin');
             return;
         }
 
