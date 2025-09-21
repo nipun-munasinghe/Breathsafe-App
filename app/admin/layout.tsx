@@ -15,7 +15,7 @@ export default function AdminLayout({
     return (
         <>
             <Sidebar />
-            <div className="relative md:ml-64 bg-blueGray-100 min-h-screen">
+            <div className="relative md:ml-64 bg-gradient-to-br from-green-100 to-orange-100 min-h-screen">
                 <AdminNavbar />
                 {/* Header */}
                 <HeaderStats />

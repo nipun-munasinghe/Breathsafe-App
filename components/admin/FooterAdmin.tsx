@@ -13,12 +13,12 @@ const FooterAdmin: React.FC = () => {
                         <div className="text-sm text-blueGray-500 font-semibold py-1 text-center md:text-left">
                             Copyright © {year}{" "}
                             <a
-                                href="https://www.creative-tim.com?ref=nr-footer-admin"
+                                href="/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blueGray-500 hover:text-blueGray-700 text-sm font-semibold py-1"
                             >
-                                Creative Tim
+                                BreathSafe
                             </a>
                         </div>
                     </div>
@@ -28,17 +28,17 @@ const FooterAdmin: React.FC = () => {
                         <ul className="flex flex-wrap list-none md:justify-end justify-center">
                             <li>
                                 <a
-                                    href="https://www.creative-tim.com?ref=nr-footer-admin"
+                                    href="/"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blueGray-600 hover:text-blueGray-800 text-sm font-semibold block py-1 px-3"
                                 >
-                                    Creative Tim
+                                    BreathSafe
                                 </a>
                             </li>
                             <li>
                                 <a
-                                    href="https://www.creative-tim.com/presentation?ref=nr-footer-admin"
+                                    href="/"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blueGray-600 hover:text-blueGray-800 text-sm font-semibold block py-1 px-3"
@@ -48,7 +48,7 @@ const FooterAdmin: React.FC = () => {
                             </li>
                             <li>
                                 <a
-                                    href="http://blog.creative-tim.com?ref=nr-footer-admin"
+                                    href="/"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blueGray-600 hover:text-blueGray-800 text-sm font-semibold block py-1 px-3"
@@ -58,12 +58,12 @@ const FooterAdmin: React.FC = () => {
                             </li>
                             <li>
                                 <a
-                                    href="https://github.com/creativetimofficial/notus-react/blob/main/LICENSE.md?ref=nr-footer-admin"
+                                    href="/"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="text-blueGray-600 hover:text-blueGray-800 text-sm font-semibold block py-1 px-3"
                                 >
-                                    MIT License
+                                    Contact Us
                                 </a>
                             </li>
                         </ul>

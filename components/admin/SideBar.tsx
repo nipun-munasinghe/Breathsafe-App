@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, {useState} from "react";
 import Link from "next/link";
 
 import NotificationDropdown from "@/components/admin/NotificationDropdown";
@@ -15,8 +15,10 @@ const Sidebar: React.FC = () => {
 
     return (
         <>
-            <nav className="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6">
-                <div className="md:flex-col md:items-stretch md:min-h-full md:flex-nowrap px-0 flex flex-wrap items-center justify-between w-full mx-auto">
+            <nav
+                className="md:left-0 md:block md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden shadow-xl bg-white flex flex-wrap items-center justify-between relative md:w-64 z-10 py-4 px-6">
+                <div
+                    className="md:flex-col md:items-stretch md:min-h-full md:flex-nowrap px-0 flex flex-wrap items-center justify-between w-full mx-auto">
                     {/* Toggler */}
                     <button
                         className="cursor-pointer text-black opacity-50 md:hidden px-3 py-1 text-xl leading-none bg-transparent rounded border border-solid border-transparent"
@@ -27,20 +29,30 @@ const Sidebar: React.FC = () => {
                     </button>
 
                     {/* Brand */}
-                    <Link
-                        className="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
-                        href="/"
-                    >
-                        Notus React
+                    <Link href="/" className="group inline-flex items-center gap-2">
+                        <span
+                            className={"inline-grid h-9 w-9 place-items-center rounded-xl ring-1 bg-gradient-to-br from-green-100 to-orange-100 ring-black/5"}
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden className="h-5 w-5">
+                            <path
+                                d="M5 12c0-3.866 3.134-7 7-7a7 7 0 0 1 0 14h-1.5a1.5 1.5 0 0 1-1.5-1.5v-3.25a.75.75 0 0 0-1.5 0V18A2 2 0 0 1 5 20"
+                                fill="currentColor"
+                                className={"text-lime-600"}
+                            />
+                          </svg>
+                        </span>
+                        <span className={"text-xl font-bold tracking-tight text-slate-900"}>
+                          Breath<span className={"text-lime-600"}>Safe</span>
+                        </span>
                     </Link>
 
                     {/* User (mobile) */}
                     <ul className="md:hidden items-center flex flex-wrap list-none">
                         <li className="inline-block relative">
-                            <NotificationDropdown />
+                            <NotificationDropdown/>
                         </li>
                         <li className="inline-block relative">
-                            <UserDropdown />
+                            <UserDropdown/>
                         </li>
                     </ul>
 
@@ -49,7 +61,8 @@ const Sidebar: React.FC = () => {
                         className={`md:flex md:flex-col md:items-stretch md:opacity-100 md:relative md:mt-4 md:shadow-none shadow absolute top-0 left-0 right-0 z-40 overflow-y-auto overflow-x-hidden h-auto items-center flex-1 rounded ${collapseShow}`}
                     >
                         {/* Collapse header (mobile only) */}
-                        <div className="md:min-w-full md:hidden block pb-4 mb-4 border-b border-solid border-blueGray-200">
+                        <div
+                            className="md:min-w-full md:hidden block pb-4 mb-4 border-b border-solid border-blueGray-200">
                             <div className="flex flex-wrap">
                                 <div className="w-6/12">
                                     <Link
@@ -83,7 +96,7 @@ const Sidebar: React.FC = () => {
                         </form>
 
                         {/* Divider */}
-                        <hr className="my-4 md:min-w-full" />
+                        <hr className="my-4 md:min-w-full"/>
 
                         {/* Admin Layout Pages */}
                         <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
@@ -172,7 +185,7 @@ const Sidebar: React.FC = () => {
                         </ul>
 
                         {/* Divider */}
-                        <hr className="my-4 md:min-w-full" />
+                        <hr className="my-4 md:min-w-full"/>
 
                         {/* Auth Layout Pages */}
                         <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
@@ -201,7 +214,7 @@ const Sidebar: React.FC = () => {
                         </ul>
 
                         {/* Divider */}
-                        <hr className="my-4 md:min-w-full" />
+                        <hr className="my-4 md:min-w-full"/>
 
                         {/* No Layout Pages */}
                         <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
@@ -230,7 +243,7 @@ const Sidebar: React.FC = () => {
                         </ul>
 
                         {/* Divider */}
-                        <hr className="my-4 md:min-w-full" />
+                        <hr className="my-4 md:min-w-full"/>
 
                     </div>
                 </div>
