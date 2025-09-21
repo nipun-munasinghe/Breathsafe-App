@@ -2,7 +2,6 @@
 
 import React from "react";
 
-// components
 import CardStats from "@/components/admin/CardStats";
 
 const HeaderStats: React.FC = () => {
