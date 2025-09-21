@@ -157,7 +157,7 @@ const Sidebar: React.FC = () => {
                                     className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
                                     href="/admin/new-requests"
                                 >
-                                    <i className="fas fa-fingerprint text-blueGray-400 mr-2 text-sm"></i>{" "}
+                                    <i className="fas fa-inbox text-blueGray-400 mr-2 text-sm"></i>{" "}
                                     New Requests
                                 </Link>
                             </li>
@@ -167,7 +167,7 @@ const Sidebar: React.FC = () => {
                                     className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
                                     href="/"
                                 >
-                                    <i className="fas fa-clipboard-list text-blueGray-300 mr-2 text-sm"></i>{" "}
+                                    <i className="fas fa-check-square text-blueGray-300 mr-2 text-sm"></i>{" "}
                                     Approved Requests
                                 </Link>
                             </li>
@@ -186,7 +186,7 @@ const Sidebar: React.FC = () => {
                                     className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
                                     href="/landing"
                                 >
-                                    <i className="fas fa-newspaper text-blueGray-400 mr-2 text-sm"></i>{" "}
+                                    <i className="fas fa-plus-circle text-blueGray-400 mr-2 text-sm"></i>{" "}
                                     Create Sensor
                                 </Link>
                             </li>
@@ -196,7 +196,7 @@ const Sidebar: React.FC = () => {
                                     className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
                                     href="/profile"
                                 >
-                                    <i className="fas fa-user-circle text-blueGray-400 mr-2 text-sm"></i>{" "}
+                                    <i className="fas fa-list text-blueGray-400 mr-2 text-sm"></i>{" "}
                                     Sensor List
                                 </Link>
                             </li>

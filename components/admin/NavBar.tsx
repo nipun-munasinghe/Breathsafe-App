@@ -2,6 +2,7 @@
 
 import React from "react";
 import UserDropdown from "@/components/admin/dropdown/UserDropdown";
+import {Search} from "lucide-react";
 
 export default function Navbar() {
     return (
@@ -21,9 +22,10 @@ export default function Navbar() {
                     {/* Form */}
                     <form className="md:flex hidden flex-row flex-wrap items-center lg:ml-auto mr-3">
                         <div className="relative flex w-full flex-wrap items-stretch">
-              <span className="z-10 h-full leading-snug font-normal absolute text-center text-blueGray-300 bg-transparent rounded text-base items-center justify-center w-8 pl-3 py-3">
-                <i className="fas fa-search"></i>
-              </span>
+                          <span
+                              className="z-10 h-full leading-snug font-normal absolute text-center text-blueGray-300 bg-transparent rounded text-base items-center justify-center w-8 pl-3 py-3">
+                            <Search className="w-5 h-5" />
+                          </span>
                             <input
                                 type="text"
                                 placeholder="Search here..."
