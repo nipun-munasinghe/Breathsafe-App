@@ -2,7 +2,7 @@
 
 import React from "react";
 
-import CardStats from "@/components/admin/CardStats";
+import CardStats from "@/components/admin/cards/CardStats";
 
 const HeaderStats: React.FC = () => {
     return (

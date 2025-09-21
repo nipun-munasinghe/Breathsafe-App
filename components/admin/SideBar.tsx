@@ -3,8 +3,8 @@
 import React, {useState} from "react";
 import Link from "next/link";
 
-import NotificationDropdown from "@/components/admin/NotificationDropdown";
-import UserDropdown from "@/components/admin/UserDropdown";
+import NotificationDropdown from "@/components/admin/dropdown/NotificationDropdown";
+import UserDropdown from "@/components/admin/dropdown/UserDropdown";
 
 const Sidebar: React.FC = () => {
     const [collapseShow, setCollapseShow] = useState("hidden");
