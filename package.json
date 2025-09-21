@@ -9,7 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.0.1",
+    "@popperjs/core": "^2.11.8",
     "axios": "^1.11.0",
+    "chart.js": "^4.5.0",
     "formik": "^2.4.6",
     "lucide-react": "^0.539.0",
     "next": "^15.5.3",
