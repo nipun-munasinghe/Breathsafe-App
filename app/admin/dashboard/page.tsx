@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import CardLineChart from "@/components/admin/CardLineChart";
-import CardBarChart from "@/components/admin/CardBarChart";
-import CardPageVisits from "@/components/admin/CardPageVisits";
-import CardSocialTraffic from "@/components/admin/CardSocialTraffic";
+import CardLineChart from "@/components/admin/cards/CardLineChart";
+import CardBarChart from "@/components/admin/cards/CardBarChart";
+import CardPageVisits from "@/components/admin/cards/CardPageVisits";
+import CardSocialTraffic from "@/components/admin/cards/CardSocialTraffic";
 
 const Dashboard: React.FC = () => {
     return (

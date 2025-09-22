@@ -11,6 +11,7 @@ import {RequestCard} from "@/components/requests/RequestCard";
 import {FilterBar} from "@/components/requests/FilterBar";
 import {getMyRequests} from "@/service/requestApi";
 import {ViewRequestModal} from "@/components/requests/ViewRequestModel";
+import {EditRequestModal} from "@/components/requests/EditRequestModel";
 
 export default function MyRequests() {
     const router = useRouter();
@@ -19,6 +20,7 @@ export default function MyRequests() {
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [selectedRequest, setSelectedRequest] = useState<CommunityRequest | null>(null);
     const [showViewModal, setShowViewModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
 
 
     const fetchRequests = async () => {
@@ -43,11 +45,6 @@ export default function MyRequests() {
         return request.status === statusFilter;
     });
 
-    const handleEdit = (request: CommunityRequest) => {
-        // Navigate to edit page with request data
-        router.push(`/edit-request/${request.id}`);
-    };
-
     const handleDelete = (id: number) => {
         setRequests(requests.filter(request => request.id !== id));
     };
@@ -61,11 +58,28 @@ export default function MyRequests() {
         router.push('/create-request');
     };
 
+    const handleEdit = (request: CommunityRequest) => {
+        setSelectedRequest(request);
+        setShowEditModal(true);
+    };
+
+    const handleSaveEdit = (updatedData: Partial<CommunityRequest>) => {
+        if (selectedRequest) {
+            setRequests(requests.map(req =>
+                req.id === selectedRequest.id
+                    ? { ...req, ...updatedData }
+                    : req
+            ));
+            setShowEditModal(false);
+            setSelectedRequest(null);
+        }
+    };
+
     return (
         <ProtectedRoute>
             <Header/>
 
-            <main className="min-h-screen">
+            <main className="min-h-screen" style={{ background: "linear-gradient(to bottom, #064E3B 0%, #0F172A 30%, #FFFFFF 50%, #FFFFFF 100%)" }}>
                 <div className="container mx-auto px-4 py-8 max-w-7xl">
 
                     {/* Page Header */}
@@ -181,6 +195,16 @@ export default function MyRequests() {
                     setSelectedRequest(null);
                 }}
                 onEdit={handleEdit}
+            />
+
+            <EditRequestModal
+                request={selectedRequest}
+                isOpen={showEditModal}
+                onClose={() => {
+                    setShowEditModal(false);
+                    setSelectedRequest(null);
+                }}
+                onSave={handleSaveEdit}
             />
 
             <Footer/>
