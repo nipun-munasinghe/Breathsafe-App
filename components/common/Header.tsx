@@ -16,6 +16,8 @@ const navItems: NavItem[] = [
   { href: "/sensors", label: "Sensors" },
   { href: "/analytics", label: "Analytics" },
   { href: "/support", label: "Support" },
+  
+  
 ];
 
 function cx(...classes: Array<string | false | null | undefined>) {
@@ -237,7 +239,7 @@ function UserMenu({
             solid ? "border-slate-100" : "border-white/20"
           )}
         >
-          <MenuLink href="/profile" onSelect={() => setOpen(false)}>
+          <MenuLink href="/userProfile" onSelect={() => setOpen(false)}>
             <UserRound className="h-4 w-4" />
             Profile
           </MenuLink>
@@ -417,7 +419,7 @@ export default function Header() {
             {/* Mobile: user actions */}
             {!isInitialized || !isLoggedIn || !user ? null : (
               <div className="grid gap-1 rounded-xl bg-white/70 p-2">
-                <MenuLink href="/profile" onSelect={() => setOpen(false)}>
+                <MenuLink href="/userProfile" onSelect={() => setOpen(false)}>
                   <UserRound className="h-4 w-4" />
                   Profile
                 </MenuLink>
