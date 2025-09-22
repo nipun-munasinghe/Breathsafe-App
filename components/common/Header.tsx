@@ -15,9 +15,7 @@ const navItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/sensors", label: "Sensors" },
   { href: "/analytics", label: "Analytics" },
-  { href: "/support", label: "Support" },
-  
-  
+  { href: "/support", label: "Support" }
 ];
 
 function cx(...classes: Array<string | false | null | undefined>) {
