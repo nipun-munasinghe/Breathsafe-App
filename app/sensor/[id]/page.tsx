@@ -8,7 +8,8 @@ import { ProtectedRoute } from '@/components/common/protectedRoute';
 import SensorStatsGrid from '@/components/sensor/SensorStatsGrid';
 import SensorChart from '@/components/sensor/SensorChart';
 import { getSensorById, getSensorDataByWeek, getSensorStats } from '@/service/sensorApi';
-import { Sensor, ChartData, SensorStats, AQICategory } from '@/types/sensor/types';
+import { Sensor, ChartData, SensorStats } from '@/types/sensor/types';
+// import AQICategory from '@/types/sensor/types';
 import ToastUtils from '@/utils/toastUtils';
 
 export default function SensorDetails() {
