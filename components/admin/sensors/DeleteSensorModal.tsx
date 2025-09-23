@@ -180,7 +180,7 @@ export const DeleteSensorModal: React.FC<DeleteSensorModalProps> = ({
           {/* Mobile-specific confirmation text */}
           <div className="block sm:hidden text-center pt-2">
             <p className="text-xs text-gray-500">
-              Tap "Delete Permanently" to confirm deletion
+              Tap &quot;Delete Permanently&quot; to confirm deletion
             </p>
           </div>
         </div>
