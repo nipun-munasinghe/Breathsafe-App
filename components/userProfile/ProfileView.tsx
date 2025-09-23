@@ -1,17 +1,11 @@
 "use client";
-
+import React from 'react';
+import Image from "next/image";
 import { UserProfile } from '@/types/user';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Calendar, 
-  MapPin, 
+import {
   Camera,
   Edit,
-  Trash2,
-  Globe,
-  X
+  Trash2
 } from 'lucide-react';
 
 interface ProfileViewProps {
@@ -48,11 +42,15 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
               <div className="relative group">
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gradient-to-br from-emerald-400 to-teal-500">
                   {user.profileImage ? (
-                    <img 
-                      src={user.profileImage} 
-                      alt={`${user.firstName} ${user.lastName}`}
-                      className="w-full h-full object-cover"
-                    />
+                    <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden">
+                      <Image
+                        src={user.profileImage}
+                        alt={`${user.firstName} ${user.lastName}`}
+                        fill
+                        className="object-cover"
+                        sizes="160px"
+                      />
+                    </div>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-2xl md:text-3xl font-semibold text-white">
                       {getInitials(user.firstName, user.lastName)}
