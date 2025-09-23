@@ -16,14 +16,7 @@ const initialUserData: UserProfile = {
   dateOfBirth: '1999-11-28',
   address: 'Colombo, Sri Lanka',
   profileImage: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg',
-  bio: 'Passionate healthcare professional dedicated to providing quality care and improving patient outcomes.',
-  languages: ['English', 'Sinhala', 'Tamil'],
-  publicDetails: {
-    specialization: 'General Practice',
-    experience: '10 years',
-    license: 'MED-LK-789456',
-    publicBio: 'General Medicine Specialist with extensive experience in primary healthcare and patient consultation.'
-  }
+  bio: 'Passionate healthcare professional dedicated to providing quality care and improving patient outcomes.'
 };
 
 export default function Home() {

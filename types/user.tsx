@@ -9,11 +9,5 @@ export interface UserProfile {
   address: string;
   profileImage: string;
   bio: string;
-  languages: string[];
-  publicDetails: {
-    specialization?: string;
-    experience?: string;
-    license?: string;
-    publicBio?: string;
-  };
+  
 }

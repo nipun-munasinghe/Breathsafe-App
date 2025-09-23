@@ -138,7 +138,8 @@ export function ProfileEdit({
                 </div>
               </div>
 
-              {/* Username */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Username */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-slate-700">
                   Username
@@ -167,8 +168,10 @@ export function ProfileEdit({
                   required
                 />
               </div>
+              </div>
 
-              {/* Phone Number */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Phone Number */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-slate-700">
                   Phone Number
@@ -201,6 +204,7 @@ export function ProfileEdit({
                   required
                 />
               </div>
+              </div>
 
               {/* Address */}
               <div className="space-y-2 md:col-span-2">
@@ -212,7 +216,7 @@ export function ProfileEdit({
                   type="text"
                   value={formData.address}
                   onChange={(e) => handleInputChange("address", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors min-h-[80px]"
                   required
                 />
               </div>
@@ -227,7 +231,7 @@ export function ProfileEdit({
                   type="text"
                   value={formData.bio}
                   onChange={(e) => handleInputChange("bio", e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors min-h-[80px]"
                   required
                 />
               </div>
