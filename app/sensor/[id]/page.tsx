@@ -84,7 +84,7 @@ export default function SensorDetails() {
     fetchSensorData();
   }, [sensorId]);
 
-  /*const getAQIColor =*/ (category: AQICategory) => {
+  /*const getAQIColor = (category: AQICategory) => {
     switch (category) {
       case AQICategory.GOOD:
         return 'text-green-600 bg-green-100';
@@ -101,7 +101,7 @@ export default function SensorDetails() {
       default:
         return 'text-gray-600 bg-gray-100';
     }
-  };
+  };*/
 
   if (error) {
     return (
