@@ -2,7 +2,7 @@
 
 import React, { JSX, useState } from 'react';
 import { AdminSensor } from '@/types/sensors/admin';
-import { Search, RefreshCw, Activity, Edit, Trash2, MapPin, ExternalLink, Wifi, WifiOff, Eye, AlertCircle, Settings } from 'lucide-react';
+import { Search, RefreshCw, Activity, Edit, RotateCcw, MapPin, ExternalLink, Wifi, WifiOff, Eye, AlertCircle, Settings } from 'lucide-react';
 import Link from 'next/link';
 
 interface CardSensorListProps {
@@ -10,7 +10,7 @@ interface CardSensorListProps {
   loading: boolean;
   totalSensors: number;
   onEdit: (sensor: AdminSensor) => void;
-  onDelete: (sensor: AdminSensor) => void;
+  onClearData: (sensor: AdminSensor) => void;  // Changed from onDelete
   onSearch: (search: string) => void;
   onRefresh: () => void;
 }
@@ -19,11 +19,11 @@ interface CardSensorListProps {
 const SensorCard: React.FC<{ 
   sensor: AdminSensor;
   onEdit: (sensor: AdminSensor) => void;
-  onDelete: (sensor: AdminSensor) => void;
+  onClearData: (sensor: AdminSensor) => void;  // Changed from onDelete
   formatDate: (dateString: string | null) => string;
   openInMaps: (lat: number, lng: number) => void;
   getStatusBadge: (status: string) => JSX.Element;
-}> = ({ sensor, onEdit, onDelete, formatDate, openInMaps, getStatusBadge }) => (
+}> = ({ sensor, onEdit, onClearData, formatDate, openInMaps, getStatusBadge }) => (
   <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4 shadow-sm">
     {/* Header with ID and Status */}
     <div className="flex items-center justify-between mb-3">
@@ -98,11 +98,11 @@ const SensorCard: React.FC<{
         Edit
       </button>
       <button
-        onClick={() => onDelete(sensor)}
-        className="flex-1 bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center text-xs font-medium"
+        onClick={() => onClearData(sensor)}
+        className="flex-1 bg-orange-500 text-white px-3 py-2 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center text-xs font-medium"
       >
-        <Trash2 className="w-3 h-3 mr-1" />
-        Delete
+        <RotateCcw className="w-3 h-3 mr-1" />
+        Clear Data
       </button>
     </div>
   </div>
@@ -113,7 +113,7 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
   loading,
   totalSensors,
   onEdit,
-  onDelete,
+  onClearData,  // Changed from onDelete
   onSearch,
   onRefresh
 }) => {
@@ -243,7 +243,7 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
                     key={sensor.id} 
                     sensor={sensor}
                     onEdit={onEdit}
-                    onDelete={onDelete}
+                    onClearData={onClearData}
                     formatDate={formatDate}
                     openInMaps={openInMaps}
                     getStatusBadge={getStatusBadge}
@@ -352,11 +352,11 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
                             Edit
                           </button>
                           <button
-                            onClick={() => onDelete(sensor)}
-                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors flex items-center text-xs font-medium"
+                            onClick={() => onClearData(sensor)}
+                            className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors flex items-center text-xs font-medium"
                           >
-                            <Trash2 className="w-3 h-3 mr-1" />
-                            Delete
+                            <RotateCcw className="w-3 h-3 mr-1" />
+                            Clear Data
                           </button>
                         </div>
                       </td>

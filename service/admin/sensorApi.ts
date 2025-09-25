@@ -245,3 +245,25 @@ export const deleteSensor = async (id: number): Promise<void> => {
 
   mockSensors.splice(index, 1);
 };
+
+//function to clear sensor data
+export const clearSensorData = async (id: number): Promise<AdminSensor> => {
+  await new Promise(resolve => setTimeout(resolve, 800));
+
+  const index = mockSensors.findIndex(sensor => sensor.id === id);
+  if (index === -1) {
+    throw new Error('Sensor not found');
+  }
+
+  // Clear only the data, keep all configuration
+  const clearedSensor = {
+    ...mockSensors[index],
+    lastCO2Reading: null,        // Clear CO2 reading
+    lastAQIReading: null,        // Clear AQI reading
+    lastReadingTime: null,       // Clear last reading time
+    updatedAt: new Date().toISOString()
+  };
+
+  mockSensors[index] = clearedSensor;
+  return clearedSensor;
+};
