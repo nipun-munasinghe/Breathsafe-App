@@ -41,6 +41,38 @@ export const DeleteSensorModal: React.FC<DeleteSensorModalProps> = ({
     });
   };
 
+  // Helper function to get status color based on backend enum
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'ONLINE':
+        return 'text-green-600';
+      case 'OFFLINE':
+        return 'text-red-600';
+      case 'MAINTENANCE':
+        return 'text-yellow-600';
+      case 'ERROR':
+        return 'text-red-600';
+      default:
+        return 'text-gray-600';
+    }
+  };
+
+  // Helper function to format status display text
+  const getStatusDisplayText = (status: string) => {
+    switch (status) {
+      case 'ONLINE':
+        return 'Online';
+      case 'OFFLINE':
+        return 'Offline';
+      case 'MAINTENANCE':
+        return 'Maintenance';
+      case 'ERROR':
+        return 'Error';
+      default:
+        return 'Unknown';
+    }
+  };
+
   if (!isOpen || !sensor) return null;
 
   return (
@@ -106,10 +138,8 @@ export const DeleteSensorModal: React.FC<DeleteSensorModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 text-xs sm:text-sm">
               <div className="bg-white rounded-lg p-3">
                 <span className="text-gray-600 block">Status</span>
-                <span className={`font-semibold ${
-                  sensor.status === 'Active' ? 'text-green-600' : 'text-red-600'
-                }`}>
-                  {sensor.status}
+                <span className={`font-semibold ${getStatusColor(sensor.status)}`}>
+                  {getStatusDisplayText(sensor.status)}
                 </span>
               </div>
               <div className="bg-white rounded-lg p-3">
