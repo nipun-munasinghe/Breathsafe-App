@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { JSX, useState } from 'react';
 import { AdminSensor } from '@/types/sensors/admin';
 import { Search, RefreshCw, Activity, Edit, Trash2, MapPin, ExternalLink, Wifi, WifiOff, Eye, AlertCircle, Settings } from 'lucide-react';
 import Link from 'next/link';
@@ -15,6 +15,99 @@ interface CardSensorListProps {
   onRefresh: () => void;
 }
 
+// Move SensorCard OUTSIDE the main component to prevent recreation
+const SensorCard: React.FC<{ 
+  sensor: AdminSensor;
+  onEdit: (sensor: AdminSensor) => void;
+  onDelete: (sensor: AdminSensor) => void;
+  formatDate: (dateString: string | null) => string;
+  openInMaps: (lat: number, lng: number) => void;
+  getStatusBadge: (status: string) => JSX.Element;
+}> = ({ sensor, onEdit, onDelete, formatDate, openInMaps, getStatusBadge }) => (
+  <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4 shadow-sm">
+    {/* Header with ID and Status */}
+    <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center">
+        <div className="bg-gradient-to-br from-lime-500 to-emerald-500 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+          <span className="text-white font-bold text-sm">{sensor.id}</span>
+        </div>
+        <div>
+          <h3 className="font-bold text-slate-800 text-sm">{sensor.name}</h3>
+          <p className="text-xs text-gray-500">ID: {sensor.id}</p>
+        </div>
+      </div>
+      {getStatusBadge(sensor.status)}
+    </div>
+
+    {/* Location */}
+    <div className="mb-3">
+      <div className="flex items-start mb-1">
+        <MapPin className="w-4 h-4 text-lime-600 mr-2 mt-0.5 flex-shrink-0" />
+        <div>
+          <p className="font-semibold text-slate-700 text-sm">{sensor.location}</p>
+          <div className="flex items-center text-gray-500 text-xs mt-1">
+            <span className="font-mono">
+              {sensor.latitude.toFixed(4)}, {sensor.longitude.toFixed(4)}
+            </span>
+            <button
+              onClick={() => openInMaps(sensor.latitude, sensor.longitude)}
+              className="ml-2 text-lime-600 hover:text-lime-700 p-1 hover:bg-lime-50 rounded"
+            >
+              <ExternalLink className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Readings */}
+    <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="bg-gray-50 rounded-lg p-3">
+        <p className="text-xs text-gray-600 mb-1">CO₂ Level</p>
+        <p className="font-bold text-slate-800">
+          {sensor.lastCO2Reading ? `${sensor.lastCO2Reading} ppm` : 'No data'}
+        </p>
+      </div>
+      <div className="bg-gray-50 rounded-lg p-3">
+        <p className="text-xs text-gray-600 mb-1">AQI Value</p>
+        <p className="font-bold text-slate-800">
+          {sensor.lastAQIReading ? sensor.lastAQIReading : 'No data'}
+        </p>
+      </div>
+    </div>
+
+    {/* Last Reading Time */}
+    <div className="mb-4">
+      <p className="text-xs text-gray-600">Last Reading: {formatDate(sensor.lastReadingTime)}</p>
+      <p className="text-xs text-gray-500">Created: {formatDate(sensor.createdAt)}</p>
+    </div>
+
+    {/* Actions */}
+    <div className="flex space-x-2">
+      <Link href={`/sensor/${sensor.id}`} className="flex-1">
+        <button className="w-full bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center text-xs font-medium">
+          <Eye className="w-3 h-3 mr-1" />
+          View
+        </button>
+      </Link>
+      <button
+        onClick={() => onEdit(sensor)}
+        className="flex-1 bg-lime-600 text-white px-3 py-2 rounded-lg hover:bg-lime-700 transition-colors flex items-center justify-center text-xs font-medium"
+      >
+        <Edit className="w-3 h-3 mr-1" />
+        Edit
+      </button>
+      <button
+        onClick={() => onDelete(sensor)}
+        className="flex-1 bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center text-xs font-medium"
+      >
+        <Trash2 className="w-3 h-3 mr-1" />
+        Delete
+      </button>
+    </div>
+  </div>
+);
+
 export const CardSensorList: React.FC<CardSensorListProps> = ({
   sensors,
   loading,
@@ -26,12 +119,12 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSearchChange = (value: string) => {
+  const handleSearchChange = React.useCallback((value: string) => {
     setSearchTerm(value);
     onSearch(value);
-  };
+  }, [onSearch]);
 
-  const formatDate = (dateString: string | null) => {
+  const formatDate = React.useCallback((dateString: string | null) => {
     if (!dateString) return 'No data';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -40,14 +133,14 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
+  }, []);
 
-  const openInMaps = (lat: number, lng: number) => {
+  const openInMaps = React.useCallback((lat: number, lng: number) => {
     window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
-  };
+  }, []);
 
   // Status Badge
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = React.useCallback((status: string) => {
     switch (status) {
       case 'ONLINE':
         return (
@@ -85,97 +178,11 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
           </span>
         );
     }
-  };
-
-  // Mobile Card Component
-  const SensorCard: React.FC<{ sensor: AdminSensor }> = ({ sensor }) => (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4 shadow-sm">
-      {/* Header with ID and Status */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center">
-          <div className="bg-gradient-to-br from-lime-500 to-emerald-500 w-10 h-10 rounded-full flex items-center justify-center mr-3">
-            <span className="text-white font-bold text-sm">{sensor.id}</span>
-          </div>
-          <div>
-            <h3 className="font-bold text-slate-800 text-sm">{sensor.name}</h3>
-            <p className="text-xs text-gray-500">ID: {sensor.id}</p>
-          </div>
-        </div>
-        {getStatusBadge(sensor.status)}
-      </div>
-
-      {/* Location */}
-      <div className="mb-3">
-        <div className="flex items-start mb-1">
-          <MapPin className="w-4 h-4 text-lime-600 mr-2 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="font-semibold text-slate-700 text-sm">{sensor.location}</p>
-            <div className="flex items-center text-gray-500 text-xs mt-1">
-              <span className="font-mono">
-                {sensor.latitude.toFixed(4)}, {sensor.longitude.toFixed(4)}
-              </span>
-              <button
-                onClick={() => openInMaps(sensor.latitude, sensor.longitude)}
-                className="ml-2 text-lime-600 hover:text-lime-700 p-1 hover:bg-lime-50 rounded"
-              >
-                <ExternalLink className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Readings */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-gray-50 rounded-lg p-3">
-          <p className="text-xs text-gray-600 mb-1">CO₂ Level</p>
-          <p className="font-bold text-slate-800">
-            {sensor.lastCO2Reading ? `${sensor.lastCO2Reading} ppm` : 'No data'}
-          </p>
-        </div>
-        <div className="bg-gray-50 rounded-lg p-3">
-          <p className="text-xs text-gray-600 mb-1">AQI Value</p>
-          <p className="font-bold text-slate-800">
-            {sensor.lastAQIReading ? sensor.lastAQIReading : 'No data'}
-          </p>
-        </div>
-      </div>
-
-      {/* Last Reading Time */}
-      <div className="mb-4">
-        <p className="text-xs text-gray-600">Last Reading: {formatDate(sensor.lastReadingTime)}</p>
-        <p className="text-xs text-gray-500">Created: {formatDate(sensor.createdAt)}</p>
-      </div>
-
-      {/* Actions */}
-      <div className="flex space-x-2">
-        <Link href={`/sensor/${sensor.id}`} className="flex-1">
-          <button className="w-full bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center text-xs font-medium">
-            <Eye className="w-3 h-3 mr-1" />
-            View
-          </button>
-        </Link>
-        <button
-          onClick={() => onEdit(sensor)}
-          className="flex-1 bg-lime-600 text-white px-3 py-2 rounded-lg hover:bg-lime-700 transition-colors flex items-center justify-center text-xs font-medium"
-        >
-          <Edit className="w-3 h-3 mr-1" />
-          Edit
-        </button>
-        <button
-          onClick={() => onDelete(sensor)}
-          className="flex-1 bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center text-xs font-medium"
-        >
-          <Trash2 className="w-3 h-3 mr-1" />
-          Delete
-        </button>
-      </div>
-    </div>
-  );
+  }, []);
 
   return (
     <div className="relative flex flex-col break-words bg-white w-full mb-6 shadow-lg rounded-2xl border border-gray-100">
-      {/* Header */}
+      {/* Header - Always visible */}
       <div className="rounded-t-2xl mb-0 px-4 sm:px-6 py-4 sm:py-6 border-0">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center">
@@ -232,7 +239,15 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
             <div className="block lg:hidden">
               <div className="space-y-4">
                 {sensors.map((sensor) => (
-                  <SensorCard key={sensor.id} sensor={sensor} />
+                  <SensorCard 
+                    key={sensor.id} 
+                    sensor={sensor}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    formatDate={formatDate}
+                    openInMaps={openInMaps}
+                    getStatusBadge={getStatusBadge}
+                  />
                 ))}
               </div>
             </div>
@@ -318,7 +333,7 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
                       </td>
 
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        {getStatusBadge(sensor.status, sensor.isOnline)}
+                        {getStatusBadge(sensor.status)}
                       </td>
 
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
