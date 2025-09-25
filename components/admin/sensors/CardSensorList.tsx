@@ -47,7 +47,7 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
   };
 
   // Status Badge
-  const getStatusBadge = (status: string, isOnline: boolean) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ONLINE':
         return (
