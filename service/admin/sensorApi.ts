@@ -1,5 +1,5 @@
-import privateAxios from '@/lib/privateAxios';
-import { AdminSensor, SensorListResponse, SensorFormData } from '@/types/sensors/admin';
+// import privateAxios from '@/lib/privateAxios';
+import { AdminSensor, SensorListResponse, SensorFormData, SensorReadingsFormData } from '@/types/sensors/admin';
 
 // Original API calls
 /*
@@ -36,6 +36,16 @@ export const updateSensor = async (id: number, sensorData: SensorFormData): Prom
   }
 };
 
+//this function for readings-only updates
+export const updateSensorReadings = async (id: number, readingsData: SensorReadingsFormData): Promise<AdminSensor> => {
+  try {
+    const response = await privateAxios.patch<AdminSensor>(`/admin/sensors/${id}/readings`, readingsData);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Failed to update sensor readings');
+  }
+};
+
 export const deleteSensor = async (id: number): Promise<void> => {
   try {
     await privateAxios.delete(`/admin/sensors/${id}`);
@@ -45,7 +55,7 @@ export const deleteSensor = async (id: number): Promise<void> => {
 };
 */
 
-// Dummy data implementations
+// Dummy data
 const mockSensors: AdminSensor[] = [
   {
     id: 1,
@@ -124,7 +134,7 @@ export const getSensors = async (
   limit: number = 10,
   search?: string
 ): Promise<SensorListResponse> => {
-  // Simulate API delay
+  
   await new Promise(resolve => setTimeout(resolve, 800));
 
   let filteredSensors = [...mockSensors];
@@ -181,6 +191,46 @@ export const updateSensor = async (id: number, sensorData: SensorFormData): Prom
     ...mockSensors[index],
     ...sensorData,
     isOnline: sensorData.status === 'Active',
+    updatedAt: new Date().toISOString()
+  };
+
+  mockSensors[index] = updatedSensor;
+  return updatedSensor;
+};
+
+export const updateSensorReadings = async (id: number, readingsData: SensorReadingsFormData): Promise<AdminSensor> => {
+  await new Promise(resolve => setTimeout(resolve, 800));
+
+  const index = mockSensors.findIndex(sensor => sensor.id === id);
+  if (index === -1) {
+    throw new Error('Sensor not found');
+  }
+
+  // Validate readings before update
+  if (readingsData.lastCO2Reading !== null && readingsData.lastCO2Reading < 0) {
+    throw new Error('CO₂ level cannot be negative');
+  }
+  
+  if (readingsData.lastAQIReading !== null && readingsData.lastAQIReading < 0) {
+    throw new Error('AQI level cannot be negative');
+  }
+
+  if (readingsData.lastCO2Reading !== null && readingsData.lastCO2Reading > 50000) {
+    throw new Error('CO₂ level exceeds maximum allowed value');
+  }
+
+  if (readingsData.lastAQIReading !== null && readingsData.lastAQIReading > 500) {
+    throw new Error('AQI level exceeds maximum allowed value');
+  }
+
+  //update readings and status only
+  const updatedSensor = {
+    ...mockSensors[index],
+    lastCO2Reading: readingsData.lastCO2Reading,
+    lastAQIReading: readingsData.lastAQIReading,
+    status: readingsData.status,
+    isOnline: readingsData.status === 'Active',
+    lastReadingTime: new Date().toISOString(), //update reading time
     updatedAt: new Date().toISOString()
   };
 

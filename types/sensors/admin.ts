@@ -27,3 +27,9 @@ export interface SensorListResponse {
   page: number;
   limit: number;
 }
+
+export interface SensorReadingsFormData {
+  lastCO2Reading: number | null;
+  lastAQIReading: number | null;
+  status: 'Active' | 'Inactive';
+}

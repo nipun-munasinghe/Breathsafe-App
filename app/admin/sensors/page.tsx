@@ -5,7 +5,7 @@ import { AdminSensor } from '@/types/sensors/admin';
 import { CardSensorList } from '@/components/admin/sensors/CardSensorList';
 import { EditSensorModal } from '@/components/admin/sensors/EditSensorModal';
 import { DeleteSensorModal } from '@/components/admin/sensors/DeleteSensorModal';
-import { getSensors, updateSensor, deleteSensor } from '@/service/admin/sensorApi';
+import { getSensors, updateSensorReadings, deleteSensor } from '@/service/admin/sensorApi';
 
 const AdminSensors: React.FC = () => {
   const [sensors, setSensors] = useState<AdminSensor[]>([]);
@@ -47,15 +47,17 @@ const AdminSensors: React.FC = () => {
     setShowDeleteModal(true);
   };
 
-  const handleUpdateSensor = async (sensorData: any) => {
+  //updateSensorReadings
+  const handleUpdateSensor = async (readingsData: any) => {
     if (!selectedSensor) return;
 
     try {
-      await updateSensor(selectedSensor.id, sensorData);
-      await loadSensors();
-      console.log('Sensor updated successfully');
+      await updateSensorReadings(selectedSensor.id, readingsData);
+      await loadSensors(); // Reload the list
+      console.log('Sensor readings updated successfully');
     } catch (error) {
-      console.error('Error updating sensor:', error);
+      console.error('Error updating sensor readings:', error);
+      throw error;
     }
   };
 
@@ -73,7 +75,7 @@ const AdminSensors: React.FC = () => {
 
   const handleSearch = (search: string) => {
     setSearchTerm(search);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1); //reset to first page when searching
   };
 
   return (
