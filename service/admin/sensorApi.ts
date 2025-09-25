@@ -1,5 +1,5 @@
-// import privateAxios from '@/lib/privateAxios';
-import { AdminSensor, SensorListResponse, SensorFormData, SensorReadingsFormData } from '@/types/sensors/admin';
+import privateAxios from '@/lib/privateAxios';
+import { AdminSensor, SensorListResponse, SensorFormData, SensorReadingsFormData, SensorStatus } from '@/types/sensors/admin';
 
 // Original API calls
 /*
@@ -36,7 +36,7 @@ export const updateSensor = async (id: number, sensorData: SensorFormData): Prom
   }
 };
 
-//this function for readings-only updates
+//function for readings-only updates
 export const updateSensorReadings = async (id: number, readingsData: SensorReadingsFormData): Promise<AdminSensor> => {
   try {
     const response = await privateAxios.patch<AdminSensor>(`/admin/sensors/${id}/readings`, readingsData);
@@ -55,7 +55,7 @@ export const deleteSensor = async (id: number): Promise<void> => {
 };
 */
 
-// Dummy data
+// Updated dummy data
 const mockSensors: AdminSensor[] = [
   {
     id: 1,
@@ -65,7 +65,7 @@ const mockSensors: AdminSensor[] = [
     longitude: 79.8612,
     lastCO2Reading: 420,
     lastAQIReading: 45,
-    status: 'Active',
+    status: 'ONLINE',
     lastReadingTime: "2025-09-23T08:30:00.000Z",
     isOnline: true,
     createdAt: "2025-09-01T10:00:00.000Z",
@@ -79,7 +79,7 @@ const mockSensors: AdminSensor[] = [
     longitude: 80.6337,
     lastCO2Reading: 385,
     lastAQIReading: 38,
-    status: 'Active',
+    status: 'ONLINE',
     lastReadingTime: "2025-09-23T08:25:00.000Z",
     isOnline: true,
     createdAt: "2025-09-02T11:00:00.000Z",
@@ -93,7 +93,7 @@ const mockSensors: AdminSensor[] = [
     longitude: 80.2168,
     lastCO2Reading: null,
     lastAQIReading: null,
-    status: 'Inactive',
+    status: 'OFFLINE',
     lastReadingTime: null,
     isOnline: false,
     createdAt: "2025-09-03T09:00:00.000Z",
@@ -107,9 +107,9 @@ const mockSensors: AdminSensor[] = [
     longitude: 79.8358,
     lastCO2Reading: 456,
     lastAQIReading: 52,
-    status: 'Active',
+    status: 'MAINTENANCE',
     lastReadingTime: "2025-09-23T08:20:00.000Z",
-    isOnline: true,
+    isOnline: false,
     createdAt: "2025-09-04T14:00:00.000Z",
     updatedAt: "2025-09-23T08:20:00.000Z"
   },
@@ -121,9 +121,9 @@ const mockSensors: AdminSensor[] = [
     longitude: 80.3464,
     lastCO2Reading: 478,
     lastAQIReading: 58,
-    status: 'Active',
+    status: 'ERROR',
     lastReadingTime: "2025-09-23T08:15:00.000Z",
-    isOnline: true,
+    isOnline: false,
     createdAt: "2025-09-05T12:00:00.000Z",
     updatedAt: "2025-09-23T08:15:00.000Z"
   }
@@ -134,7 +134,6 @@ export const getSensors = async (
   limit: number = 10,
   search?: string
 ): Promise<SensorListResponse> => {
-  
   await new Promise(resolve => setTimeout(resolve, 800));
 
   let filteredSensors = [...mockSensors];
@@ -170,7 +169,7 @@ export const createSensor = async (sensorData: SensorFormData): Promise<AdminSen
     lastCO2Reading: null,
     lastAQIReading: null,
     lastReadingTime: null,
-    isOnline: sensorData.status === 'Active',
+    isOnline: sensorData.status === 'ONLINE',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
@@ -190,7 +189,7 @@ export const updateSensor = async (id: number, sensorData: SensorFormData): Prom
   const updatedSensor = {
     ...mockSensors[index],
     ...sensorData,
-    isOnline: sensorData.status === 'Active',
+    isOnline: sensorData.status === 'ONLINE',
     updatedAt: new Date().toISOString()
   };
 
@@ -198,6 +197,7 @@ export const updateSensor = async (id: number, sensorData: SensorFormData): Prom
   return updatedSensor;
 };
 
+//only updates readings
 export const updateSensorReadings = async (id: number, readingsData: SensorReadingsFormData): Promise<AdminSensor> => {
   await new Promise(resolve => setTimeout(resolve, 800));
 
@@ -223,14 +223,11 @@ export const updateSensorReadings = async (id: number, readingsData: SensorReadi
     throw new Error('AQI level exceeds maximum allowed value');
   }
 
-  //update readings and status only
   const updatedSensor = {
     ...mockSensors[index],
     lastCO2Reading: readingsData.lastCO2Reading,
     lastAQIReading: readingsData.lastAQIReading,
-    status: readingsData.status,
-    isOnline: readingsData.status === 'Active',
-    lastReadingTime: new Date().toISOString(), //update reading time
+    lastReadingTime: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
 

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { AdminSensor } from '@/types/sensors/admin';
-import { Search, RefreshCw, Activity, Edit, Trash2, MapPin, ExternalLink, Wifi, WifiOff, Eye } from 'lucide-react';
+import { Search, RefreshCw, Activity, Edit, Trash2, MapPin, ExternalLink, Wifi, WifiOff, Eye, AlertCircle, Settings } from 'lucide-react';
 import Link from 'next/link';
 
 interface CardSensorListProps {
@@ -46,28 +46,44 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
     window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
   };
 
+  // Status Badge
   const getStatusBadge = (status: string, isOnline: boolean) => {
-    if (status === 'Active' && isOnline) {
-      return (
-        <span className="bg-lime-100 text-lime-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center">
-          <Wifi className="w-3 h-3 mr-1" />
-          Active
-        </span>
-      );
-    } else if (status === 'Active' && !isOnline) {
-      return (
-        <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center">
-          <WifiOff className="w-3 h-3 mr-1" />
-          Offline
-        </span>
-      );
-    } else {
-      return (
-        <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center">
-          <WifiOff className="w-3 h-3 mr-1" />
-          Inactive
-        </span>
-      );
+    switch (status) {
+      case 'ONLINE':
+        return (
+          <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center">
+            <Wifi className="w-3 h-3 mr-1" />
+            Online
+          </span>
+        );
+      case 'OFFLINE':
+        return (
+          <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center">
+            <WifiOff className="w-3 h-3 mr-1" />
+            Offline
+          </span>
+        );
+      case 'MAINTENANCE':
+        return (
+          <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center">
+            <Settings className="w-3 h-3 mr-1" />
+            Maintenance
+          </span>
+        );
+      case 'ERROR':
+        return (
+          <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center">
+            <AlertCircle className="w-3 h-3 mr-1" />
+            Error
+          </span>
+        );
+      default:
+        return (
+          <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center">
+            <WifiOff className="w-3 h-3 mr-1" />
+            Unknown
+          </span>
+        );
     }
   };
 

@@ -1,20 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AdminSensor } from '@/types/sensors/admin';
-import { Edit, X, Activity, Gauge, Settings, AlertCircle } from 'lucide-react';
-
-interface SensorReadingsFormData {
-  lastCO2Reading: number | null;
-  lastAQIReading: number | null;
-  status: 'Active' | 'Inactive';
-}
+import { AdminSensor, SensorReadingsFormData } from '@/types/sensors/admin';
+import { Edit, X, Activity, Gauge, Settings, AlertCircle, Info } from 'lucide-react';
 
 //validation errors interface
 interface ValidationErrors {
   lastCO2Reading?: string;
   lastAQIReading?: string;
-  status?: string;
 }
 
 interface EditSensorModalProps {
@@ -32,8 +25,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<SensorReadingsFormData>({
     lastCO2Reading: null,
-    lastAQIReading: null,
-    status: 'Active'
+    lastAQIReading: null
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,8 +35,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
     if (sensor) {
       setFormData({
         lastCO2Reading: sensor.lastCO2Reading,
-        lastAQIReading: sensor.lastAQIReading,
-        status: sensor.status
+        lastAQIReading: sensor.lastAQIReading
       });
       //clear errors when new sensor data is loaded
       setErrors({});
@@ -56,7 +47,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
   const validateForm = (): boolean => {
     const newErrors: ValidationErrors = {};
 
-    //CO2 level validation
+    //CO2 Level validation
     if (formData.lastCO2Reading !== null) {
       if (formData.lastCO2Reading < 0) {
         newErrors.lastCO2Reading = 'CO₂ level must be a positive value';
@@ -67,7 +58,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
       }
     }
 
-    //AQI level validation
+    //AQI Level validation
     if (formData.lastAQIReading !== null) {
       if (formData.lastAQIReading < 0) {
         newErrors.lastAQIReading = 'AQI level must be a positive value';
@@ -78,12 +69,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
       }
     }
 
-    //status validation
-    if (!formData.status || (formData.status !== 'Active' && formData.status !== 'Inactive')) {
-      newErrors.status = 'Please select a valid sensor status';
-    }
-
-    //check if both readings are null
+    // Check if both readings are null
     if (formData.lastCO2Reading === null && formData.lastAQIReading === null) {
       newErrors.lastCO2Reading = 'At least one reading (CO₂ or AQI) must be provided';
       newErrors.lastAQIReading = 'At least one reading (CO₂ or AQI) must be provided';
@@ -93,7 +79,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  //real-time field validation
+  // Real-time field validation
   const validateField = (fieldName: keyof SensorReadingsFormData, value: any) => {
     const newErrors = { ...errors };
 
@@ -117,13 +103,6 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
           } else if (value > 500) {
             newErrors.lastAQIReading = 'AQI level too high (max: 500)';
           }
-        }
-        break;
-
-      case 'status':
-        delete newErrors.status;
-        if (!value || (value !== 'Active' && value !== 'Inactive')) {
-          newErrors.status = 'Please select a valid status';
         }
         break;
     }
@@ -158,8 +137,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
     onClose();
     setFormData({
       lastCO2Reading: null,
-      lastAQIReading: null,
-      status: 'Active'
+      lastAQIReading: null
     });
     setErrors({});
     setSubmitError(null);
@@ -186,7 +164,43 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
     return 'text-red-600'; // Very Poor
   };
 
-  //error message component
+  // Helper function to get status badge based on backend enum
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'ONLINE':
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+            🟢 Online
+          </span>
+        );
+      case 'OFFLINE':
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+            🔴 Offline
+          </span>
+        );
+      case 'MAINTENANCE':
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+            🔧 Maintenance
+          </span>
+        );
+      case 'ERROR':
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+            ⚠️ Error
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+            ❓ Unknown
+          </span>
+        );
+    }
+  };
+
+  // Error message component
   const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
     <div className="flex items-center mt-1 text-red-600 text-xs">
       <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
@@ -208,7 +222,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
               </div>
               <div>
                 <h2 className="text-lg sm:text-xl font-bold text-white">Update Sensor Readings</h2>
-                <p className="text-lime-100 text-xs sm:text-sm mt-1">Edit CO₂, AQI values and status</p>
+                <p className="text-lime-100 text-xs sm:text-sm mt-1">Edit CO₂ and AQI values only</p>
               </div>
             </div>
             <button
@@ -220,9 +234,9 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
           </div>
         </div>
 
-        {/* Sensor Info */}
+        {/* Sensor Info (Read-only) */}
         <div className="p-4 sm:p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 mb-4">
             <div className="bg-gradient-to-br from-lime-500 to-emerald-500 w-12 h-12 rounded-full flex items-center justify-center">
               <span className="text-white font-bold">{sensor.id}</span>
             </div>
@@ -240,9 +254,23 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
               </p>
             </div>
           </div>
+
+          {/* Current Status Display (Read-only) */}
+          <div className="bg-gray-50 rounded-lg p-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Settings className="w-4 h-4 mr-2 text-slate-600" />
+                <span className="text-sm font-medium text-gray-700">Current Status:</span>
+              </div>
+              {getStatusBadge(sensor.status)}
+            </div>
+            <p className="text-xs text-gray-500 mt-1 ml-6">
+              Status is managed by system operations and cannot be changed here
+            </p>
+          </div>
         </div>
 
-        {/* Error Message */}
+        {/* General Error Message */}
         {submitError && (
           <div className="p-4 mx-4 mt-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
@@ -286,7 +314,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
             {/* CO2 Error Message */}
             {errors.lastCO2Reading && <ErrorMessage message={errors.lastCO2Reading} />}
             
-            {/* CO2 Level indicator */}
+            {/* CO2 Level Indicator */}
             <div className="mt-2 text-xs">
               {formData.lastCO2Reading && !errors.lastCO2Reading && (
                 <div className={`inline-flex items-center px-2 py-1 rounded-full ${
@@ -359,50 +387,18 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
             </div>
           </div>
 
-          {/* Sensor status */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-              <Settings className="w-4 h-4 mr-2 text-slate-600" />
-              Sensor Status
-            </label>
-            <select
-              value={formData.status}
-              onChange={(e) => {
-                const value = e.target.value as 'Active' | 'Inactive';
-                setFormData({ ...formData, status: value });
-                validateField('status', value);
-              }}
-              className={`w-full px-3 py-3 text-sm border rounded-lg outline-none font-medium transition-colors ${
-                errors.status 
-                  ? 'border-red-300 focus:ring-2 focus:ring-red-500 focus:border-red-500' 
-                  : 'border-gray-300 focus:ring-2 focus:ring-slate-600 focus:border-slate-600'
-              }`}
-              required
-            >
-              <option value="">Select Status</option>
-              <option value="Active">🟢 Active</option>
-              <option value="Inactive">🔴 Inactive</option>
-            </select>
-            
-            {/* Status Error Message */}
-            {errors.status && <ErrorMessage message={errors.status} />}
-            
-            <p className="mt-2 text-xs text-gray-500">
-              Set sensor status to control data collection and monitoring
-            </p>
-          </div>
-
           {/* Info Box */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start">
-              <Activity className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+              <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
               <div>
                 <h4 className="font-medium text-blue-900 text-sm">Validation Rules</h4>
                 <ul className="text-blue-700 text-xs mt-1 space-y-1">
                   <li>• CO₂ levels: Must be positive, maximum 50,000 ppm</li>
-                  <li>• AQI values: Must be positive, maximum 500</li>
+                  <li>• AQI values: Must be positive, maximum 500 (EPA scale)</li>
                   <li>• At least one reading (CO₂ or AQI) must be provided</li>
                   <li>• Values must be whole numbers (no decimals)</li>
+                  <li>• Sensor status is managed by system operations</li>
                 </ul>
               </div>
             </div>
