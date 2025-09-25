@@ -101,7 +101,7 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
             <p className="text-xs text-gray-500">ID: {sensor.id}</p>
           </div>
         </div>
-        {getStatusBadge(sensor.status, sensor.isOnline)}
+        {getStatusBadge(sensor.status)}
       </div>
 
       {/* Location */}
