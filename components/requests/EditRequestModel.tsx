@@ -28,7 +28,7 @@ export const EditRequestModal: React.FC<{
             try {
                 const response = await updateRequest(values, request!.id);
                 if(!response?.success) {
-                    return
+                    return;
                 }
                 ToastUtils.success("Request updated successfully");
                 onSave({
