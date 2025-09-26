@@ -1,7 +1,7 @@
 import {apiResponse} from "@/types/common";
 import ToastUtils from "@/utils/toastUtils";
 import privateAxios from "@/lib/privateAxios";
-import {CommunityRequest, CommunityRequestData} from "@/types/request";
+import {CommunityRequest, CommunityRequestData, RequestApprove} from "@/types/request";
 
 export const createRequest = async (data: CommunityRequestData): Promise<apiResponse | null> => {
     try {
@@ -50,5 +50,26 @@ export const getAllRequests = async (): Promise<apiResponse<CommunityRequest[]> 
     } catch (error: any) {
         ToastUtils.error("Retrieval failed. " + error?.response?.data?.message);
         return {success: false, data: [] as CommunityRequest[], error: error?.response?.data?.message};
+    }
+};
+
+
+export const approveRequest = async (data: RequestApprove, id: number): Promise<apiResponse | null> => {
+    try {
+        await privateAxios.patch<void>(`/sensorRequests/${id}/approve`, data);
+        return {success: true};
+    } catch (error: any) {
+        ToastUtils.error("Approval failed. " + error?.response.data.message);
+        return {success: false, error: error.response.data.message};
+    }
+};
+
+export const rejectRequest = async (data: RequestApprove, id: number): Promise<apiResponse | null> => {
+    try {
+        await privateAxios.patch<void>(`/sensorRequests/${id}/reject`, data);
+        return {success: true};
+    } catch (error: any) {
+        ToastUtils.error("Rejection failed. " + error?.response.data.message);
+        return {success: false, error: error.response.data.message};
     }
 };

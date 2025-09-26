@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from "react";
-import {CommunityRequest} from "@/types/request";
+import React, {forwardRef, useEffect, useImperativeHandle, useState} from "react";
+import {CardPendingRequestsRef, CommunityRequest} from "@/types/request";
 import {Calendar, CheckCircle, Clock, ExternalLink, MapPin, RefreshCw, Search, XCircle} from "lucide-react";
 import {getAllRequests} from "@/service/requestApi";
 import {apiResponse} from "@/types/common";
 
-export const CardPendingRequests: React.FC<{
+export const CardPendingRequests = forwardRef<CardPendingRequestsRef, {
     onApprove: (request: CommunityRequest) => void;
     onReject: (request: CommunityRequest) => void;
-}> = ({ onApprove, onReject }) => {
+}>(({ onApprove, onReject }, ref) => {
     const [requests, setRequests] = useState<CommunityRequest[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -32,6 +32,9 @@ export const CardPendingRequests: React.FC<{
         fetchData();
     }, []);
 
+    useImperativeHandle(ref, () => ({
+        refetch: fetchData
+    }));
 
     const filteredRequests = requests.filter(request =>
         request.requestedLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -215,4 +218,6 @@ export const CardPendingRequests: React.FC<{
             </div>
         </div>
     );
-};
+});
+
+CardPendingRequests.displayName = "CardPendingRequests";
