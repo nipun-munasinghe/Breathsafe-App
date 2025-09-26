@@ -3,6 +3,8 @@ import {useFormik} from "formik";
 import React, {useState} from "react";
 import {AlertCircle, Edit3, Info, MapIcon, MapPin, MessageSquare, Save, X} from "lucide-react";
 import MapSelector from "@/components/requests/MapSelector";
+import {updateRequest} from "@/service/requestApi";
+import ToastUtils from "@/utils/toastUtils";
 
 export const EditRequestModal: React.FC<{
     request: CommunityRequest | null;
@@ -24,10 +26,11 @@ export const EditRequestModal: React.FC<{
         onSubmit: async (values) => {
             setIsSubmitting(true);
             try {
-                // Add your API call here
-                console.log('Updating request:', request?.id, 'with values:', values);
-                await new Promise(resolve => setTimeout(resolve, 1500));
-
+                const response = await updateRequest(values, request!.id);
+                if(!response?.success) {
+                    return
+                }
+                ToastUtils.success("Request updated successfully");
                 onSave({
                     ...values,
                     updatedAt: new Date().toISOString()
