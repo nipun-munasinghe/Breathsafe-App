@@ -382,7 +382,8 @@ export default function Header() {
     return () => window.removeEventListener("app:signout", onAppSignOut);
   }, [onAppSignOut]);
 
-  const solid = scrolled;
+  // CHANGE: Keep transparent only on home ("/") at top; solid everywhere else for better readability
+  const solid = pathname !== "/" || scrolled;
 
   // Determine role and build menus
   const role: Role | undefined = (user?.role as Role) || undefined;
@@ -417,7 +418,7 @@ export default function Header() {
       <div className="mx-auto w-full max-w-7xl px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Brand */}
-            <Link href="/" className="group inline-flex items-center gap-2">
+          <Link href="/" className="group inline-flex items-center gap-2">
             <span
               className={cx(
                 "inline-grid h-9 w-9 place-items-center rounded-xl ring-1",
