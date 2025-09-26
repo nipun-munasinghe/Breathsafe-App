@@ -1,7 +1,6 @@
 import privateAxios from "@/lib/privateAxios";
 import ToastUtils from "@/utils/toastUtils";
 import { SubscriptionCreatePayload, SubscriptionItem, SubscriptionUpdatePayload } from "@/types/subscription";
-import { apiResponse } from "@/types/common";
 
 export const getMySubscriptions = async (): Promise<SubscriptionItem[]> => {
   try {

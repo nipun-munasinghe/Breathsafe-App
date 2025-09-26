@@ -79,7 +79,7 @@ export default function MyRequests() {
         <ProtectedRoute>
             <Header/>
 
-            <main className="min-h-screen" style={{ background: "linear-gradient(to bottom, #064E3B 0%, #0F172A 30%, #FFFFFF 50%, #FFFFFF 100%)" }}>
+            <main className="min-h-screen">
                 <div className="container mx-auto px-4 py-8 max-w-7xl">
 
                     {/* Page Header */}
