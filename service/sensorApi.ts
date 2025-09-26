@@ -1,5 +1,5 @@
 import privateAxios from '@/lib/privateAxios';
-import { SensorData, Sensor, SensorStats, ChartData } from '@/types/sensor/types';
+import { Sensor, SensorStats, ChartData } from '@/types/sensors/admin';
 
 // Original API calls
 /*
