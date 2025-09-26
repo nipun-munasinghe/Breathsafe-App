@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { Activity, Calendar, Wifi, Clock } from 'lucide-react';
-import { SensorStats } from '@/types/sensor/types';
+import { SensorStats } from '@/types/sensors/admin';
 
 interface SensorStatsGridProps {
   stats: SensorStats;
