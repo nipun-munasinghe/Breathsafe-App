@@ -1,85 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {CommunityRequest} from "@/types/request";
 import {Calendar, CheckCircle, Clock, ExternalLink, MapPin, RefreshCw, Search, XCircle} from "lucide-react";
-
-const mockRequests: CommunityRequest[] = [
-    {
-        id: 1,
-        requestedLocation: "Kandy City Center",
-        latitude: 7.2906,
-        longitude: 80.6337,
-        justification: "High traffic area with multiple schools nearby. Air quality concerns due to heavy vehicle emissions during peak hours.",
-        status: "PENDING",
-        adminComments: null,
-        approvedAt: null,
-        rejectedAt: null,
-        createdAt: "2025-09-21T08:30:00.000Z",
-        updatedAt: "2025-09-21T08:30:00.000Z",
-        requesterId: 1,
-        requesterName: "Saman Perera",
-        approvedById: null,
-        approvedByName: null,
-        sensorId: null,
-        sensorName: null
-    },
-    {
-        id: 2,
-        requestedLocation: "Kegalle Town",
-        latitude: 7.2513,
-        longitude: 80.3464,
-        justification: "Industrial area affecting residential community. Need monitoring for public health safety.",
-        status: "PENDING",
-        adminComments: null,
-        approvedAt: null,
-        rejectedAt: null,
-        createdAt: "2025-09-20T16:12:31.324Z",
-        updatedAt: "2025-09-20T16:12:31.324Z",
-        requesterId: 2,
-        requesterName: "Moditha Marasingha",
-        approvedById: null,
-        approvedByName: null,
-        sensorId: null,
-        sensorName: null
-    },
-    {
-        id: 3,
-        requestedLocation: "Kegalle Town",
-        latitude: 7.2513,
-        longitude: 80.3464,
-        justification: "Industrial area affecting residential community. Need monitoring for public health safety.",
-        status: "PENDING",
-        adminComments: null,
-        approvedAt: null,
-        rejectedAt: null,
-        createdAt: "2025-09-20T16:12:31.324Z",
-        updatedAt: "2025-09-20T16:12:31.324Z",
-        requesterId: 2,
-        requesterName: "Moditha Marasingha",
-        approvedById: null,
-        approvedByName: null,
-        sensorId: null,
-        sensorName: null
-    },
-    {
-        id: 4,
-        requestedLocation: "Kegalle Town",
-        latitude: 7.2513,
-        longitude: 80.3464,
-        justification: "Industrial area affecting residential community. Need monitoring for public health safety.",
-        status: "PENDING",
-        adminComments: null,
-        approvedAt: null,
-        rejectedAt: null,
-        createdAt: "2025-09-20T16:12:31.324Z",
-        updatedAt: "2025-09-20T16:12:31.324Z",
-        requesterId: 2,
-        requesterName: "Moditha Marasingha",
-        approvedById: null,
-        approvedByName: null,
-        sensorId: null,
-        sensorName: null
-    }
-];
+import {getAllRequests} from "@/service/requestApi";
+import {apiResponse} from "@/types/common";
 
 export const CardPendingRequests: React.FC<{
     onApprove: (request: CommunityRequest) => void;
@@ -90,12 +13,24 @@ export const CardPendingRequests: React.FC<{
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        // Simulate API call
-        setTimeout(() => {
-            setRequests(mockRequests);
-            setIsLoading(false);
-        }, 1000);
+        const fetchData = async () => {
+            try {
+                const response: apiResponse<CommunityRequest> | null = await getAllRequests();
+                setTimeout(() => {
+                    setRequests(
+                        response?.data?.filter((req: CommunityRequest) => req.status === "PENDING") || []
+                    );
+                    setIsLoading(false);
+                }, 1000);
+            } catch (error) {
+                console.error("Failed to fetch requests", error);
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
     }, []);
+
 
     const filteredRequests = requests.filter(request =>
         request.requestedLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||

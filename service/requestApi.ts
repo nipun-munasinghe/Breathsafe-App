@@ -1,7 +1,7 @@
 import {apiResponse} from "@/types/common";
 import ToastUtils from "@/utils/toastUtils";
 import privateAxios from "@/lib/privateAxios";
-import {CommunityRequestData} from "@/types/request";
+import {CommunityRequest, CommunityRequestData} from "@/types/request";
 
 export const createRequest = async (data: CommunityRequestData): Promise<apiResponse | null> => {
     try {
@@ -39,6 +39,16 @@ export const updateRequest = async (data: CommunityRequestData, id: number): Pro
         return {success: true};
     } catch (error: any) {
         ToastUtils.error("Submission failed. " + error?.response.data.message);
+        return {success: false, error: error.response.data.message};
+    }
+};
+
+export const getAllRequests = async (): Promise<apiResponse<CommunityRequest> | null> => {
+    try {
+        const response = await privateAxios.get<apiResponse>("/sensorRequests/all");
+        return {success: true, data: response.data};
+    } catch (error: any) {
+        ToastUtils.error("Retrieval failed. " + error?.response.data.message);
         return {success: false, error: error.response.data.message};
     }
 };
