@@ -45,10 +45,10 @@ export const updateRequest = async (data: CommunityRequestData, id: number): Pro
 
 export const getAllRequests = async (): Promise<apiResponse<CommunityRequest[]> | null> => {
     try {
-        const response = await privateAxios.get<apiResponse>("/sensorRequests/all");
+        const response = await privateAxios.get<CommunityRequest[]>("/sensorRequests/all");
         return {success: true, data: response.data};
     } catch (error: any) {
-        ToastUtils.error("Retrieval failed. " + error?.response.data.message);
-        return {success: false, error: error.response.data.message};
+        ToastUtils.error("Retrieval failed. " + error?.response?.data?.message);
+        return {success: false, data: [] as CommunityRequest[], error: error?.response?.data?.message};
     }
 };
