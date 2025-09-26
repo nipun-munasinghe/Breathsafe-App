@@ -12,22 +12,23 @@ export const CardPendingRequests: React.FC<{
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response: apiResponse<CommunityRequest> | null = await getAllRequests();
-                setTimeout(() => {
-                    setRequests(
-                        response?.data?.filter((req: CommunityRequest) => req.status === "PENDING") || []
-                    );
-                    setIsLoading(false);
-                }, 1000);
-            } catch (error) {
-                console.error("Failed to fetch requests", error);
+    const fetchData = async () => {
+        try {
+            const response: apiResponse<CommunityRequest[]> | null = await getAllRequests();
+            setTimeout(() => {
+                const data = response?.data ?? [];
+                setRequests(
+                    data.filter((req: CommunityRequest) => req.status === "PENDING") || []
+                );
                 setIsLoading(false);
-            }
-        };
+            }, 1000);
+        } catch (error) {
+            console.error("Failed to fetch requests", error);
+            setIsLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchData();
     }, []);
 
@@ -91,7 +92,7 @@ export const CardPendingRequests: React.FC<{
                                 </div>
 
                                 <button
-                                    onClick={() => setIsLoading(true)}
+                                    onClick={() => fetchData()}
                                     className="bg-lime-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-950 transition-colors flex items-center"
                                 >
                                     <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`}/>

@@ -43,7 +43,7 @@ export const updateRequest = async (data: CommunityRequestData, id: number): Pro
     }
 };
 
-export const getAllRequests = async (): Promise<apiResponse<CommunityRequest> | null> => {
+export const getAllRequests = async (): Promise<apiResponse<CommunityRequest[]> | null> => {
     try {
         const response = await privateAxios.get<apiResponse>("/sensorRequests/all");
         return {success: true, data: response.data};
