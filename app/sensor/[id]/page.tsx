@@ -144,7 +144,7 @@ export default function SensorDetails() {
               className="flex items-center text-white hover:text-lime-200 transition-colors group"
             >
               <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-              Back to Map
+              Back
             </button>
           </div>
 

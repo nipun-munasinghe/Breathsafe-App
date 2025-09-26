@@ -4,15 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { AdminSensor } from '@/types/sensors/admin';
 import { CardSensorList } from '@/components/admin/sensors/CardSensorList';
 import { EditSensorModal } from '@/components/admin/sensors/EditSensorModal';
-import { DeleteSensorModal } from '@/components/admin/sensors/DeleteSensorModal';
-import { getSensors, updateSensor, deleteSensor } from '@/service/admin/sensorApi';
+import { ClearSensorDataModal } from '@/components/admin/sensors/ClearSensorDataModal';
+import { getSensors, updateSensorReadings, clearSensorData } from '@/service/admin/sensorApi';
 
 const AdminSensors: React.FC = () => {
   const [sensors, setSensors] = useState<AdminSensor[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSensor, setSelectedSensor] = useState<AdminSensor | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showClearDataModal, setShowClearDataModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalSensors, setTotalSensors] = useState(0);
@@ -41,33 +41,36 @@ const AdminSensors: React.FC = () => {
     setShowEditModal(true);
   };
 
-  const handleDelete = (sensor: AdminSensor) => {
-    console.log('Opening delete modal for sensor:', sensor.id);
+  const handleClearData = (sensor: AdminSensor) => {
+    console.log('Opening clear data modal for sensor:', sensor.id);
     setSelectedSensor(sensor);
-    setShowDeleteModal(true);
+    setShowClearDataModal(true);
   };
 
-  const handleUpdateSensor = async (sensorData: any) => {
+  // Update sensor readings
+  const handleUpdateSensor = async (readingsData: any) => {
     if (!selectedSensor) return;
 
     try {
-      await updateSensor(selectedSensor.id, sensorData);
-      await loadSensors();
-      console.log('Sensor updated successfully');
+      await updateSensorReadings(selectedSensor.id, readingsData);
+      await loadSensors(); // Reload the list
+      console.log('Sensor readings updated successfully');
     } catch (error) {
-      console.error('Error updating sensor:', error);
+      console.error('Error updating sensor readings:', error);
+      throw error;
     }
   };
 
-  const handleDeleteSensor = async () => {
+  // Clear sensor data
+  const handleClearSensorData = async () => {
     if (!selectedSensor) return;
 
     try {
-      await deleteSensor(selectedSensor.id);
+      await clearSensorData(selectedSensor.id);
       await loadSensors(); // Reload the list
-      console.log('Sensor deleted successfully');
+      console.log('Sensor data cleared successfully');
     } catch (error) {
-      console.error('Error deleting sensor:', error);
+      console.error('Error clearing sensor data:', error);
     }
   };
 
@@ -84,7 +87,7 @@ const AdminSensors: React.FC = () => {
           loading={loading}
           totalSensors={totalSensors}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onClearData={handleClearData}
           onSearch={handleSearch}
           onRefresh={loadSensors}
         />
@@ -101,18 +104,17 @@ const AdminSensors: React.FC = () => {
         onConfirm={handleUpdateSensor}
       />
 
-      {/* Delete Modal */}
-      <DeleteSensorModal
+      {/* Clear Data Modal */}
+      <ClearSensorDataModal
         sensor={selectedSensor}
-        isOpen={showDeleteModal}
+        isOpen={showClearDataModal}
         onClose={() => {
-          setShowDeleteModal(false);
+          setShowClearDataModal(false);
           setSelectedSensor(null);
         }}
-        onConfirm={handleDeleteSensor}
+        onConfirm={handleClearSensorData}
       />
     </>
   );
 };
-
 export default AdminSensors;
