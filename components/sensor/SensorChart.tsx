@@ -15,7 +15,7 @@ import {
 import { Download } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { ChartData } from '@/types/sensor/types';
+import { ChartData } from '@/types/sensors/admin';
 
 // Register Chart.js components
 ChartJS.register(
