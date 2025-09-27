@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import Image from "next/image";
 import { UserProfile } from '@/types/user';
 import {
@@ -21,6 +21,7 @@ interface ProfileViewProps {
 }
 
 export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
+  
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {

@@ -9,5 +9,4 @@ export interface UserProfile {
   address: string;
   profileImage: string;
   bio: string;
-  
 }
