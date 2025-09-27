@@ -1,7 +1,8 @@
 import privateAxios from '@/lib/privateAxios';
 import { AdminSensor, SensorListResponse, SensorFormData, SensorReadingsFormData, SensorStatus, SensorDataDisplayDTO } from '@/types/sensors/admin';
 
-// API calls
+//API calls
+//fetch sensor data for display in table
 export const getSensorDisplayData = async (): Promise<SensorDataDisplayDTO[]> => {
   try {
     const response = await privateAxios.get<SensorDataDisplayDTO[]>('/sensorData');
@@ -9,6 +10,34 @@ export const getSensorDisplayData = async (): Promise<SensorDataDisplayDTO[]> =>
   } catch (error: any) {
     console.error('Error fetching sensor display data:', error);
     throw new Error(error.response?.data?.message || 'Failed to fetch sensor data');
+  }
+};
+
+//delete sensor data function
+export const deleteSensorData = async (dataId: number): Promise<void> => {
+  try {
+    const response = await privateAxios.delete(`/sensorData/${dataId}`);
+    
+    //Check if response indicates success
+    if (response.status === 200) {
+      console.log('Sensor data deleted successfully:', response.data);
+      return;
+    }
+    
+    throw new Error('Delete operation failed');
+  } catch (error: any) {
+    console.error('Error deleting sensor data:', error);
+    
+    //handle different error scenarios
+    if (error.response?.status === 404) {
+      throw new Error('Sensor data not found');
+    } else if (error.response?.status === 401) {
+      throw new Error('Unauthorized access');
+    } else if (error.response?.status === 400) {
+      throw new Error(error.response?.data?.message || 'Invalid request');
+    }
+    
+    throw new Error(error.response?.data?.message || 'Failed to delete sensor data');
   }
 };
 
@@ -27,62 +56,6 @@ const mockSensors: AdminSensor[] = [
     isOnline: true,
     createdAt: "2025-09-01T10:00:00.000Z",
     updatedAt: "2025-09-23T08:30:00.000Z"
-  },
-  {
-    id: 2,
-    name: "AQM-2024-002",
-    location: "Kandy City Center",
-    latitude: 7.2906,
-    longitude: 80.6337,
-    lastCO2Reading: 385,
-    lastAQIReading: 38,
-    status: 'ONLINE',
-    lastReadingTime: "2025-09-23T08:25:00.000Z",
-    isOnline: true,
-    createdAt: "2025-09-02T11:00:00.000Z",
-    updatedAt: "2025-09-23T08:25:00.000Z"
-  },
-  {
-    id: 3,
-    name: "AQM-2024-003",
-    location: "Galle Harbor Area",
-    latitude: 6.0329,
-    longitude: 80.2168,
-    lastCO2Reading: null,
-    lastAQIReading: null,
-    status: 'OFFLINE',
-    lastReadingTime: null,
-    isOnline: false,
-    createdAt: "2025-09-03T09:00:00.000Z",
-    updatedAt: "2025-09-20T16:00:00.000Z"
-  },
-  {
-    id: 4,
-    name: "AQM-2024-004",
-    location: "Negombo Beach Road",
-    latitude: 7.2083,
-    longitude: 79.8358,
-    lastCO2Reading: 456,
-    lastAQIReading: 52,
-    status: 'MAINTENANCE',
-    lastReadingTime: "2025-09-23T08:20:00.000Z",
-    isOnline: false,
-    createdAt: "2025-09-04T14:00:00.000Z",
-    updatedAt: "2025-09-23T08:20:00.000Z"
-  },
-  {
-    id: 5,
-    name: "AQM-2024-005",
-    location: "Kegalle Industrial Zone",
-    latitude: 7.2513,
-    longitude: 80.3464,
-    lastCO2Reading: 478,
-    lastAQIReading: 58,
-    status: 'ERROR',
-    lastReadingTime: "2025-09-23T08:15:00.000Z",
-    isOnline: false,
-    createdAt: "2025-09-05T12:00:00.000Z",
-    updatedAt: "2025-09-23T08:15:00.000Z"
   }
 ];
 
@@ -95,7 +68,7 @@ export const getSensors = async (
 
   let filteredSensors = [...mockSensors];
 
-  // Apply search filter
+  //Apply search filter
   if (search) {
     const searchLower = search.toLowerCase();
     filteredSensors = filteredSensors.filter(sensor =>
@@ -105,7 +78,7 @@ export const getSensors = async (
     );
   }
 
-  // Apply pagination
+  //Apply pagination
   const startIndex = (page - 1) * limit;
   const paginatedSensors = filteredSensors.slice(startIndex, startIndex + limit);
 
@@ -163,7 +136,7 @@ export const updateSensorReadings = async (id: number, readingsData: SensorReadi
     throw new Error('Sensor not found');
   }
 
-  //Validate readings before update
+  //validate readings before update
   if (readingsData.lastCO2Reading !== null && readingsData.lastCO2Reading < 0) {
     throw new Error('CO₂ level cannot be negative');
   }
@@ -204,23 +177,12 @@ export const deleteSensor = async (id: number): Promise<void> => {
 };
 
 //function to clear sensor data
-export const clearSensorData = async (id: number): Promise<AdminSensor> => {
-  await new Promise(resolve => setTimeout(resolve, 800));
-
-  const index = mockSensors.findIndex(sensor => sensor.id === id);
-  if (index === -1) {
-    throw new Error('Sensor not found');
+export const clearSensorData = async (dataId: number): Promise<void> => {
+  try {
+    await deleteSensorData(dataId);
+    console.log(`Sensor data cleared successfully for ID: ${dataId}`);
+  } catch (error) {
+    console.error('Error clearing sensor data:', error);
+    throw error;
   }
-
-  // Clear only the data, keep all configuration
-  const clearedSensor = {
-    ...mockSensors[index],
-    lastCO2Reading: null,        // Clear CO2 reading
-    lastAQIReading: null,        // Clear AQI reading
-    lastReadingTime: null,       // Clear last reading time
-    updatedAt: new Date().toISOString()
-  };
-
-  mockSensors[index] = clearedSensor;
-  return clearedSensor;
 };
