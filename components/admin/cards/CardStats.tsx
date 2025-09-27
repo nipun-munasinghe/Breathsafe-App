@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import * as Icons from "lucide-react";
 
 type CardStatsProps = {
     statSubtitle?: string;
@@ -8,7 +9,7 @@ type CardStatsProps = {
     statArrow?: "up" | "down";
     statPercent?: string;
     statPercentColor?: string;
-    statDescripiron?: string; // keeping your spelling
+    statDescripiron?: string;
     statIconName?: string;
     statIconColor?: string;
 };
@@ -23,6 +24,7 @@ const CardStats: React.FC<CardStatsProps> = ({
                                                  statIconName = "far fa-chart-bar",
                                                  statIconColor = "bg-red-500",
                                              }) => {
+    const Icon = statIconName ? (Icons as any)[statIconName] : null;
     return (
         <div className="relative flex flex-col min-w-0 break-words bg-white rounded mb-6 xl:mb-0 shadow-lg">
             <div className="flex-auto p-4">
@@ -42,7 +44,7 @@ const CardStats: React.FC<CardStatsProps> = ({
                                 statIconColor
                             }
                         >
-                            <i className={statIconName}></i>
+                            {Icon && <Icon className="w-5 h-5" />}
                         </div>
                     </div>
                 </div>

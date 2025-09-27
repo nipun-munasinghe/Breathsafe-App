@@ -4,19 +4,87 @@ import React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import {Menu, X, Bell, ChevronDown, LogOut, UserRound, Users} from "lucide-react";
+import {
+  Menu,
+  X,
+  Bell,
+  ChevronDown,
+  LogOut,
+  UserRound,
+  Users,
+  LayoutDashboard,
+  Shield,
+  Settings,
+  GaugeCircle,
+  Wrench,
+  Activity,
+  PlusCircle
+} from "lucide-react";
 
 import { useAuthStore } from "@/store/authStore";
 import type { loggedInUser } from "@/types/user/types";
 
+/* =========================================================
+   ROLE + MENU CONFIGURATION (EDIT THIS SECTION ONLY)
+   Add or change items here for quick customization.
+   ========================================================= */
+
+type Role = "USER" | "ADMIN" | "SENSOR_ADMIN";
 type NavItem = { href: string; label: string };
-const navItems: NavItem[] = [
-  { href: "/", label: "Home" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/sensors", label: "Sensors" },
-  { href: "/analytics", label: "Analytics" },
-  { href: "/create-request", label: "Request Sensor" },
-];
+
+type DropdownItem =
+  | { label: string; href: string; icon: React.ReactNode }
+  | { label: string; action: "signout"; icon: React.ReactNode };
+
+// Top navigation items
+const NAV_CONFIG: Record<"COMMON" | Role, NavItem[]> = {
+  COMMON: [
+    { href: "/", label: "Home" },
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/sensors", label: "Sensors" },
+    { href: "/analytics", label: "Analytics" },
+  ],
+  USER: [
+    { href: "/create-request", label: "Request Sensor" },
+  ],
+  SENSOR_ADMIN: [
+    { href: "/sensor-admin/overview", label: "Sensor Admin" },
+    { href: "/sensor-admin/queue", label: "Pending Queue" },
+  ],
+  ADMIN: [
+    { href: "/admin", label: "Admin" },
+    { href: "/admin/users", label: "Users" },
+    { href: "/admin/settings", label: "Settings" },
+  ],
+};
+
+// Dropdown (user menu) items per role
+const DROPDOWN_CONFIG: Record<Role, DropdownItem[]> = {
+  USER: [
+    { label: "Profile", href: "/profile", icon: <UserRound className="h-4 w-4" /> },
+    { label: "My Requests", href: "/my-requests", icon: <Users className="h-4 w-4" /> },
+    { label: "Create Request", href: "/create-request", icon: <PlusCircle className="h-4 w-4" /> },
+    { label: "Sign out", action: "signout", icon: <LogOut className="h-4 w-4" /> },
+  ],
+  SENSOR_ADMIN: [
+    { label: "Profile", href: "/profile", icon: <UserRound className="h-4 w-4" /> },
+    { label: "Sensor Overview", href: "/sensor-admin/overview", icon: <GaugeCircle className="h-4 w-4" /> },
+    { label: "Manage Sensors", href: "/sensor-admin/manage", icon: <Wrench className="h-4 w-4" /> },
+    { label: "Activity Log", href: "/sensor-admin/activity", icon: <Activity className="h-4 w-4" /> },
+    { label: "Sign out", action: "signout", icon: <LogOut className="h-4 w-4" /> },
+  ],
+  ADMIN: [
+    { label: "Admin Dashboard", href: "/admin", icon: <LayoutDashboard className="h-4 w-4" /> },
+    { label: "User Management", href: "/admin/users", icon: <Shield className="h-4 w-4" /> },
+    { label: "System Settings", href: "/admin/settings", icon: <Settings className="h-4 w-4" /> },
+    { label: "Profile", href: "/profile", icon: <UserRound className="h-4 w-4" /> },
+    { label: "Sign out", action: "signout", icon: <LogOut className="h-4 w-4" /> },
+  ],
+};
+
+/* =========================================================
+   UTILS
+   ========================================================= */
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
@@ -30,15 +98,12 @@ function fullName(u: loggedInUser | null) {
   return name || u.username || "User";
 }
 
-/** Common avatar fields we might get from different auth providers */
 type Avatarish = {
   avatarUrl?: string | null;
   image?: string | null;
   avatar?: string | null;
   photoURL?: string | null;
 };
-
-/** Attempts to derive an avatar URL from the user, or returns null. */
 function avatarFromUser(u: loggedInUser | null): string | null {
   if (!u) return null;
   const v = u as unknown as Avatarish;
@@ -147,34 +212,43 @@ function NavLink({ item, active, solid }: { item: NavItem; active: boolean; soli
   );
 }
 
-function MenuLink({
-  href,
-  children,
-  onSelect,
+function DropdownList({
+  items,
+  onAction,
+  onNavigate,
 }: {
-  href: string;
-  children: React.ReactNode;
-  onSelect?: () => void;
+  items: DropdownItem[];
+  onAction: (action: string) => void;
+  onNavigate: () => void;
 }) {
   return (
-    <Link
-      href={href}
-      className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
-      onClick={onSelect}
-    >
-      {children}
-    </Link>
-  );
-}
-
-function MenuButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
-      onClick={onClick}
-    >
-      {children}
-    </button>
+    <>
+      {items.map((it, i) => {
+        if ("href" in it) {
+          return (
+            <Link
+              key={i}
+              href={it.href}
+              onClick={onNavigate}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+            >
+              {it.icon}
+              {it.label}
+            </Link>
+          );
+        }
+        return (
+          <button
+            key={i}
+            onClick={() => onAction(it.action)}
+            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+          >
+            {it.icon}
+            {it.label}
+          </button>
+        );
+      })}
+    </>
   );
 }
 
@@ -182,10 +256,12 @@ function UserMenu({
   user,
   solid,
   onSignOut,
+  items,
 }: {
   user: loggedInUser;
   solid: boolean;
   onSignOut: () => void;
+  items: DropdownItem[];
 }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement | null>(null);
@@ -197,6 +273,13 @@ function UserMenu({
     if (open) document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [open]);
+
+  function handleAction(action: string) {
+    if (action === "signout") {
+      setOpen(false);
+      onSignOut();
+    }
+  }
 
   return (
     <div className="relative" ref={ref}>
@@ -214,11 +297,23 @@ function UserMenu({
           <AvatarImg src={avatarFromUser(user)} alt="Profile" />
           <span
             className={cx(
-              "text-sm font-medium",
+              "text-sm font-medium flex items-center gap-1",
               solid ? "text-slate-900 group-hover:text-emerald-950" : "text-white group-hover:text-white"
             )}
           >
             {fullName(user)}
+            {user.role && (
+              <span
+                className={cx(
+                  "text-[10px] font-semibold tracking-wide rounded px-1 py-0.5 border",
+                  solid
+                    ? "border-lime-600/30 text-lime-700 bg-lime-100/70"
+                    : "border-white/30 text-white/80 bg-white/10"
+                )}
+              >
+                {user.role}
+              </span>
+            )}
           </span>
         </span>
         <ChevronDown
@@ -233,27 +328,19 @@ function UserMenu({
         <div
           role="menu"
           className={cx(
-            "absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border bg-white shadow-lg",
+            "absolute right-0 mt-2 w-64 overflow-hidden rounded-xl border bg-white shadow-lg",
             solid ? "border-slate-100" : "border-white/20"
           )}
         >
-          <MenuLink href="/userProfile" onSelect={() => setOpen(false)}>
-            <UserRound className="h-4 w-4" />
-            Profile
-          </MenuLink>
-          <MenuLink href="/my-requests" onSelect={() => setOpen(false)}>
-            <Users className="h-4 w-4" />
-              My Requests
-          </MenuLink>
-          <MenuButton
-            onClick={() => {
-              setOpen(false);
-              onSignOut();
-            }}
-          >
-            <LogOut className="h-4 w-4" />
-            Sign out
-          </MenuButton>
+          <div className="px-3 py-2 border-b border-slate-100 bg-slate-50/60">
+            <p className="text-xs font-semibold text-slate-500">Signed in as</p>
+            <p className="text-sm font-medium text-slate-800 break-all">{user.username}</p>
+          </div>
+          <DropdownList
+            items={items}
+            onAction={handleAction}
+            onNavigate={() => setOpen(false)}
+          />
         </div>
       )}
     </div>
@@ -272,7 +359,7 @@ export default function Header() {
   const [open, setOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
 
-  // Scroll shadow / solid header
+  // Scroll effect
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -280,7 +367,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Sign out helper + global event hook
+  // Sign out
   const handleSignOut = React.useCallback(() => {
     logout();
     router.push("/signin");
@@ -295,7 +382,29 @@ export default function Header() {
     return () => window.removeEventListener("app:signout", onAppSignOut);
   }, [onAppSignOut]);
 
-  const solid = scrolled;
+  // CHANGE: Keep transparent only on home ("/") at top; solid everywhere else for better readability
+  const solid = pathname !== "/" || scrolled;
+
+  // Determine role and build menus
+  const role: Role | undefined = (user?.role as Role) || undefined;
+
+  const navItems: NavItem[] = React.useMemo(() => {
+    const aggregated = [
+      ...NAV_CONFIG.COMMON,
+      ...(role ? NAV_CONFIG[role] : []),
+    ];
+    const seen = new Set<string>();
+    return aggregated.filter((i) => {
+      if (seen.has(i.href)) return false;
+      seen.add(i.href);
+      return true;
+    });
+  }, [role]);
+
+  const dropdownItems: DropdownItem[] = React.useMemo(() => {
+    if (!role) return DROPDOWN_CONFIG.USER; // Fallback if role missing
+    return DROPDOWN_CONFIG[role];
+  }, [role]);
 
   return (
     <header
@@ -306,7 +415,6 @@ export default function Header() {
           : "bg-transparent"
       )}
     >
-      {/* Outer container */}
       <div className="mx-auto w-full max-w-7xl px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Brand */}
@@ -344,7 +452,12 @@ export default function Header() {
             ) : (
               <div className="flex items-center gap-2">
                 <NotificationsButton solid={solid} />
-                <UserMenu user={user} solid={solid} onSignOut={handleSignOut} />
+                <UserMenu
+                  user={user}
+                  solid={solid}
+                  onSignOut={handleSignOut}
+                  items={dropdownItems}
+                />
               </div>
             )}
           </div>
@@ -364,7 +477,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile sheet (independent of header scroll) */}
+      {/* Mobile sheet */}
       <div
         className={cx(
           "md:hidden overflow-hidden transition-[max-height] duration-300 ease-in-out",
@@ -373,7 +486,7 @@ export default function Header() {
       >
         <div className="px-4 pb-4">
           <nav className="grid gap-2 rounded-2xl bg-gradient-to-br from-green-100 to-orange-100 p-2">
-            {/* Mobile: header area */}
+            {/* Mobile header user block */}
             {!isInitialized || !isLoggedIn || !user ? null : (
               <div className="flex items-center justify-between rounded-xl bg-white/70 px-3 py-2">
                 <div className="flex items-center gap-2">
@@ -386,14 +499,16 @@ export default function Header() {
                   />
                   <div className="flex flex-col">
                     <span className="text-sm font-medium text-slate-900">{fullName(user)}</span>
-                    <span className="text-xs text-slate-500">{user.username}</span>
+                    <span className="text-xs text-slate-500">
+                      {user.username}{user.role ? ` • ${user.role}` : ""}
+                    </span>
                   </div>
                 </div>
                 <NotificationsButton solid={true} />
               </div>
             )}
 
-            {/* Mobile: nav links */}
+            {/* Mobile nav items */}
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -401,7 +516,9 @@ export default function Header() {
                 onClick={() => setOpen(false)}
                 className={cx(
                   "rounded-xl px-3 py-2 text-sm transition-colors",
-                  isExact(pathname, item.href) ? "bg-white text-emerald-950" : "text-slate-600 hover:bg-white/70 hover:text-emerald-950"
+                  isExact(pathname, item.href)
+                    ? "bg-white text-emerald-950"
+                    : "text-slate-600 hover:bg-white/70 hover:text-emerald-950"
                 )}
                 aria-current={isExact(pathname, item.href) ? "page" : undefined}
               >
@@ -409,31 +526,24 @@ export default function Header() {
               </Link>
             ))}
 
-            {/* Mobile: auth buttons */}
+            {/* Mobile auth */}
             {!isInitialized || isLoggedIn ? null : (
               <AuthButtons layout="grid" onItemClick={() => setOpen(false)} solid={true} />
             )}
 
-            {/* Mobile: user actions */}
+            {/* Mobile dropdown action list */}
             {!isInitialized || !isLoggedIn || !user ? null : (
               <div className="grid gap-1 rounded-xl bg-white/70 p-2">
-                <MenuLink href="/userProfile" onSelect={() => setOpen(false)}>
-                  <UserRound className="h-4 w-4" />
-                  Profile
-                </MenuLink>
-                <MenuLink href="/my-requests" onSelect={() => setOpen(false)}>
-                  <Users className="h-4 w-4" />
-                  My Requests
-                </MenuLink>
-                <MenuButton
-                  onClick={() => {
-                    setOpen(false);
-                    handleSignOut();
+                <DropdownList
+                  items={dropdownItems}
+                  onAction={(a) => {
+                    if (a === "signout") {
+                      setOpen(false);
+                      handleSignOut();
+                    }
                   }}
-                >
-                  <LogOut className="h-4 w-4" />
-                  Sign out
-                </MenuButton>
+                  onNavigate={() => setOpen(false)}
+                />
               </div>
             )}
           </nav>
