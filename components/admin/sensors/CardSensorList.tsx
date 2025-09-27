@@ -6,10 +6,6 @@ import { getSensorDisplayData } from '@/service/admin/sensorApi';
 import { Search, RefreshCw, Activity, Edit, RotateCcw, MapPin, ExternalLink, Wifi, WifiOff, Eye, AlertCircle, Settings } from 'lucide-react';
 import Link from 'next/link';
 
-interface CardSensorListProps {
-  //fetching data internally
-}
-
 // Convert SensorDataDisplayDTO to AdminSensor format
 const convertToAdminSensor = (displayData: SensorDataDisplayDTO): AdminSensor => {
   return {
@@ -120,7 +116,7 @@ const SensorCard: React.FC<{
   </div>
 );
 
-export const CardSensorList: React.FC<CardSensorListProps> = () => {
+export const CardSensorList: React.FC = () => {
   const [sensors, setSensors] = useState<AdminSensor[]>([]);
   const [filteredSensors, setFilteredSensors] = useState<AdminSensor[]>([]);
   const [loading, setLoading] = useState(true);
