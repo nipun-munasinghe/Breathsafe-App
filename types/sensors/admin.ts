@@ -87,4 +87,10 @@ export interface SensorDataDisplayDTO {
   co2Level: number | null;
   aqiValue: number | null;
   timestamp: string | null;
+  dataId?: number;
+}
+
+//delete response interface
+export interface DeleteSensorDataResponse {
+  message: string;
 }
