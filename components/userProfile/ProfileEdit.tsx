@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { UserProfile } from "@/types/user";
 import {
   Save,
@@ -83,10 +84,12 @@ export function ProfileEdit({
                   <div className="relative group">
                     <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white shadow-xl overflow-hidden bg-gradient-to-br from-emerald-400 to-teal-500">
                       {formData.profileImage ? (
-                        <img
+                        <Image
                           src={formData.profileImage}
                           alt={`${formData.firstName} ${formData.lastName}`}
                           className="w-full h-full object-cover"
+                          fill
+                          sizes="160px"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-2xl md:text-3xl font-semibold text-white">
