@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { createPopper } from "@popperjs/core";
+import React, {useState, useRef} from "react";
+import {createPopper} from "@popperjs/core";
 import Image from "next/image";
 import teamImg from "@/public/profile-pic.jpg";
 
@@ -39,15 +39,16 @@ const UserDropdown: React.FC = () => {
                 }}
             >
                 <div className="items-center flex">
-          <span className="w-12 h-12 text-sm text-white bg-blueGray-200 inline-flex items-center justify-center rounded-full overflow-hidden">
-            <Image
-                alt="User profile"
-                src={teamImg}
-                className="rounded-full border-none shadow-lg"
-                width={48}
-                height={48}
-            />
-          </span>
+                  <span
+                      className="w-12 h-12 text-sm text-white bg-blueGray-200 inline-flex items-center justify-center rounded-full overflow-hidden">
+                    <Image
+                        alt="User profile"
+                        src={teamImg}
+                        className="rounded-full border-none shadow-lg"
+                        width={48}
+                        height={48}
+                    />
+                  </span>
                 </div>
             </a>
 
@@ -78,7 +79,7 @@ const UserDropdown: React.FC = () => {
                 >
                     Something else here
                 </a>
-                <div className="h-0 my-2 border border-solid border-blueGray-100" />
+                <div className="h-0 my-2 border border-solid border-blueGray-100"/>
                 <a
                     href="#"
                     className="text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-blueGray-700"

@@ -44,3 +44,12 @@ export interface CommunityRequest {
     sensorId: number | null;
     sensorName: string | null;
 }
+
+export interface RequestApprove {
+    sensorId: number;
+    adminComments: string;
+}
+
+export type CardPendingRequestsRef = {
+    refetch: () => void;
+};
