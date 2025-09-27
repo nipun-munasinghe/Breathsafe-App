@@ -1,26 +1,15 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { Check, Clock, MapPin, ToggleLeft, ToggleRight } from "lucide-react";
+import React, {useMemo, useState} from "react";
+import {Check, Clock, MapPin, ToggleLeft, ToggleRight} from "lucide-react";
 import dynamic from "next/dynamic";
 import * as yup from "yup";
 import ToastUtils from "@/utils/toastUtils";
+import {CreateSensorFormData, SensorStatus, sensorValidationSchema, statusOptions} from "@/types/sensors/admin";
 
 const MapSelector = dynamic(() => import("@/components/requests/MapSelector"), {
   ssr: false,
 });
-
-type SensorStatus = "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR";
-
-interface CreateSensorFormData {
-  name: string;
-  installationDate: string;
-  isActive: boolean;
-  status: SensorStatus | "";
-  latitude: number | null;
-  longitude: number | null;
-  location: string;
-}
 
 const initialFormData: CreateSensorFormData = {
   name: "",
@@ -31,63 +20,6 @@ const initialFormData: CreateSensorFormData = {
   longitude: null,
   location: "",
 };
-
-const statusOptions: SensorStatus[] = [
-  "ONLINE",
-  "OFFLINE",
-  "MAINTENANCE",
-  "ERROR",
-];
-
-// Yup validation schema
-const sensorValidationSchema = yup.object({
-  name: yup
-    .string()
-    .required("Sensor name is required")
-    .min(3, "Sensor name must be at least 3 characters")
-    .max(100, "Sensor name must be less than 100 characters")
-    .trim(),
-  installationDate: yup
-    .string()
-    .required("Installation date is required")
-    .test("valid-date", "Please enter a valid date", (value) => {
-      if (!value) return false;
-      const date = new Date(value);
-      return date instanceof Date && !isNaN(date.getTime());
-    })
-    .test(
-      "not-future",
-      "Installation date cannot be in the future",
-      (value) => {
-        if (!value) return true;
-        const date = new Date(value);
-        return date <= new Date();
-      }
-    ),
-  isActive: yup.boolean().required("Active status is required"),
-  status: yup
-    .string()
-    .required("Status is required")
-    .oneOf(statusOptions, "Please select a valid status"),
-  latitude: yup
-    .number()
-    .required("Latitude is required")
-    .min(-90, "Latitude must be between -90 and 90")
-    .max(90, "Latitude must be between -90 and 90")
-    .typeError("Latitude must be a valid number"),
-  longitude: yup
-    .number()
-    .required("Longitude is required")
-    .min(-180, "Longitude must be between -180 and 180")
-    .max(180, "Longitude must be between -180 and 180")
-    .typeError("Longitude must be a valid number"),
-  location: yup
-    .string()
-    .required("Location is required")
-    .min(5, "Location must be at least 5 characters")
-    .max(200, "Location must be less than 200 characters")
-    .trim(),
-});
 
 const CreateSensor: React.FC = () => {
   const [formData, setFormData] =
@@ -135,7 +67,6 @@ const CreateSensor: React.FC = () => {
     }
   };
 
-  // Validate entire form
   const validateForm = async (): Promise<boolean> => {
     try {
       await sensorValidationSchema.validate(formData, { abortEarly: false });
@@ -162,7 +93,7 @@ const CreateSensor: React.FC = () => {
       longitude: lng,
       location: address,
     }));
-    // Validate the updated fields
+
     validateField("latitude", lat);
     validateField("longitude", lng);
     validateField("location", address);
@@ -197,6 +128,7 @@ const CreateSensor: React.FC = () => {
         location: formData.location.trim(),
       };
 
+      console.log(payload);
       ToastUtils.success("Sensor created successfully!");
     } catch (err: any) {
       setSubmitError(err?.message || "Failed to submit form");

@@ -183,15 +183,15 @@ const Sidebar: React.FC = () => {
               <li className="items-center">
                 <Link
                   className={`text-xs uppercase py-3 font-bold block ${
-                    isActive("/admin/sensor_Management")
+                    isActive("/admin/create-sensor")
                       ? "text-lightBlue-500 hover:text-lightBlue-600"
                       : "text-blueGray-700 hover:text-blueGray-500"
                   }`}
-                  href="/admin/sensor_Management"
+                  href="/admin/create-sensor"
                 >
                   <i
                     className={`fas fa-plus-circle mr-2 text-sm ${
-                      isActive("/admin/sensor_Management")
+                      isActive("/admin/create-sensor")
                         ? "opacity-75"
                         : "text-blueGray-400"
                     }`}
