@@ -2,41 +2,137 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import * as yup from "yup";
 import Button from "@/components/common/Button";
 import { registerUser } from "@/service/userApi";
 import { UserData } from "@/types/user/types";
 
+// Validation schema using Yup
+const validationSchema = yup.object().shape({
+  firstName: yup
+    .string()
+    .required("First name is required")
+    .min(2, "First name must be at least 2 characters"),
+  lastName: yup
+    .string()
+    .required("Last name is required")
+    .min(2, "Last name must be at least 2 characters"),
+  username: yup
+    .string()
+    .required("Username is required")
+    .min(3, "Username must be at least 3 characters"),
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Please enter a valid email address"),
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(8, "Password must be at least 8 characters"),
+  confirmPassword: yup
+    .string()
+    .required("Please confirm your password")
+    .oneOf([yup.ref("password")], "Passwords must match"),
+  agreeToTerms: yup
+    .boolean()
+    .oneOf([true], "You must agree to the terms and conditions"),
+});
+
 const Page = () => {
+  const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
-  const [userData, setUserData] = useState<UserData>({username: "", firstName: "", lastName: "", email: "", password: "", role: "USER"});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [userData, setUserData] = useState<UserData>({
+    username: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    role: "USER",
+  });
 
   const handlePasswordChecker = () => {
     const password = document.getElementById("password") as HTMLInputElement;
-    const confirmPassword = document.getElementById(
+    const confirmPasswordElement = document.getElementById(
       "confirmPassword"
     ) as HTMLInputElement;
 
-    if (password.value === confirmPassword.value) {
-      setErrorMessage("");
-    } else {
-      setErrorMessage("Password does not match");
+    if (password?.value && confirmPasswordElement?.value) {
+      if (password.value === confirmPasswordElement.value) {
+        setErrorMessage("");
+      } else {
+        setErrorMessage("Password does not match");
+      }
+    }
+  };
+
+  const validateForm = async () => {
+    try {
+      await validationSchema.validate(
+        {
+          ...userData,
+          confirmPassword,
+          agreeToTerms,
+        },
+        { abortEarly: false }
+      );
+
+      setValidationErrors({});
+      return true;
+    } catch (error) {
+      if (error instanceof yup.ValidationError) {
+        const errors: Record<string, string> = {};
+        error.inner.forEach((err) => {
+          if (err.path) {
+            errors[err.path] = err.message;
+          }
+        });
+        setValidationErrors(errors);
+      }
+      return false;
     }
   };
 
   const handleSubmission = async (e: React.FormEvent) => {
-  e.preventDefault();
-  try {
-    await registerUser(userData);
-  } catch (error) {
-      console.error("Error registering user:", error);
-  }
-};
+    e.preventDefault();
+    setErrorMessage("");
 
+    // Validate form
+    const isValid = await validateForm();
+    if (!isValid) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await registerUser(userData);
+      if (!response.success) {
+        setErrorMessage("Registration failed. Please try again.");
+        return;
+      }
+
+      setTimeout(() => {
+        router.push("/signin");
+      }, 2000);
+    } catch (error) {
+      console.error("Error registering user:", error);
+      setErrorMessage("Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     handlePasswordChecker();
-  }, []);
+  }, [userData.password, confirmPassword]);
 
   return (
     <div className="flex justify-center bg-emerald-950 min-h-screen py-12 px-4">
@@ -59,7 +155,11 @@ const Page = () => {
               Create your account to get started
             </p>
           </div>
-          <form className="mt-4 space-y-5 animate-fade-in-up" onSubmit={handleSubmission} action="POST">
+          <form
+            className="mt-4 space-y-5 animate-fade-in-up"
+            onSubmit={handleSubmission}
+            action="POST"
+          >
             {/* First & Last Name */}
             <div className="flex flex-col sm:flex-row gap-4 mb-0">
               <div className="flex flex-col flex-1">
@@ -75,10 +175,17 @@ const Page = () => {
                   name="firstName"
                   placeholder="First Name"
                   value={userData.firstName}
-                  onChange={(e) => setUserData({ ...userData, firstName: e.target.value })}
+                  onChange={(e) =>
+                    setUserData({ ...userData, firstName: e.target.value })
+                  }
                   className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                   required
                 />
+                {validationErrors.firstName && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {validationErrors.firstName}
+                  </p>
+                )}
               </div>
               <div className="flex flex-col flex-1">
                 <label
@@ -93,17 +200,24 @@ const Page = () => {
                   name="lastName"
                   placeholder="Last Name"
                   value={userData.lastName}
-                  onChange={(e) => setUserData({ ...userData, lastName: e.target.value })}
+                  onChange={(e) =>
+                    setUserData({ ...userData, lastName: e.target.value })
+                  }
                   className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                   required
                 />
+                {validationErrors.lastName && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {validationErrors.lastName}
+                  </p>
+                )}
               </div>
             </div>
 
             {/* Username */}
             <div className="flex flex-col mt-3 mb-0">
               <label
-                htmlFor="email"
+                htmlFor="userName"
                 className="text-gray-500 text-sm lg:text-lg"
               >
                 Username
@@ -114,12 +228,18 @@ const Page = () => {
                 name="userName"
                 placeholder="Enter your Username"
                 value={userData.username}
-                onChange={(e) => setUserData({ ...userData, username: e.target.value })}
+                onChange={(e) =>
+                  setUserData({ ...userData, username: e.target.value })
+                }
                 className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                 required
               />
+              {validationErrors.username && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.username}
+                </p>
+              )}
             </div>
-
 
             {/* Email */}
             <div className="flex flex-col mt-3 mb-0">
@@ -135,10 +255,17 @@ const Page = () => {
                 name="email"
                 placeholder="Enter your email"
                 value={userData.email}
-                onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                onChange={(e) =>
+                  setUserData({ ...userData, email: e.target.value })
+                }
                 className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                 required
               />
+              {validationErrors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.email}
+                </p>
+              )}
             </div>
 
             {/* Password */}
@@ -155,11 +282,18 @@ const Page = () => {
                 name="password"
                 placeholder="Enter your password"
                 value={userData.password}
-                onChange={(e) => setUserData({ ...userData, password: e.target.value })}
+                onChange={(e) =>
+                  setUserData({ ...userData, password: e.target.value })
+                }
                 onKeyUp={handlePasswordChecker}
                 className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                 required
               />
+              {validationErrors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.password}
+                </p>
+              )}
             </div>
 
             {/* Confirm Password */}
@@ -174,21 +308,48 @@ const Page = () => {
                 type="password"
                 id="confirmPassword"
                 placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 onKeyUp={handlePasswordChecker}
                 className="border p-2 rounded-md w-full focus:outline-none focus:ring-2 focus:border-transparent focus:ring-lime-600 transition duration-300"
                 required
               />
+              {validationErrors.confirmPassword && (
+                <p className="text-red-500 text-sm mt-1">
+                  {validationErrors.confirmPassword}
+                </p>
+              )}
             </div>
 
             {/* Terms */}
             <div className="flex items-center gap-2 mt-4">
-              <input type="checkbox" id="rememberMe" />
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={agreeToTerms}
+                onChange={(e) => setAgreeToTerms(e.target.checked)}
+              />
               <label htmlFor="rememberMe" className="text-sm text-gray-600">
                 I agree to the Terms & Conditions
               </label>
             </div>
+            {validationErrors.agreeToTerms && (
+              <p className="text-red-500 text-sm mt-1">
+                {validationErrors.agreeToTerms}
+              </p>
+            )}
 
-            <Button onClick={() => {}} name="Register" type="submit"/>
+            {/* Register Button with Loading State */}
+            <div className="relative">
+              {isLoading ? (
+                <div className="w-full bg-gray-400 text-white py-2 px-4 rounded-md flex items-center justify-center cursor-not-allowed">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  <span>Registering...</span>
+                </div>
+              ) : (
+                <Button onClick={() => {}} name="Register" type="submit" />
+              )}
+            </div>
 
             {/* Error Message */}
             {errorMessage && (
