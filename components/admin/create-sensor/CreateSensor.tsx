@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import * as yup from "yup";
 import ToastUtils from "@/utils/toastUtils";
 import {CreateSensorFormData, SensorStatus, sensorValidationSchema, statusOptions} from "@/types/sensors/admin";
+import {createSensor} from "@/service/sensorApi";
 
 const MapSelector = dynamic(() => import("@/components/requests/MapSelector"), {
   ssr: false,
@@ -118,7 +119,7 @@ const CreateSensor: React.FC = () => {
     setSubmitting(true);
 
     try {
-      const payload = {
+      const payload : CreateSensorFormData = {
         name: formData.name.trim(),
         installationDate: new Date(formData.installationDate).toISOString(),
         isActive: formData.isActive,
@@ -128,10 +129,13 @@ const CreateSensor: React.FC = () => {
         location: formData.location.trim(),
       };
 
-      console.log(payload);
-      ToastUtils.success("Sensor created successfully!");
+      const response = await createSensor(payload);
+      if (response?.success) {
+          ToastUtils.success("Sensor created successfully!");
+          setFormData(initialFormData);
+      }
     } catch (err: any) {
-      setSubmitError(err?.message || "Failed to submit form");
+      setSubmitError(err?.message || "Failed to submit form!");
     } finally {
       setSubmitting(false);
     }
