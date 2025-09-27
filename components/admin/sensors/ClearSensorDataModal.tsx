@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AdminSensor, SensorDataDisplayDTO } from '@/types/sensors/admin';
+import { AdminSensor } from '@/types/sensors/admin';
 import { clearSensorData } from '@/service/admin/sensorDataApi';
 import { RotateCcw, AlertTriangle, X, MapPin, Calendar, Database, CheckCircle } from 'lucide-react';
 
