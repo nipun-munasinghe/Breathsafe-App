@@ -8,11 +8,13 @@ import { ProfileEdit } from "../../components/userProfile/ProfileEdit";
 import { ProtectedRoute } from "@/components/common/protectedRoute";
 import Footer from "@/components/common/Footer";
 import { getUserDetails, updateUserProfile } from "@/service/userApi";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   // Fetch user details from API
   const fetchUserDetails = async () => {
@@ -26,7 +28,10 @@ export default function Home() {
           username: response.data.username,
           email: response.data.email,
           phone: response.data.phone || "",
-          dateOfBirth: response.data.dateOfBirth || "",
+          // ✅ Normalize LocalDateTime -> yyyy-MM-dd for <input type="date">
+          dateOfBirth: response.data.dateOfBirth
+            ? new Date(response.data.dateOfBirth).toISOString().split("T")[0]
+            : "",
           address: response.data.address || "",
           bio: response.data.bio || "",
           profileImage: response.data.profileImage || "",
@@ -55,12 +60,25 @@ export default function Home() {
   // Save updated user data
   const handleSave = async (updatedUser: UserProfile) => {
     try {
-      const response = await updateUserProfile(updatedUser);
+      const payload = {
+        ...updatedUser,
+        dateOfBirth: updatedUser.dateOfBirth
+          ? `${updatedUser.dateOfBirth}`
+          : "",
+      };
+
+      const response = await updateUserProfile(payload);
       if (response?.success && response.data) {
-        setUser(response.data);
-        console.log(response);
+        setUser({
+          ...response.data,
+          dateOfBirth: response.data.dateOfBirth
+            ? new Date(response.data.dateOfBirth).toISOString().split("T")[0]
+            : "",
+        });
         setIsEditing(false);
         console.log("Profile updated successfully:", response.data);
+        router.push("/userProfile");
+        
       } else {
         console.error(response?.error || "Failed to update profile");
       }

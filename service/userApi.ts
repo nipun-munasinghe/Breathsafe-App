@@ -54,3 +54,16 @@ export const updateUserProfile = async (
     return { success: false, error: error.response.data.message };
   }
 };
+
+export const deleteUserAccount = async (): Promise<boolean> => {
+  try {
+    await privateAxios.delete("/user");
+    ToastUtils.success("Account deleted successfully.");
+    return true;
+  } catch (error: any) {
+    ToastUtils.error(
+      "Failed to delete account. " + error.response.data.message
+    );
+    return false;
+  }
+};

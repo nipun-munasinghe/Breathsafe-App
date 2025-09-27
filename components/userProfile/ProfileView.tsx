@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect } from 'react';
+import React from "react";
 import Image from "next/image";
-import { UserProfile } from '@/types/user';
+import { UserProfile } from "@/types/user";
 import {
   Camera,
   Edit,
@@ -11,8 +11,8 @@ import {
   Phone,
   AtSign,
   Mail,
-  MapPin
-} from 'lucide-react';
+  MapPin,
+} from "lucide-react";
 
 interface ProfileViewProps {
   user: UserProfile;
@@ -20,8 +20,21 @@ interface ProfileViewProps {
   onImageUpload: (file: File) => void;
 }
 
+// Format date string for display
+export function formatDate(date: string | null): string {
+  if (!date) return "";
+
+  const parsedDate = new Date(date);
+  if (isNaN(parsedDate.getTime())) return "";
+
+  const year = parsedDate.getFullYear();
+  const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+  const day = String(parsedDate.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
-  
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -33,22 +46,11 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
   return (
-    <div className=" bg-gradient-to-br from-slate-50 to-slate-100 mt-25 mb-25 p-4 md:p-6">
+    <div className="bg-gradient-to-br from-slate-50 to-slate-100 mt-25 mb-25 p-4 md:p-6">
       <div className="max-w-full mx-auto space-y-6">
-
-        {/* Profile Container with All User Information */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border-t-gradient-to-r from-lime-600 to-emerald-600 relative">
-          {/* Top Border Gradient */}
+        {/* Profile Container */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden relative">
           <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-lime-600 to-emerald-600"></div>
           <div className="p-6 md:p-8 pt-10">
             <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-8">
@@ -72,7 +74,7 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                       </div>
                     )}
                   </div>
-                  
+
                   <label className="absolute bottom-2 right-2 cursor-pointer">
                     <div className="w-10 h-10 bg-blue-gray-900/20 hover:bg-blue-gray-900/30 text-blue-gray-900 rounded-full flex items-center justify-center shadow-lg transition-colors duration-200 backdrop-blur-sm">
                       <Camera className="w-5 h-5" />
@@ -85,10 +87,12 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                     />
                   </label>
                 </div>
-                <p className="text-sm text-blue-gray-900/70 text-center">Click the camera icon to change your profile picture</p>
+                <p className="text-sm text-blue-gray-900/70 text-center">
+                  Click the camera icon to change your profile picture
+                </p>
               </div>
 
-              {/* Complete User Information */}
+              {/* User Information */}
               <div className="flex-1 text-blue-gray-900 text-center lg:text-left">
                 <div className="space-y-6">
                   {/* Name and Username */}
@@ -98,13 +102,15 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                     </h2>
                     <div className="flex items-center justify-center lg:justify-start space-x-2">
                       <AtSign className="w-5 h-5 text-blue-gray-900/70" />
-                      <span className="text-lg text-blue-gray-900/80">{user.username}</span>
+                      <span className="text-lg text-blue-gray-900/80">
+                        {user.username}
+                      </span>
                     </div>
                   </div>
 
-                  {/* All User Information Cards */}
+                  {/* Information Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {/* Full Name Card */}
+                    {/* Full Name */}
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center space-x-3">
                         <div className="bg-lime-100 p-2 rounded-full">
@@ -112,12 +118,14 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                         </div>
                         <div>
                           <p className="text-blue-gray-900/70 text-sm">Full Name</p>
-                          <p className="text-blue-gray-900 font-semibold">{user.firstName} {user.lastName}</p>
+                          <p className="text-blue-gray-900 font-semibold">
+                            {user.firstName} {user.lastName}
+                          </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Email Card */}
+                    {/* Email */}
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center space-x-3">
                         <div className="bg-emerald-100 p-2 rounded-full">
@@ -130,7 +138,7 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                       </div>
                     </div>
 
-                    {/* Phone Card */}
+                    {/* Phone */}
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center space-x-3">
                         <div className="bg-lime-100 p-2 rounded-full">
@@ -143,7 +151,7 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                       </div>
                     </div>
 
-                    {/* Birthday Card */}
+                    {/* Birthday */}
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center space-x-3">
                         <div className="bg-emerald-100 p-2 rounded-full">
@@ -151,12 +159,14 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                         </div>
                         <div>
                           <p className="text-blue-gray-900/70 text-sm">Birthday</p>
-                          <p className="text-blue-gray-900 font-semibold">{formatDate(user.dateOfBirth)}</p>
+                          <p className="text-blue-gray-900 font-semibold">
+                            {formatDate(user.dateOfBirth)}
+                          </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Address Card */}
+                    {/* Address */}
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 md:col-span-2">
                       <div className="flex items-start space-x-3">
                         <div className="bg-lime-100 p-2 rounded-full mt-1">
@@ -170,7 +180,7 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                     </div>
                   </div>
 
-                  {/* Bio Section */}
+                  {/* Bio */}
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <div className="space-y-3">
                       <h4 className="text-blue-gray-900 font-semibold text-lg">About Me</h4>

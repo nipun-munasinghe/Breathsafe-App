@@ -51,7 +51,13 @@ export function ProfileEdit({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    const payload: UserProfile = {
+      ...formData,
+      dateOfBirth: formData.dateOfBirth
+        ? `${formData.dateOfBirth}T00:00:00`
+        : "",
+    };
+    onSave(payload);
   };
 
   const getInitials = (firstName: string, lastName: string) => {
@@ -216,7 +222,9 @@ export function ProfileEdit({
                           <div className="bg-emerald-100 p-2 rounded-full">
                             <Calendar className="w-5 h-5 text-emerald-600" />
                           </div>
-                          <p className="text-slate-600 text-sm">Date of Birth</p>
+                          <p className="text-slate-600 text-sm">
+                            Date of Birth
+                          </p>
                         </div>
                         <input
                           type="date"
