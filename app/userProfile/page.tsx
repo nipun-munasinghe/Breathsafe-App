@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from 'react';
+import Header from "@/components/common/Header";
 import { UserProfile } from '@/types/user';
 import { ProfileView } from '../../components/userProfile/ProfileView';
 import { ProfileEdit } from '../../components/userProfile/ProfileEdit';
+import { ProtectedRoute } from '@/components/common/protectedRoute';
+import Footer from '@/components/common/Footer';
 
 // Sample user data
 const initialUserData: UserProfile = {
@@ -50,20 +53,25 @@ export default function Home() {
 
   return (
     <>
-      {isEditing ? (
-        <ProfileEdit
-          user={user}
-          onSave={handleSave}
-          onCancel={handleCancel}
-          onImageUpload={handleImageUpload}
-        />
-      ) : (
-        <ProfileView
-          user={user}
-          onEdit={handleEdit}
-          onImageUpload={handleImageUpload}
-        />
-      )}
-    </>
+      <ProtectedRoute>
+        <Header/>
+          {isEditing ? (
+            <ProfileEdit
+              user={user}
+              onSave={handleSave}
+              onCancel={handleCancel}
+              onImageUpload={handleImageUpload}
+            />
+          ) : (
+            <ProfileView
+              user={user}
+              onEdit={handleEdit}
+              onImageUpload={handleImageUpload}
+            />
+          )}
+        <Footer/>
+      </ProtectedRoute>
+      </>
+    
   );
 }
