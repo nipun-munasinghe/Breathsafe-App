@@ -7,7 +7,7 @@ import Footer from '@/components/common/Footer';
 import { ProtectedRoute } from '@/components/common/protectedRoute';
 import SensorStatsGrid from '@/components/sensor/SensorStatsGrid';
 import SensorChart from '@/components/sensor/SensorChart';
-import { getSensorById, getSensorDataByWeek, getSensorStats } from '@/service/sensorApi';
+import { getSensorById, getSensorDataByWeek, getSensorStats } from '@/service/admin/sensorChartApi';
 import { Sensor, ChartData, SensorStats } from '@/types/sensors/admin';
 import ToastUtils from '@/utils/toastUtils';
 

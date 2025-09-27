@@ -2,7 +2,7 @@
 
 import React, { JSX, useState, useEffect } from 'react';
 import { AdminSensor, SensorDataDisplayDTO } from '@/types/sensors/admin';
-import { getSensorDisplayData } from '@/service/admin/sensorApi';
+import { getSensorDisplayData } from '@/service/admin/sensorDataApi';
 import { Search, RefreshCw, Activity, Edit, RotateCcw, MapPin, ExternalLink, Wifi, WifiOff, Eye, AlertCircle, Settings } from 'lucide-react';
 import Link from 'next/link';
 
