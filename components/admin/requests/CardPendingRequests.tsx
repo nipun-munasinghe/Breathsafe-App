@@ -1,101 +1,40 @@
-import React, {useEffect, useState} from "react";
-import {CommunityRequest} from "@/types/request";
+import React, {forwardRef, useEffect, useImperativeHandle, useState} from "react";
+import {CardPendingRequestsRef, CommunityRequest} from "@/types/request";
 import {Calendar, CheckCircle, Clock, ExternalLink, MapPin, RefreshCw, Search, XCircle} from "lucide-react";
+import {getAllRequests} from "@/service/requestApi";
+import {apiResponse} from "@/types/common";
 
-const mockRequests: CommunityRequest[] = [
-    {
-        id: 1,
-        requestedLocation: "Kandy City Center",
-        latitude: 7.2906,
-        longitude: 80.6337,
-        justification: "High traffic area with multiple schools nearby. Air quality concerns due to heavy vehicle emissions during peak hours.",
-        status: "PENDING",
-        adminComments: null,
-        approvedAt: null,
-        rejectedAt: null,
-        createdAt: "2025-09-21T08:30:00.000Z",
-        updatedAt: "2025-09-21T08:30:00.000Z",
-        requesterId: 1,
-        requesterName: "Saman Perera",
-        approvedById: null,
-        approvedByName: null,
-        sensorId: null,
-        sensorName: null
-    },
-    {
-        id: 2,
-        requestedLocation: "Kegalle Town",
-        latitude: 7.2513,
-        longitude: 80.3464,
-        justification: "Industrial area affecting residential community. Need monitoring for public health safety.",
-        status: "PENDING",
-        adminComments: null,
-        approvedAt: null,
-        rejectedAt: null,
-        createdAt: "2025-09-20T16:12:31.324Z",
-        updatedAt: "2025-09-20T16:12:31.324Z",
-        requesterId: 2,
-        requesterName: "Moditha Marasingha",
-        approvedById: null,
-        approvedByName: null,
-        sensorId: null,
-        sensorName: null
-    },
-    {
-        id: 3,
-        requestedLocation: "Kegalle Town",
-        latitude: 7.2513,
-        longitude: 80.3464,
-        justification: "Industrial area affecting residential community. Need monitoring for public health safety.",
-        status: "PENDING",
-        adminComments: null,
-        approvedAt: null,
-        rejectedAt: null,
-        createdAt: "2025-09-20T16:12:31.324Z",
-        updatedAt: "2025-09-20T16:12:31.324Z",
-        requesterId: 2,
-        requesterName: "Moditha Marasingha",
-        approvedById: null,
-        approvedByName: null,
-        sensorId: null,
-        sensorName: null
-    },
-    {
-        id: 4,
-        requestedLocation: "Kegalle Town",
-        latitude: 7.2513,
-        longitude: 80.3464,
-        justification: "Industrial area affecting residential community. Need monitoring for public health safety.",
-        status: "PENDING",
-        adminComments: null,
-        approvedAt: null,
-        rejectedAt: null,
-        createdAt: "2025-09-20T16:12:31.324Z",
-        updatedAt: "2025-09-20T16:12:31.324Z",
-        requesterId: 2,
-        requesterName: "Moditha Marasingha",
-        approvedById: null,
-        approvedByName: null,
-        sensorId: null,
-        sensorName: null
-    }
-];
-
-export const CardPendingRequests: React.FC<{
+export const CardPendingRequests = forwardRef<CardPendingRequestsRef, {
     onApprove: (request: CommunityRequest) => void;
     onReject: (request: CommunityRequest) => void;
-}> = ({ onApprove, onReject }) => {
+}>(({ onApprove, onReject }, ref) => {
     const [requests, setRequests] = useState<CommunityRequest[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        // Simulate API call
-        setTimeout(() => {
-            setRequests(mockRequests);
+    const fetchData = async () => {
+        try {
+            const response: apiResponse<CommunityRequest[]> | null = await getAllRequests();
+            setTimeout(() => {
+                const data = response?.data ?? [];
+                setRequests(
+                    data.filter((req: CommunityRequest) => req.status === "PENDING") || []
+                );
+                setIsLoading(false);
+            }, 1000);
+        } catch (error) {
+            console.error("Failed to fetch requests", error);
             setIsLoading(false);
-        }, 1000);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
     }, []);
+
+    useImperativeHandle(ref, () => ({
+        refetch: fetchData
+    }));
 
     const filteredRequests = requests.filter(request =>
         request.requestedLocation.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -156,7 +95,7 @@ export const CardPendingRequests: React.FC<{
                                 </div>
 
                                 <button
-                                    onClick={() => setIsLoading(true)}
+                                    onClick={() => fetchData()}
                                     className="bg-lime-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-950 transition-colors flex items-center"
                                 >
                                     <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`}/>
@@ -279,4 +218,6 @@ export const CardPendingRequests: React.FC<{
             </div>
         </div>
     );
-};
+});
+
+CardPendingRequests.displayName = "CardPendingRequests";

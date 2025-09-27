@@ -4,10 +4,6 @@ import React from "react";
 import Link from "next/link";
 import { Github, Linkedin, Mail, Heart, ChevronRight } from "lucide-react";
 
-/* =========================
-   Editable configuration
-   ========================= */
-
 type LinkItem = { label: string; href: string; external?: boolean };
 type LinkGroup = { heading: string; links: LinkItem[] };
 
@@ -41,7 +37,6 @@ const LINK_GROUPS: LinkGroup[] = [
   },
 ];
 
-// Social links (update URLs to real destinations)
 const SOCIAL_LINKS: { label: string; href: string; icon: React.ReactNode; aria: string; external?: boolean }[] = [
   {
     label: "GitHub",
@@ -81,13 +76,12 @@ export default function Footer({ showNewsletter = true, variant = "dark" }: Foot
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email");
-    // TODO: Integrate real subscription endpoint (fetch/axios call)
     console.log("Newsletter subscribe:", email);
     (e.currentTarget as HTMLFormElement).reset();
   }
 
   return (
-    <footer className={`relative mt-24 border-t border-white/10 ${bgClass} text-neutral-300`}>
+    <footer className={`relative border-t border-white/10 ${bgClass} text-neutral-300`}>
       {/* Decorative subtle glow */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-28 left-1/2 h-64 w-[55rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-emerald-600/15 via-lime-400/5 to-amber-400/15 blur-2xl" />
