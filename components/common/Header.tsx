@@ -24,11 +24,6 @@ import {
 import { useAuthStore } from "@/store/authStore";
 import type { loggedInUser } from "@/types/user/types";
 
-/* =========================================================
-   ROLE + MENU CONFIGURATION (EDIT THIS SECTION ONLY)
-   Add or change items here for quick customization.
-   ========================================================= */
-
 type Role = "USER" | "ADMIN" | "SENSOR_ADMIN";
 type NavItem = { href: string; label: string };
 
