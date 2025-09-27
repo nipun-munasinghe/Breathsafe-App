@@ -75,3 +75,16 @@ export interface ChartData {
   co2Data: number[];
   aqiData: number[];
 }
+
+export interface SensorDataDisplayDTO {
+  sensorId: number;
+  sensorName: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+  sensorStatus: 'ONLINE' | 'OFFLINE' | 'MAINTENANCE' | 'ERROR';
+  createdAt: string;
+  co2Level: number | null;
+  aqiValue: number | null;
+  timestamp: string | null;
+}

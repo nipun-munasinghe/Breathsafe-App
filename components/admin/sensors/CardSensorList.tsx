@@ -1,25 +1,37 @@
 'use client';
 
-import React, { JSX, useState } from 'react';
-import { AdminSensor } from '@/types/sensors/admin';
+import React, { JSX, useState, useEffect } from 'react';
+import { AdminSensor, SensorDataDisplayDTO } from '@/types/sensors/admin';
+import { getSensorDisplayData } from '@/service/admin/sensorApi';
 import { Search, RefreshCw, Activity, Edit, RotateCcw, MapPin, ExternalLink, Wifi, WifiOff, Eye, AlertCircle, Settings } from 'lucide-react';
 import Link from 'next/link';
 
 interface CardSensorListProps {
-  sensors: AdminSensor[];
-  loading: boolean;
-  totalSensors: number;
-  onEdit: (sensor: AdminSensor) => void;
-  onClearData: (sensor: AdminSensor) => void;  // Changed from onDelete
-  onSearch: (search: string) => void;
-  onRefresh: () => void;
+  //fetching data internally
 }
 
-// Move SensorCard OUTSIDE the main component to prevent recreation
+// Convert SensorDataDisplayDTO to AdminSensor format
+const convertToAdminSensor = (displayData: SensorDataDisplayDTO): AdminSensor => {
+  return {
+    id: displayData.sensorId,
+    name: displayData.sensorName,
+    location: displayData.location,
+    latitude: displayData.latitude,
+    longitude: displayData.longitude,
+    lastCO2Reading: displayData.co2Level,
+    lastAQIReading: displayData.aqiValue,
+    status: displayData.sensorStatus,
+    lastReadingTime: displayData.timestamp,
+    isOnline: displayData.sensorStatus === 'ONLINE',
+    createdAt: displayData.createdAt,
+    updatedAt: displayData.createdAt
+  };
+};
+
 const SensorCard: React.FC<{ 
   sensor: AdminSensor;
   onEdit: (sensor: AdminSensor) => void;
-  onClearData: (sensor: AdminSensor) => void;  // Changed from onDelete
+  onClearData: (sensor: AdminSensor) => void;
   formatDate: (dateString: string | null) => string;
   openInMaps: (lat: number, lng: number) => void;
   getStatusBadge: (status: string) => JSX.Element;
@@ -108,21 +120,51 @@ const SensorCard: React.FC<{
   </div>
 );
 
-export const CardSensorList: React.FC<CardSensorListProps> = ({
-  sensors,
-  loading,
-  totalSensors,
-  onEdit,
-  onClearData,  // Changed from onDelete
-  onSearch,
-  onRefresh
-}) => {
+export const CardSensorList: React.FC<CardSensorListProps> = () => {
+  const [sensors, setSensors] = useState<AdminSensor[]>([]);
+  const [filteredSensors, setFilteredSensors] = useState<AdminSensor[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Load real sensor data from backend
+  const loadSensors = async () => {
+    setLoading(true);
+    try {
+      const displayData = await getSensorDisplayData();
+      const convertedSensors = displayData.map(convertToAdminSensor);
+      setSensors(convertedSensors);
+      setFilteredSensors(convertedSensors);
+    } catch (error) {
+      console.error('Error loading sensors:', error);
+      setSensors([]);
+      setFilteredSensors([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSensors();
+  }, []);
 
   const handleSearchChange = React.useCallback((value: string) => {
     setSearchTerm(value);
-    onSearch(value);
-  }, [onSearch]);
+    if (value.trim() === '') {
+      setFilteredSensors(sensors);
+    } else {
+      const searchLower = value.toLowerCase();
+      const filtered = sensors.filter(sensor =>
+        sensor.name.toLowerCase().includes(searchLower) ||
+        sensor.location.toLowerCase().includes(searchLower) ||
+        sensor.status.toLowerCase().includes(searchLower)
+      );
+      setFilteredSensors(filtered);
+    }
+  }, [sensors]);
+
+  const handleRefresh = () => {
+    loadSensors();
+  };
 
   const formatDate = React.useCallback((dateString: string | null) => {
     if (!dateString) return 'No data';
@@ -138,6 +180,20 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
   const openInMaps = React.useCallback((lat: number, lng: number) => {
     window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
   }, []);
+
+  // Handle edit
+  const handleEdit = (sensor: AdminSensor) => {
+    console.log('Edit sensor:', sensor);
+    alert(`Edit functionality for sensor: ${sensor.name}\n(This would require implementing sensor update API)`);
+  };
+
+  // Handle clear data
+  const handleClearData = (sensor: AdminSensor) => {
+    console.log('Clear data for sensor:', sensor);
+    if (confirm(`Are you sure you want to clear data for sensor: ${sensor.name}?`)) {
+      console.log('User confirmed clearing data');
+    }
+  };
 
   // Status Badge
   const getStatusBadge = React.useCallback((status: string) => {
@@ -190,8 +246,8 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
               <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-xl sm:text-2xl text-slate-900">Sensor Management</h3>
-              <p className="text-gray-600 text-sm sm:text-base">Manage and monitor air quality sensors ({totalSensors} total)</p>
+              <h3 className="font-bold text-xl sm:text-2xl text-slate-900">Sensor Data Display</h3>
+              <p className="text-gray-600 text-sm sm:text-base">Real-time air quality monitoring ({filteredSensors.length} sensors)</p>
             </div>
           </div>
 
@@ -208,7 +264,7 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
             </div>
 
             <button
-              onClick={onRefresh}
+              onClick={handleRefresh}
               className="bg-lime-600 text-white px-4 py-2 rounded-lg hover:bg-lime-700 transition-colors flex items-center justify-center"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
@@ -227,7 +283,7 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
               <p className="text-gray-600">Loading sensors...</p>
             </div>
           </div>
-        ) : sensors.length === 0 ? (
+        ) : filteredSensors.length === 0 ? (
           <div className="text-center py-12">
             <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-700 mb-2">No Sensors Found</h3>
@@ -238,12 +294,12 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
             {/* Mobile View - Cards */}
             <div className="block lg:hidden">
               <div className="space-y-4">
-                {sensors.map((sensor) => (
+                {filteredSensors.map((sensor) => (
                   <SensorCard 
                     key={sensor.id} 
                     sensor={sensor}
-                    onEdit={onEdit}
-                    onClearData={onClearData}
+                    onEdit={handleEdit}
+                    onClearData={handleClearData}
                     formatDate={formatDate}
                     openInMaps={openInMaps}
                     getStatusBadge={getStatusBadge}
@@ -276,7 +332,7 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
                 </thead>
 
                 <tbody>
-                  {sensors.map((sensor) => (
+                  {filteredSensors.map((sensor) => (
                     <tr key={sensor.id} className="hover:bg-slate-50 transition-colors">
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                         <div className="flex items-center">
@@ -345,14 +401,14 @@ export const CardSensorList: React.FC<CardSensorListProps> = ({
                             </button>
                           </Link>
                           <button
-                            onClick={() => onEdit(sensor)}
+                            onClick={() => handleEdit(sensor)}
                             className="bg-lime-600 text-white px-4 py-2 rounded-lg hover:bg-lime-700 transition-colors flex items-center text-xs font-medium"
                           >
                             <Edit className="w-3 h-3 mr-1" />
                             Edit
                           </button>
                           <button
-                            onClick={() => onClearData(sensor)}
+                            onClick={() => handleClearData(sensor)}
                             className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors flex items-center text-xs font-medium"
                           >
                             <RotateCcw className="w-3 h-3 mr-1" />
