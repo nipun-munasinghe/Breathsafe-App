@@ -1,61 +1,18 @@
 import privateAxios from '@/lib/privateAxios';
-import { AdminSensor, SensorListResponse, SensorFormData, SensorReadingsFormData, SensorStatus } from '@/types/sensors/admin';
+import { AdminSensor, SensorListResponse, SensorFormData, SensorReadingsFormData, SensorStatus, SensorDataDisplayDTO } from '@/types/sensors/admin';
 
-// Original API calls
-/*
-export const getSensors = async (
-  page: number = 1,
-  limit: number = 10,
-  search?: string
-): Promise<SensorListResponse> => {
+// API calls
+export const getSensorDisplayData = async (): Promise<SensorDataDisplayDTO[]> => {
   try {
-    const response = await privateAxios.get<SensorListResponse>('/admin/sensors', {
-      params: { page, limit, search }
-    });
+    const response = await privateAxios.get<SensorDataDisplayDTO[]>('/sensorData');
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Failed to fetch sensors');
+    console.error('Error fetching sensor display data:', error);
+    throw new Error(error.response?.data?.message || 'Failed to fetch sensor data');
   }
 };
 
-export const createSensor = async (sensorData: SensorFormData): Promise<AdminSensor> => {
-  try {
-    const response = await privateAxios.post<AdminSensor>('/admin/sensors', sensorData);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Failed to create sensor');
-  }
-};
-
-export const updateSensor = async (id: number, sensorData: SensorFormData): Promise<AdminSensor> => {
-  try {
-    const response = await privateAxios.put<AdminSensor>(`/admin/sensors/${id}`, sensorData);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Failed to update sensor');
-  }
-};
-
-//function for readings-only updates
-export const updateSensorReadings = async (id: number, readingsData: SensorReadingsFormData): Promise<AdminSensor> => {
-  try {
-    const response = await privateAxios.patch<AdminSensor>(`/admin/sensors/${id}/readings`, readingsData);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Failed to update sensor readings');
-  }
-};
-
-export const deleteSensor = async (id: number): Promise<void> => {
-  try {
-    await privateAxios.delete(`/admin/sensors/${id}`);
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Failed to delete sensor');
-  }
-};
-*/
-
-// Updated dummy data
+//dummy data
 const mockSensors: AdminSensor[] = [
   {
     id: 1,
@@ -206,7 +163,7 @@ export const updateSensorReadings = async (id: number, readingsData: SensorReadi
     throw new Error('Sensor not found');
   }
 
-  // Validate readings before update
+  //Validate readings before update
   if (readingsData.lastCO2Reading !== null && readingsData.lastCO2Reading < 0) {
     throw new Error('CO₂ level cannot be negative');
   }
