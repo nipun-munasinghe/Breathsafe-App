@@ -31,6 +31,7 @@ export interface SensorListResponse {
   page: number;
   limit: number;
 }
+
 export interface SensorReadingsFormData {
   lastCO2Reading: number | null;
   lastAQIReading: number | null;
@@ -80,16 +81,16 @@ export interface ChartData {
 
 export interface SensorDataDisplayDTO {
   sensorId: number;
-  sensorName: string;
+  name: string;
   location: string;
   latitude: number;
   longitude: number;
-  sensorStatus: 'ONLINE' | 'OFFLINE' | 'MAINTENANCE' | 'ERROR';
+  status: SensorStatus;
   createdAt: string;
+  dataId: number;
   co2Level: number | null;
   aqiValue: number | null;
   timestamp: string | null;
-  dataId?: number;
 }
 
 //delete response interface
@@ -99,7 +100,7 @@ export interface DeleteSensorDataResponse {
 
 export const statusOptions: SensorStatus[] = [
     "ONLINE",
-    "OFFLINE",
+    "OFFLINE", 
     "MAINTENANCE",
     "ERROR",
 ];
