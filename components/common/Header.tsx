@@ -34,10 +34,11 @@ const NAV_CONFIG: Record<"COMMON" | Role, NavItem[]> = {
   COMMON: [
     { href: "/", label: "Home" },
     { href: "/map", label: "Map" },
-    { href: "/sensors", label: "Sensors" },
-    { href: "/analytics", label: "Analytics" },
+    { href: "/about", label: "About Us" },
+
   ],
   USER: [
+    { href: "/contact", label: "Contact Us" },
     { href: "/create-request", label: "Request Sensor" },
   ],
   SENSOR_ADMIN: [
@@ -45,7 +46,7 @@ const NAV_CONFIG: Record<"COMMON" | Role, NavItem[]> = {
     { href: "/sensor-admin/queue", label: "Pending Queue" },
   ],
   ADMIN: [
-    { href: "/admin/dashboard", label: "Admin" }
+    { href: "/admin/dashboard", label: "Admin Dashboard" }
   ],
 };
 

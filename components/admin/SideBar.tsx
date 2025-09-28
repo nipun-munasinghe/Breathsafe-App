@@ -164,7 +164,7 @@ const Sidebar: React.FC = () => {
               <li className="items-center">
                 <Link
                   className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
-                  href="/"
+                  href="/admin/approved-requests"
                 >
                   <i className="fas fa-check-square text-blueGray-300 mr-2 text-sm"></i>{" "}
                   Approved Requests

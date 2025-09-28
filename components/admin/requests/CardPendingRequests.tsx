@@ -7,7 +7,8 @@ import {apiResponse} from "@/types/common";
 export const CardPendingRequests = forwardRef<CardPendingRequestsRef, {
     onApprove: (request: CommunityRequest) => void;
     onReject: (request: CommunityRequest) => void;
-}>(({ onApprove, onReject }, ref) => {
+    isPending?: boolean;
+}>(({onApprove, onReject, isPending = true}, ref) => {
     const [requests, setRequests] = useState<CommunityRequest[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -18,7 +19,9 @@ export const CardPendingRequests = forwardRef<CardPendingRequestsRef, {
             setTimeout(() => {
                 const data = response?.data ?? [];
                 setRequests(
-                    data.filter((req: CommunityRequest) => req.status === "PENDING") || []
+                    isPending
+                        ? data.filter((req: CommunityRequest) => req.status === "PENDING")
+                        : data.filter((req: CommunityRequest) => req.status === "APPROVED")
                 );
                 setIsLoading(false);
             }, 1000);
@@ -76,7 +79,12 @@ export const CardPendingRequests = forwardRef<CardPendingRequestsRef, {
                                     <Clock className="w-6 h-6 text-white"/>
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-2xl text-slate-900">Pending Requests</h3>
+                                    {
+                                        isPending ? (
+                                            <h3 className="font-bold text-2xl text-slate-900">Pending Requests</h3>) : (
+                                            <h3 className="font-bold text-2xl text-slate-900">Approved Requests</h3>)
+                                    }
+
                                     <p className="text-gray-600">Review and manage community sensor requests</p>
                                 </div>
                             </div>
@@ -119,7 +127,7 @@ export const CardPendingRequests = forwardRef<CardPendingRequestsRef, {
                 ) : filteredRequests.length === 0 ? (
                     <div className="text-center py-12">
                         <Clock className="w-16 h-16 text-gray-300 mx-auto mb-4"/>
-                        <h3 className="text-xl font-semibold text-gray-700 mb-2">No Pending Requests</h3>
+                        <h3 className="text-xl font-semibold text-gray-700 mb-2">{isPending ? ("No Pending Requests") : ("No Approved Requests")}</h3>
                         <p className="text-gray-500">All requests have been reviewed</p>
                     </div>
                 ) : (
@@ -135,9 +143,11 @@ export const CardPendingRequests = forwardRef<CardPendingRequestsRef, {
                             <th className="px-6 bg-slate-50 text-slate-500 align-middle border border-solid border-slate-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
                                 Justification
                             </th>
-                            <th className="px-6 bg-slate-50 text-slate-500 align-middle border border-solid border-slate-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
-                                Actions
-                            </th>
+                            {isPending && (
+                                <th className="px-6 bg-slate-50 text-slate-500 align-middle border border-solid border-slate-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">
+                                    Actions
+                                </th>
+                            )}
                         </tr>
                         </thead>
 
@@ -192,24 +202,25 @@ export const CardPendingRequests = forwardRef<CardPendingRequestsRef, {
                                     </div>
                                 </td>
 
-                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                    <div className="flex space-x-2">
-                                        <button
-                                            onClick={() => handleApprove(request)}
-                                            className="bg-lime-600 text-white px-4 py-2 rounded-lg hover:bg-lime-700 transition-colors flex items-center text-xs font-medium"
-                                        >
-                                            <CheckCircle className="w-3 h-3 mr-1"/>
-                                            Approve
-                                        </button>
-                                        <button
-                                            onClick={() => handleReject(request)}
-                                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors flex items-center text-xs font-medium"
-                                        >
-                                            <XCircle className="w-3 h-3 mr-1"/>
-                                            Reject
-                                        </button>
-                                    </div>
-                                </td>
+                                {isPending && (
+                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                        <div className="flex space-x-2">
+                                            <button
+                                                onClick={() => handleApprove(request)}
+                                                className="bg-lime-600 text-white px-4 py-2 rounded-lg hover:bg-lime-700 transition-colors flex items-center text-xs font-medium"
+                                            >
+                                                <CheckCircle className="w-3 h-3 mr-1"/>
+                                                Approve
+                                            </button>
+                                            <button
+                                                onClick={() => handleReject(request)}
+                                                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors flex items-center text-xs font-medium"
+                                            >
+                                                <XCircle className="w-3 h-3 mr-1"/>
+                                                Reject
+                                            </button>
+                                        </div>
+                                    </td>)}
                             </tr>
                         ))}
                         </tbody>

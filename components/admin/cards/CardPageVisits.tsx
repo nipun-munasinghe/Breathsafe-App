@@ -12,11 +12,10 @@ interface PageVisit {
 }
 
 const data: PageVisit[] = [
-    { page: "/argon/", visitors: 4569, uniqueUsers: 340, bounceRate: "46,53%", trend: "up", trendColor: "text-emerald-500" },
-    { page: "/argon/index.html", visitors: 3985, uniqueUsers: 319, bounceRate: "46,53%", trend: "down", trendColor: "text-orange-500" },
-    { page: "/argon/charts.html", visitors: 3513, uniqueUsers: 294, bounceRate: "36,49%", trend: "down", trendColor: "text-orange-500" },
-    { page: "/argon/tables.html", visitors: 2050, uniqueUsers: 147, bounceRate: "50,87%", trend: "up", trendColor: "text-emerald-500" },
-    { page: "/argon/profile.html", visitors: 1795, uniqueUsers: 190, bounceRate: "46,53%", trend: "down", trendColor: "text-red-500" },
+    { page: "/map/", visitors: 4569, uniqueUsers: 340, bounceRate: "46,53%", trend: "up", trendColor: "text-emerald-500" },
+    { page: "/index.html", visitors: 3985, uniqueUsers: 319, bounceRate: "46,53%", trend: "down", trendColor: "text-orange-500" },
+    { page: "/login.html", visitors: 3513, uniqueUsers: 294, bounceRate: "36,49%", trend: "down", trendColor: "text-orange-500" },
+    { page: "/register.html", visitors: 2050, uniqueUsers: 147, bounceRate: "50,87%", trend: "up", trendColor: "text-emerald-500" },
 ];
 
 const CardPageVisits: React.FC = () => {
@@ -25,7 +24,7 @@ const CardPageVisits: React.FC = () => {
             <div className="rounded-t mb-0 px-4 py-3 border-0">
                 <div className="flex flex-wrap items-center">
                     <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-                        <h3 className="font-semibold text-base text-blueGray-700">Page visits</h3>
+                        <h3 className="font-semibold text-base text-blueGray-700">Site visits</h3>
                     </div>
                     <div className="relative w-full px-4 max-w-full flex-grow flex-1 text-right">
                         <button
