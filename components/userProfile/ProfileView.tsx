@@ -13,6 +13,8 @@ import {
   Mail,
   MapPin,
 } from "lucide-react";
+import { deleteUserAccount } from "@/service/userApi";
+import { useRouter } from "next/navigation";
 
 interface ProfileViewProps {
   user: UserProfile;
@@ -35,10 +37,22 @@ export function formatDate(date: string | null): string {
 }
 
 export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
+  const router = useRouter();
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       onImageUpload(file);
+    }
+  };
+
+  const handleDelete = async () => {
+    const confirmed = confirm("Are you sure you want to delete your account?");
+    if (!confirmed) return;
+
+    const success = await deleteUserAccount();
+    if (success) {
+      router.push("/signin"); 
     }
   };
 
@@ -117,7 +131,9 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                           <User className="w-5 h-5 text-lime-600" />
                         </div>
                         <div>
-                          <p className="text-blue-gray-900/70 text-sm">Full Name</p>
+                          <p className="text-blue-gray-900/70 text-sm">
+                            Full Name
+                          </p>
                           <p className="text-blue-gray-900 font-semibold">
                             {user.firstName} {user.lastName}
                           </p>
@@ -133,7 +149,9 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                         </div>
                         <div>
                           <p className="text-blue-gray-900/70 text-sm">Email</p>
-                          <p className="text-blue-gray-900 font-semibold">{user.email}</p>
+                          <p className="text-blue-gray-900 font-semibold">
+                            {user.email}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -145,8 +163,12 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                           <Phone className="w-5 h-5 text-lime-600" />
                         </div>
                         <div>
-                          <p className="text-blue-gray-900/70 text-sm">Phone Number</p>
-                          <p className="text-blue-gray-900 font-semibold">{user.phone}</p>
+                          <p className="text-blue-gray-900/70 text-sm">
+                            Phone Number
+                          </p>
+                          <p className="text-blue-gray-900 font-semibold">
+                            {user.phone}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -158,7 +180,9 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                           <Calendar className="w-5 h-5 text-emerald-600" />
                         </div>
                         <div>
-                          <p className="text-blue-gray-900/70 text-sm">Birthday</p>
+                          <p className="text-blue-gray-900/70 text-sm">
+                            Birthday
+                          </p>
                           <p className="text-blue-gray-900 font-semibold">
                             {formatDate(user.dateOfBirth)}
                           </p>
@@ -173,8 +197,12 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                           <MapPin className="w-5 h-5 text-lime-600" />
                         </div>
                         <div>
-                          <p className="text-blue-gray-900/70 text-sm">Address</p>
-                          <p className="text-blue-gray-900 font-semibold">{user.address}</p>
+                          <p className="text-blue-gray-900/70 text-sm">
+                            Address
+                          </p>
+                          <p className="text-blue-gray-900 font-semibold">
+                            {user.address}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -183,8 +211,12 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                   {/* Bio */}
                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                     <div className="space-y-3">
-                      <h4 className="text-blue-gray-900 font-semibold text-lg">About Me</h4>
-                      <p className="text-blue-gray-900/80 leading-relaxed">{user.bio}</p>
+                      <h4 className="text-blue-gray-900 font-semibold text-lg">
+                        About Me
+                      </h4>
+                      <p className="text-blue-gray-900/80 leading-relaxed">
+                        {user.bio}
+                      </p>
                     </div>
                   </div>
 
@@ -197,7 +229,10 @@ export function ProfileView({ user, onEdit, onImageUpload }: ProfileViewProps) {
                       <Edit className="w-5 h-5 mr-2" />
                       Edit Profile
                     </button>
-                    <button className="inline-flex items-center justify-center px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    <button
+                      className="inline-flex items-center justify-center px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      onClick={handleDelete}
+                    >
                       <Trash2 className="w-5 h-5 mr-2" />
                       Delete Profile
                     </button>
