@@ -6,10 +6,14 @@ import React, { useEffect, useState } from "react";
 import Button from "@/components/common/Button";
 import { registerUser } from "@/service/userApi";
 import { UserData } from "@/types/user/types";
+import ToastUtils from "@/utils/toastUtils";
+import { useRouter } from "next/router";
+
 
 const Page = () => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [userData, setUserData] = useState<UserData>({username: "", firstName: "", lastName: "", email: "", password: "", role: "USER"});
+    const router = useRouter();
+    const [userData, setUserData] = useState<UserData>({username: "", firstName: "", lastName: "", email: "", password: "", role: "USER"});
 
   const handlePasswordChecker = () => {
     const password = document.getElementById("password") as HTMLInputElement;
@@ -27,7 +31,11 @@ const Page = () => {
   const handleSubmission = async (e: React.FormEvent) => {
   e.preventDefault();
   try {
-    await registerUser(userData);
+      const response = await registerUser(userData);
+      if (response) {
+          ToastUtils.success("Registration successful! Please sign in.");
+          await router.push("/signin");
+      }
   } catch (error) {
       console.error("Error registering user:", error);
   }

@@ -8,8 +8,10 @@ export const registerUser = async (userData: UserData) => {
   try {
     await publicAxios.post("/auth/register", userData);
     ToastUtils.success("Registration successful!");
+    return true;
   } catch (error: any) {
     ToastUtils.error("Registration failed. Please try again." + error);
+    return false;
   }
 };
 
