@@ -3,7 +3,7 @@
 import React, {useEffect, useState} from "react";
 import SensorList from "@/components/admin/all-sensors/sensor_List";
 import UpdateSensorModal from "@/components/admin/all-sensors/updateSensorModel";
-import {getAllSensors} from "@/service/sensorApi";
+import {deleteSensor, getAllSensors} from "@/service/sensorApi";
 import ToastUtils from "@/utils/toastUtils";
 import {SensorStatus} from "@/types/sensors/admin";
 
@@ -65,9 +65,14 @@ export default function AllSensorsPage() {
     setEditingSensor(null);
   };
 
-  const handleDelete = (sensorId: number) => {
+  const handleDelete = async (sensorId: number) => {
     if (confirm("Are you sure you want to delete this sensor?")) {
       setSensors((prev) => prev.filter((sensor) => sensor.id !== sensorId));
+      const response = await deleteSensor(sensorId);
+      if(!response?.success){
+        ToastUtils.error("Failed to delete sensor. " + response?.error);
+        await fetchSensors();
+      }
     }
   };
 
