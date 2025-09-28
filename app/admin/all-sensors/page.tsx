@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import SensorList from "@/components/admin/all-sensors/sensor_List";
 import UpdateSensorModal from "@/components/admin/all-sensors/updateSensorModel";
+import {getAllSensors} from "@/service/sensorApi";
+import ToastUtils from "@/utils/toastUtils";
 
 type SensorStatus = "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR";
 
@@ -22,54 +24,28 @@ interface Sensor {
 }
 
 export default function AllSensorsPage() {
-  const [sensors, setSensors] = useState<Sensor[]>([
-    // Mock data - replace with actual API call
-    {
-      id: 1,
-      name: "Colombo Central CO₂ Sensor",
-      location: "Colombo 07, Sri Lanka",
-      latitude: 6.9271,
-      longitude: 79.8612,
-      status: "ONLINE",
-      installationDate: "2024-01-15T10:30:00Z",
-      lastMaintenance: "2024-01-20T14:00:00Z",
-      batteryLevel: 85,
-      isActive: true,
-      createdAt: "2024-01-15T10:30:00Z",
-      updatedAt: "2024-01-20T14:00:00Z",
-    },
-    {
-      id: 2,
-      name: "Kandy Air Quality Monitor",
-      location: "Kandy, Sri Lanka",
-      latitude: 7.2906,
-      longitude: 80.6337,
-      status: "MAINTENANCE",
-      installationDate: "2024-01-10T09:15:00Z",
-      lastMaintenance: "2024-01-25T11:30:00Z",
-      batteryLevel: 45,
-      isActive: true,
-      createdAt: "2024-01-10T09:15:00Z",
-      updatedAt: "2024-01-25T11:30:00Z",
-    },
-    {
-      id: 3,
-      name: "Galle Environmental Sensor",
-      location: "Galle, Sri Lanka",
-      latitude: 6.0535,
-      longitude: 80.221,
-      status: "OFFLINE",
-      installationDate: "2024-01-05T08:45:00Z",
-      lastMaintenance: "2024-01-15T16:20:00Z",
-      batteryLevel: 15,
-      isActive: false,
-      createdAt: "2024-01-05T08:45:00Z",
-      updatedAt: "2024-01-15T16:20:00Z",
-    },
-  ]);
-
+  const [sensors, setSensors] = useState<Sensor[]>([]);
   const [editingSensor, setEditingSensor] = useState<Sensor | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+
+    const fetchSensors = async () => {
+        try {
+            const response = await getAllSensors();
+            if (response?.success) {
+                setSensors(response?.data);
+            }
+            else{
+                ToastUtils.error("Failed to fetch sensors." + response?.error);
+            }
+        } catch (error) {
+            console.error('Failed to fetch sensors:', error);
+        } finally {
+        }
+    };
+
+    useEffect(() => {
+        fetchSensors();
+    }, []);
 
   const handleEdit = (sensor: Sensor) => {
     setEditingSensor(sensor);
