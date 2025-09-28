@@ -63,13 +63,6 @@ const SensorList: React.FC<SensorListProps> = ({
     }
   };
 
-  const getBatteryColor = (level?: number) => {
-    if (!level) return "text-gray-500";
-    if (level > 70) return "text-green-600";
-    if (level > 30) return "text-yellow-600";
-    return "text-red-600";
-  };
-
   return (
     <>
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">

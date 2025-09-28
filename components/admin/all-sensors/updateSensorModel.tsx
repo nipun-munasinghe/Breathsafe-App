@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, MapPin, Calendar, Battery, Clock, Save } from "lucide-react";
+import { MapPin, Calendar, Battery, Clock, Save } from "lucide-react";
 import dynamic from "next/dynamic";
 import * as yup from "yup";
 
