@@ -202,12 +202,33 @@ const Sidebar: React.FC = () => {
 
               <li className="items-center">
                 <Link
+                  className={`text-xs uppercase py-3 font-bold block ${
+                    isActive("/admin/all-sensors")
+                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      : "text-blueGray-700 hover:text-blueGray-500"
+                  }`}
+                  href="/admin/all-sensors"
+                >
+                  <i
+                    className={`fas fa-list mr-2 text-sm ${
+                      isActive("/admin/all-sensors")
+                        ? "opacity-75"
+                        : "text-blueGray-400"
+                    }`}
+                  ></i>{" "}
+                  SENSOR LIST
+                </Link>
+              </li>
+
+              <li className="items-center">
+                <Link
                   className="text-blueGray-700 hover:text-blueGray-500 text-xs uppercase py-3 font-bold block"
                   href="/admin/sensors"
                 >
                   <i className="fas fa-list text-blueGray-400 mr-2 text-sm"></i>{" "}
                   Sensor Data
                 </Link>
+                           
               </li>
             </ul>
 
