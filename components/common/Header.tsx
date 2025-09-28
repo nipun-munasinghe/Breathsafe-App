@@ -16,7 +16,8 @@ import {
   GaugeCircle,
   Wrench,
   Activity,
-  PlusCircle
+  PlusCircle,
+  ListChecks
 } from "lucide-react";
 
 import { useAuthStore } from "@/store/authStore";
@@ -55,6 +56,7 @@ const DROPDOWN_CONFIG: Record<Role, DropdownItem[]> = {
   USER: [
     { label: "Profile", href: "/my-profile", icon: <UserRound className="h-4 w-4" /> },
     { label: "My Requests", href: "/my-requests", icon: <Users className="h-4 w-4" /> },
+    { label: "My Subscriptions", href: "/subscriptions", icon: <ListChecks className="h-4 w-4" /> },
     { label: "Create Request", href: "/create-request", icon: <PlusCircle className="h-4 w-4" /> },
     { label: "Sign out", action: "signout", icon: <LogOut className="h-4 w-4" /> },
   ],
@@ -62,12 +64,14 @@ const DROPDOWN_CONFIG: Record<Role, DropdownItem[]> = {
     { label: "Profile", href: "/my-profile", icon: <UserRound className="h-4 w-4" /> },
     { label: "Sensor Overview", href: "/admin/dashboard", icon: <GaugeCircle className="h-4 w-4" /> },
     { label: "Manage Sensors", href: "/sensor-admin/manage", icon: <Wrench className="h-4 w-4" /> },
+    { label: "My Subscriptions", href: "/subscriptions", icon: <ListChecks className="h-4 w-4" /> },
     { label: "Activity Log", href: "/sensor-admin/activity", icon: <Activity className="h-4 w-4" /> },
     { label: "Sign out", action: "signout", icon: <LogOut className="h-4 w-4" /> },
   ],
   ADMIN: [
     { label: "Profile", href: "/my-profile", icon: <UserRound className="h-4 w-4" /> },
     { label: "Admin Dashboard", href: "/admin/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+    { label: "My Subscriptions", href: "/subscriptions", icon: <ListChecks className="h-4 w-4" /> },
     { label: "Sign out", action: "signout", icon: <LogOut className="h-4 w-4" /> },
   ],
 };
