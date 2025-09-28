@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { UserProfile } from "@/types/user";
 import {
   Camera,
   Edit,
@@ -13,6 +12,8 @@ import {
   Mail,
   MapPin,
 } from "lucide-react";
+
+import {UserProfile} from "@/types/user/types";
 import { deleteUserAccount } from "@/service/userApi";
 import { useRouter } from "next/navigation";
 

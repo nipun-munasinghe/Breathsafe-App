@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Header from "@/components/common/Header";
-import { UserProfile } from "@/types/user";
 import { ProfileView } from "../../components/userProfile/ProfileView";
 import { ProfileEdit } from "../../components/userProfile/ProfileEdit";
 import { ProtectedRoute } from "@/components/common/protectedRoute";
 import Footer from "@/components/common/Footer";
 import { getUserDetails, updateUserProfile } from "@/service/userApi";
 import { useRouter } from "next/navigation";
+import {UserProfile} from "@/types/user/types";
 
 export default function Home() {
   const [user, setUser] = useState<UserProfile | null>(null);
