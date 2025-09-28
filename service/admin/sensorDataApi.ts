@@ -1,5 +1,6 @@
 import privateAxios from '@/lib/privateAxios';
 import { AdminSensor, SensorListResponse, SensorFormData, SensorReadingsFormData, SensorStatus, SensorDataDisplayDTO } from '@/types/sensors/admin';
+import ToastUtils from '@/utils/toastUtils';
 
 //interface for sensor data update request
 interface SensorDataUpdateRequest {
@@ -15,7 +16,7 @@ export const getSensorDisplayData = async (): Promise<SensorDataDisplayDTO[]> =>
     const response = await privateAxios.get<SensorDataDisplayDTO[]>('/sensorData');
     return response.data;
   } catch (error: any) {
-    console.error('Error fetching sensor display data:', error);
+    ToastUtils.error("Data retrieval failed. " + error?.response?.data?.message);
     throw new Error(error.response?.data?.message || 'Failed to fetch sensor data');
   }
 };
@@ -41,7 +42,7 @@ export const updateSensorDataReadings = async (
     const response = await privateAxios.patch<SensorDataDisplayDTO>('/sensorData', updateRequest);
 
     if (response.status === 200) {
-      console.log('Sensor readings updated successfully:', response.data);
+      ToastUtils.success('Sensor readings updated successfully!');
       return response.data;
     }
 
@@ -51,15 +52,20 @@ export const updateSensorDataReadings = async (
 
     //handle different errors
     if (error.response?.status === 404) {
+      ToastUtils.error('Sensor data not found');
       throw new Error('Sensor data not found');
     } else if (error.response?.status === 401) {
-      throw new Error('Unauthorized access - Admin privileges required');
+      ToastUtils.error('Unauthorized access');
+      throw new Error('Unauthorized access');
     } else if (error.response?.status === 403) {
+      ToastUtils.error('Access forbidden - Please check your permissions');
       throw new Error('Access forbidden - Please check your permissions');
     } else if (error.response?.status === 400) {
+      ToastUtils.error(error.response?.data?.message || 'Invalid request data');
       throw new Error(error.response?.data?.message || 'Invalid request data');
     }
     
+    ToastUtils.error(error.response?.data?.message || 'Failed to update sensor readings');
     throw new Error(error.response?.data?.message || 'Failed to update sensor readings');
   }
 };
@@ -70,7 +76,7 @@ export const deleteSensorData = async (dataId: number): Promise<void> => {
     const response = await privateAxios.delete(`/sensorData/${dataId}`);
     
     if (response.status === 200) {
-      console.log('Sensor data deleted successfully:', response.data);
+      ToastUtils.success('Sensor data cleared successfully!');
       return;
     }
     
@@ -79,10 +85,13 @@ export const deleteSensorData = async (dataId: number): Promise<void> => {
     console.error('Error deleting sensor data:', error);
     
     if (error.response?.status === 404) {
+      ToastUtils.error('Sensor data not found');
       throw new Error('Sensor data not found');
     } else if (error.response?.status === 401) {
+      ToastUtils.error('Unauthorized access');
       throw new Error('Unauthorized access');
     } else if (error.response?.status === 400) {
+      ToastUtils.error(error.response?.data?.message || 'Invalid request');
       throw new Error(error.response?.data?.message || 'Invalid request');
     }
     

@@ -93,7 +93,7 @@ export interface SensorDataDisplayDTO {
   timestamp: string | null;
 }
 
-// Delete response interface
+//delete response interface
 export interface DeleteSensorDataResponse {
   message: string;
 }
