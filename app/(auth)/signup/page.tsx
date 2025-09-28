@@ -7,7 +7,7 @@ import Button from "@/components/common/Button";
 import { registerUser } from "@/service/userApi";
 import { UserData } from "@/types/user/types";
 import ToastUtils from "@/utils/toastUtils";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 
 const Page = () => {
