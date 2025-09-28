@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { UserProfile } from "@/types/user";
 import {
   Save,
   X,
@@ -13,6 +12,7 @@ import {
   AtSign,
   Mail,
 } from "lucide-react";
+import {UserProfile} from "@/types/user/types";
 
 interface ProfileEditProps {
   user: UserProfile;

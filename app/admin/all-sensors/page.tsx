@@ -5,8 +5,7 @@ import SensorList from "@/components/admin/all-sensors/sensor_List";
 import UpdateSensorModal from "@/components/admin/all-sensors/updateSensorModel";
 import {getAllSensors} from "@/service/sensorApi";
 import ToastUtils from "@/utils/toastUtils";
-
-type SensorStatus = "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR";
+import {SensorStatus} from "@/types/sensors/admin";
 
 interface Sensor {
   id: number;
