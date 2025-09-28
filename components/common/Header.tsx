@@ -13,8 +13,6 @@ import {
   UserRound,
   Users,
   LayoutDashboard,
-  Shield,
-  Settings,
   GaugeCircle,
   Wrench,
   Activity,
@@ -35,7 +33,7 @@ type DropdownItem =
 const NAV_CONFIG: Record<"COMMON" | Role, NavItem[]> = {
   COMMON: [
     { href: "/", label: "Home" },
-    { href: "/dashboard", label: "Dashboard" },
+    { href: "/map", label: "Map" },
     { href: "/sensors", label: "Sensors" },
     { href: "/analytics", label: "Analytics" },
   ],
@@ -47,46 +45,41 @@ const NAV_CONFIG: Record<"COMMON" | Role, NavItem[]> = {
     { href: "/sensor-admin/queue", label: "Pending Queue" },
   ],
   ADMIN: [
-    { href: "/admin", label: "Admin" },
-    { href: "/admin/users", label: "Users" },
-    { href: "/admin/settings", label: "Settings" },
+    { href: "/admin/dashboard", label: "Admin" }
   ],
 };
 
 // Dropdown (user menu) items per role
 const DROPDOWN_CONFIG: Record<Role, DropdownItem[]> = {
   USER: [
-    { label: "Profile", href: "/profile", icon: <UserRound className="h-4 w-4" /> },
+    { label: "Profile", href: "/my-profile", icon: <UserRound className="h-4 w-4" /> },
     { label: "My Requests", href: "/my-requests", icon: <Users className="h-4 w-4" /> },
     { label: "Create Request", href: "/create-request", icon: <PlusCircle className="h-4 w-4" /> },
     { label: "Sign out", action: "signout", icon: <LogOut className="h-4 w-4" /> },
   ],
   SENSOR_ADMIN: [
-    { label: "Profile", href: "/profile", icon: <UserRound className="h-4 w-4" /> },
-    { label: "Sensor Overview", href: "/sensor-admin/overview", icon: <GaugeCircle className="h-4 w-4" /> },
+    { label: "Profile", href: "/my-profile", icon: <UserRound className="h-4 w-4" /> },
+    { label: "Sensor Overview", href: "/admin/dashboard", icon: <GaugeCircle className="h-4 w-4" /> },
     { label: "Manage Sensors", href: "/sensor-admin/manage", icon: <Wrench className="h-4 w-4" /> },
     { label: "Activity Log", href: "/sensor-admin/activity", icon: <Activity className="h-4 w-4" /> },
     { label: "Sign out", action: "signout", icon: <LogOut className="h-4 w-4" /> },
   ],
   ADMIN: [
-    { label: "Admin Dashboard", href: "/admin", icon: <LayoutDashboard className="h-4 w-4" /> },
-    { label: "User Management", href: "/admin/users", icon: <Shield className="h-4 w-4" /> },
-    { label: "System Settings", href: "/admin/settings", icon: <Settings className="h-4 w-4" /> },
-    { label: "Profile", href: "/profile", icon: <UserRound className="h-4 w-4" /> },
+    { label: "Profile", href: "/my-profile", icon: <UserRound className="h-4 w-4" /> },
+    { label: "Admin Dashboard", href: "/admin/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
     { label: "Sign out", action: "signout", icon: <LogOut className="h-4 w-4" /> },
   ],
 };
 
-/* =========================================================
-   UTILS
-   ========================================================= */
 
 function cx(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
+
 function isExact(pathname: string, href: string) {
   return pathname === href;
 }
+
 function fullName(u: loggedInUser | null) {
   if (!u) return "User";
   const name = [u.firstName, u.lastName].filter(Boolean).join(" ").trim();
@@ -99,6 +92,7 @@ type Avatarish = {
   avatar?: string | null;
   photoURL?: string | null;
 };
+
 function avatarFromUser(u: loggedInUser | null): string | null {
   if (!u) return null;
   const v = u as unknown as Avatarish;

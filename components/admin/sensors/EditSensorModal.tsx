@@ -69,7 +69,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
       }
     }
 
-    // Check if both readings are null
+    // check if both readings are null
     if (formData.lastCO2Reading === null && formData.lastAQIReading === null) {
       newErrors.lastCO2Reading = 'At least one reading (CO₂ or AQI) must be provided';
       newErrors.lastAQIReading = 'At least one reading (CO₂ or AQI) must be provided';
@@ -79,7 +79,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  // Real-time field validation
+  //realtime field validation
   const validateField = (fieldName: keyof SensorReadingsFormData, value: any) => {
     const newErrors = { ...errors };
 
@@ -114,7 +114,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
     e.preventDefault();
     setSubmitError(null);
 
-    //validate form before submit
+    //Validate form before submit
     if (!validateForm()) {
       setSubmitError('Please fix the errors above before submitting');
       return;
@@ -127,7 +127,17 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Failed to update sensor readings:', error);
-      setSubmitError(error.message || 'Failed to update sensor readings. Please try again.');
+      
+      //specific error handling based on backend response
+      if (error.message.includes('Unauthorized')) {
+        setSubmitError('You do not have permission to update sensor readings');
+      } else if (error.message.includes('not found')) {
+        setSubmitError('Sensor data not found. It may have been deleted.');
+      } else if (error.message.includes('Invalid request')) {
+        setSubmitError('Invalid data provided. Please check your inputs.');
+      } else {
+        setSubmitError(error.message || 'Failed to update sensor readings. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -143,28 +153,28 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
     setSubmitError(null);
   };
 
-  // Helper function to get AQI color based on value
+  //helper function to get AQI color based on value
   const getAQIColor = (aqi: number | null) => {
     if (!aqi) return 'text-gray-500';
-    if (aqi <= 50) return 'text-green-600'; // Good
-    if (aqi <= 100) return 'text-yellow-600'; // Moderate
-    if (aqi <= 150) return 'text-orange-600'; // Unhealthy for Sensitive
-    if (aqi <= 200) return 'text-red-600'; // Unhealthy
-    if (aqi <= 300) return 'text-purple-600'; // Very Unhealthy
-    return 'text-gray-800'; // Hazardous
+    if (aqi <= 50) return 'text-green-600'; //good
+    if (aqi <= 100) return 'text-yellow-600'; //Moderate
+    if (aqi <= 150) return 'text-orange-600'; //unhealthy for Sensitive
+    if (aqi <= 200) return 'text-red-600'; //unhealthy
+    if (aqi <= 300) return 'text-purple-600'; //very unhealthy
+    return 'text-gray-800'; //Hazardous
   };
 
-  // Helper function to get CO2 color based on value
+  //helper function to get CO2 color based on value
   const getCO2Color = (co2: number | null) => {
     if (!co2) return 'text-gray-500';
-    if (co2 < 400) return 'text-green-600'; // Excellent
-    if (co2 < 600) return 'text-lime-600'; // Good
-    if (co2 < 1000) return 'text-yellow-600'; // Acceptable
+    if (co2 < 400) return 'text-green-600'; // excellent
+    if (co2 < 600) return 'text-lime-600'; //Good
+    if (co2 < 1000) return 'text-yellow-600'; //acceptable
     if (co2 < 5000) return 'text-orange-600'; // Poor
-    return 'text-red-600'; // Very Poor
+    return 'text-red-600'; // Very poor
   };
 
-  // Helper function to get status badge based on backend enum
+  //helper function to get status badge based on backend enum
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ONLINE':
@@ -200,7 +210,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
     }
   };
 
-  // Error message component
+  //Error message component
   const ErrorMessage: React.FC<{ message: string }> = ({ message }) => (
     <div className="flex items-center mt-1 text-red-600 text-xs">
       <AlertCircle className="w-3 h-3 mr-1 flex-shrink-0" />
@@ -213,7 +223,6 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="bg-gradient-to-r from-lime-600 to-emerald-600 p-4 sm:p-6 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -234,7 +243,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
           </div>
         </div>
 
-        {/* Sensor Info (Read-only) */}
+        {/* Sensor Info */}
         <div className="p-4 sm:p-6 border-b border-gray-200">
           <div className="flex items-center space-x-3 mb-4">
             <div className="bg-gradient-to-br from-lime-500 to-emerald-500 w-12 h-12 rounded-full flex items-center justify-center">
@@ -255,7 +264,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
             </div>
           </div>
 
-          {/* Current Status Display (Read-only) */}
+          {/* Current Status Display */}
           <div className="bg-gray-50 rounded-lg p-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -270,7 +279,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
           </div>
         </div>
 
-        {/* General Error Message */}
+        {/* general error msg */}
         {submitError && (
           <div className="p-4 mx-4 mt-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
@@ -281,9 +290,9 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
         )}
 
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
-          {/* CO2 Level */}
+          {/* CO2 level */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+            <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
               <Activity className="w-4 h-4 mr-2 text-lime-600" />
               CO₂ Level (ppm)
             </label>
@@ -311,10 +320,10 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
               </div>
             </div>
             
-            {/* CO2 Error Message */}
+            {/* CO2 error msg */}
             {errors.lastCO2Reading && <ErrorMessage message={errors.lastCO2Reading} />}
             
-            {/* CO2 Level Indicator */}
+            {/* CO2 level indicator */}
             <div className="mt-2 text-xs">
               {formData.lastCO2Reading && !errors.lastCO2Reading && (
                 <div className={`inline-flex items-center px-2 py-1 rounded-full ${
@@ -333,9 +342,9 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
             </div>
           </div>
 
-          {/* AQI Level */}
+          {/* AQI level */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+            <label className="text-sm font-medium text-gray-700 mb-2 flex items-center">
               <Gauge className="w-4 h-4 mr-2 text-emerald-600" />
               Air Quality Index (AQI)
             </label>
@@ -363,10 +372,10 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
               </div>
             </div>
             
-            {/* AQI Error Message */}
+            {/* AQI error msg */}
             {errors.lastAQIReading && <ErrorMessage message={errors.lastAQIReading} />}
             
-            {/* AQI Level Indicator */}
+            {/* AQI level indicator */}
             <div className="mt-2 text-xs">
               {formData.lastAQIReading && !errors.lastAQIReading && (
                 <div className={`inline-flex items-center px-2 py-1 rounded-full ${
@@ -387,12 +396,12 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
             </div>
           </div>
 
-          {/* Info Box */}
+          {/* Info box */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start">
               <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
               <div>
-                <h4 className="font-medium text-blue-900 text-sm">Validation Rules</h4>
+                <h4 className="font-medium text-blue-900 text-sm">Please remember</h4>
                 <ul className="text-blue-700 text-xs mt-1 space-y-1">
                   <li>• CO₂ levels: Must be positive, maximum 50,000 ppm</li>
                   <li>• AQI values: Must be positive, maximum 500 (EPA scale)</li>
@@ -404,7 +413,7 @@ export const EditSensorModal: React.FC<EditSensorModalProps> = ({
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action btns */}
           <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 pt-4 border-t border-gray-200">
             <button
               type="button"

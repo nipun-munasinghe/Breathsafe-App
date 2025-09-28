@@ -3,23 +3,25 @@
 import React, { JSX, useState, useEffect, useCallback } from 'react';
 import { AdminSensor, SensorDataDisplayDTO } from '@/types/sensors/admin';
 import { getSensorDisplayData } from '@/service/admin/sensorDataApi';
-import { ClearSensorDataModal } from './ClearSensorDataModal'; // Import the modal
+import { ClearSensorDataModal } from './ClearSensorDataModal';
+import { EditSensorModal } from './EditSensorModal';
+import { updateSensorReadings } from '@/service/admin/sensorDataApi';
 import { Search, RefreshCw, Activity, Edit, RotateCcw, MapPin, ExternalLink, Wifi, WifiOff, Eye, AlertCircle, Settings } from 'lucide-react';
 import Link from 'next/link';
 
-//convert SensorDataDisplayDTO to AdminSensor format
+//convert SensorDataDisplayDTO to AdminSensor format with correct field names
 const convertToAdminSensor = (displayData: SensorDataDisplayDTO): AdminSensor => {
   return {
     id: displayData.sensorId,
-    name: displayData.sensorName,
+    name: displayData.name,
     location: displayData.location,
     latitude: displayData.latitude,
     longitude: displayData.longitude,
     lastCO2Reading: displayData.co2Level,
     lastAQIReading: displayData.aqiValue,
-    status: displayData.sensorStatus,
+    status: displayData.status,
     lastReadingTime: displayData.timestamp,
-    isOnline: displayData.sensorStatus === 'ONLINE',
+    isOnline: displayData.status === 'ONLINE',
     createdAt: displayData.createdAt,
     updatedAt: displayData.createdAt
   };
@@ -129,12 +131,13 @@ export const CardSensorList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
-  //Modal state
+  //modal states
   const [clearModalOpen, setClearModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false); // Add this
   const [selectedSensor, setSelectedSensor] = useState<AdminSensor | null>(null);
   const [selectedDataId, setSelectedDataId] = useState<number | undefined>();
 
-  // Load real sensor data from backend
+  //load real sensor data from backend
   const loadSensors = useCallback(async () => {
     setLoading(true);
     try {
@@ -191,17 +194,56 @@ export const CardSensorList: React.FC = () => {
     window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
   }, []);
 
-  // Handle edit
+  //handle edit with real API integration
   const handleEdit = (sensor: AdminSensor) => {
-    console.log('Edit sensor:', sensor);
-    alert(`Edit functionality for sensor: ${sensor.name}\n(This would require implementing sensor update API)`);
+    console.log('Edit sensor readings:', sensor);
+    setSelectedSensor(sensor);
+    setEditModalOpen(true);
   };
 
-  // Handle clear data - NEW: Opens modal instead of direct confirm
+  //handle edit confirmation with real API call
+  const handleEditConfirm = async (readingsData: any) => {
+    if (!selectedSensor) return;
+
+    try {
+      //find the corresponding data ID
+      const displayDataItem = sensorDisplayData.find(item => item.sensorId === selectedSensor.id);
+      if (!displayDataItem?.dataId) {
+        throw new Error('No data ID found for this sensor');
+      }
+
+      //call the real API
+      const updatedSensor = await updateSensorReadings(displayDataItem.dataId, readingsData);
+      
+      //update local state
+      setSensors(prevSensors => 
+        prevSensors.map(sensor => 
+          sensor.id === updatedSensor.id ? updatedSensor : sensor
+        )
+      );
+      
+      setFilteredSensors(prevSensors => 
+        prevSensors.map(sensor => 
+          sensor.id === updatedSensor.id ? updatedSensor : sensor
+        )
+      );
+
+      console.log('Sensor readings updated successfully:', updatedSensor);
+      
+      //refresh the list to get the latest data
+      setTimeout(() => loadSensors(), 500);
+      
+    } catch (error) {
+      console.error('Failed to update sensor readings:', error);
+      throw error;
+    }
+  };
+
+  //handle clear data
   const handleClearData = (sensor: AdminSensor, dataId?: number) => {
     console.log('Clear data for sensor:', sensor, 'Data ID:', dataId);
     
-    // Find the corresponding data ID from display data
+    //find the corresponding data ID from display data
     const displayDataItem = sensorDisplayData.find(item => item.sensorId === sensor.id);
     const actualDataId = dataId || displayDataItem?.dataId;
     
@@ -215,26 +257,31 @@ export const CardSensorList: React.FC = () => {
     setClearModalOpen(true);
   };
 
-  // Handle modal confirm
+  //handle modal confirm
   const handleModalConfirm = () => {
     console.log('Data clearing confirmed for sensor:', selectedSensor);
-    // The actual API call is handled in the modal
   };
 
-  // Handle successful deletion
+  //handle successful deletion
   const handleDeleteSuccess = () => {
     console.log('Data deleted successfully, refreshing list...');
-    loadSensors(); // Refresh the sensor list
+    loadSensors();
   };
 
-  // Handle modal close
+  //handle modal close
   const handleModalClose = () => {
     setClearModalOpen(false);
     setSelectedSensor(null);
     setSelectedDataId(undefined);
   };
 
-  // Status Badge
+  //handle edit modal close
+  const handleEditModalClose = () => {
+    setEditModalOpen(false);
+    setSelectedSensor(null);
+  };
+
+  //status Badge
   const getStatusBadge = useCallback((status: string) => {
     switch (status) {
       case 'ONLINE':
@@ -483,6 +530,14 @@ export const CardSensorList: React.FC = () => {
         onClose={handleModalClose}
         onConfirm={handleModalConfirm}
         onSuccess={handleDeleteSuccess}
+      />
+
+      {/* Edit Sensor Readings Modal */}
+      <EditSensorModal
+        sensor={selectedSensor}
+        isOpen={editModalOpen}
+        onClose={handleEditModalClose}
+        onConfirm={handleEditConfirm}
       />
     </>
   );
