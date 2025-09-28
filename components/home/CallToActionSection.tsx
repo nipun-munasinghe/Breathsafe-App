@@ -31,7 +31,7 @@ export default function CallToActionSection() {
           <div className="mb-8 animate-fade-in">
             <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-lime-600/20 to-emerald-600/20 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-[#D9F99D] backdrop-blur-sm border border-lime-600/30">
               <Sparkles className="w-4 h-4" />
-              Start Your Journey
+              Connect & Monitor
             </span>
           </div>
 
@@ -39,8 +39,8 @@ export default function CallToActionSection() {
             Ready to breathe easier?
           </h2>
           <p className="mx-auto max-w-3xl text-xl text-white/90 leading-relaxed mb-12 animate-slide-in-right">
-            Join thousands of users who trust BreathSafe to monitor their air quality. 
-            Start monitoring in minutes and see real-time insights that help you take action with confidence.
+            Pair BreathSafe sensors and subscribe to the rooms you care about to get timely alerts and practical guidance —
+            with no monthly fees.
           </p>
 
           {/* CTA Buttons */}
@@ -50,12 +50,12 @@ export default function CallToActionSection() {
               className="group inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#65A30D] to-lime-500 px-10 py-4 text-lg font-bold text-white shadow-2xl transition-all duration-300 hover:from-lime-500 hover:to-emerald-500 hover:shadow-lime-500/25 hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#D9F99D]/50"
             >
               <Zap className="mr-3 w-6 h-6 transition-transform group-hover:rotate-12" />
-              Get Started Now
+              Get started
               <ChevronsRight className="ml-3 w-6 h-6 transition-transform group-hover:translate-x-1" />
             </a>
-            <button className="group inline-flex items-center justify-center rounded-full border-2 border-white/30 bg-white/10 px-10 py-4 text-lg font-bold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:border-white/50 hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/40">
+            <button className="group inline-flex items-center justify-center rounded-full border-2 border-white/30 bg-white/10 px-10 py-4 text-lg font-bold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/30">
               <MessageCircle className="mr-3 w-6 h-6 transition-transform group-hover:scale-110" />
-              Talk to Sales
+              View supported sensors
             </button>
           </div>
 
@@ -63,25 +63,25 @@ export default function CallToActionSection() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 animate-fade-in-up delay-500">
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:bg-white/10 hover:scale-105">
               <Shield className="w-8 h-8 text-[#D9F99D] mb-3" />
-              <div className="text-2xl font-bold text-white mb-1">99.9%</div>
-              <div className="text-sm text-white/70">Uptime Guarantee</div>
+              <div className="text-2xl font-bold text-white mb-1">Real‑time</div>
+              <div className="text-sm text-white/70">Live readings</div>
             </div>
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:bg-white/10 hover:scale-105">
               <Sparkles className="w-8 h-8 text-[#D9F99D] mb-3" />
-              <div className="text-2xl font-bold text-white mb-1">2 Min</div>
-              <div className="text-sm text-white/70">Setup Time</div>
+              <div className="text-2xl font-bold text-white mb-1">2 min</div>
+              <div className="text-sm text-white/70">Setup time</div>
             </div>
             <div className="flex flex-col items-center p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 transition-all duration-300 hover:bg-white/10 hover:scale-105">
               <MessageCircle className="w-8 h-8 text-[#D9F99D] mb-3" />
-              <div className="text-2xl font-bold text-white mb-1">24/7</div>
-              <div className="text-sm text-white/70">Expert Support</div>
+              <div className="text-2xl font-bold text-white mb-1">Multi‑room</div>
+              <div className="text-sm text-white/70">Follow sensors you choose</div>
             </div>
           </div>
 
           {/* Final message */}
           <div className="mt-16 animate-fade-in-up delay-700">
             <p className="text-white/70 text-lg">
-              Start your free trial today. No credit card required.
+              No monthly fees. Subscribe to sensors (like YouTube) to receive alerts and updates.
             </p>
           </div>
         </div>

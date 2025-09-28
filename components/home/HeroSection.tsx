@@ -15,14 +15,14 @@ export type HeroSectionProps = {
 };
 
 export default function HeroSection({
-  label = "BreathSafe - Air You Can Trust",
-  title = "Know Your Air, Protect Your Future.",
+  label = "BreathSafe • Monitor your air in real time",
+  title = "Know your air. Act with confidence.",
   subtitle =
-    "Smart monitoring that helps you and your community breathe clean air with real-time insights and intelligent alerts.",
-  primaryCta = { label: "Get Started", href: "#get-started" },
+    "Pair with BreathSafe sensors to see PM2.5, CO₂, VOCs, temperature, and humidity live. Subscribe to the sensors you care about to get alerts — no monthly fees.",
+  primaryCta = { label: "Connect a sensor", href: "#get-started" },
   images = [
     { src: "/hero-planet.png", alt: "Dashboard preview with charts" },
-    { src: "/hero-plant.png", alt: "Team collaborating around a laptop" },
+    { src: "/hero-plant.png", alt: "Live air quality monitoring with alerts" },
   ],
   rotateMs = 5500,
   align = "left",
@@ -71,13 +71,7 @@ export default function HeroSection({
 
       {/* Content layer */}
       <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-center px-4">
-        <div
-          className={
-            isCenter
-              ? "mx-auto max-w-4xl text-center"
-              : "ml-0 max-w-3xl text-left"
-          }
-        >
+        <div className={isCenter ? "mx-auto max-w-4xl text-center" : "ml-0 max-w-3xl text-left"}>
           {/* Green accent label */}
           {label && (
             <div className="mb-6 animate-fade-in">
@@ -101,14 +95,14 @@ export default function HeroSection({
           >
             <a
               href={primaryCta.href}
-              className="group inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#65A30D] to-lime-500 px-8 py-4 text-lg font-semibold text-white shadow-xl transition-all duration-300 hover:from-[#064E3B] hover:to-emerald-700 hover:shadow-2xl hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#D9F99D]/50"
+              className="group inline-flex items-center justify-center rounded-full bg-gradient-to-r from-[#65A30D] to-lime-500 px-8 py-4 text-lg font-semibold text-white shadow-xl transition-all duration-300 hover:from-lime-500 hover:to-emerald-500 hover:shadow-lime-500/25 hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#D9F99D]/50"
             >
               {primaryCta.label}
               <ChevronsRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
             </a>
-            <button className="group inline-flex items-center justify-center rounded-full border-2 border-white/30 bg-white/10 px-8 py-4 text-lg font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:border-white/50 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/40">
+            <button className="group inline-flex items-center justify-center rounded-full border-2 border-white/30 bg-white/10 px-8 py-4 text-lg font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/15 hover:scale-105 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/30">
               <Play className="mr-2 w-5 h-5 transition-transform group-hover:scale-110" />
-              Watch Demo
+              Watch demo
             </button>
           </div>
         </div>
@@ -122,9 +116,7 @@ export default function HeroSection({
             onClick={() => setActive(idx)}
             aria-label={`Show image ${idx + 1}`}
             className={`h-3 w-10 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/40 ${
-              active === idx
-                ? "bg-white shadow-lg scale-110"
-                : "bg-white/50 hover:bg-white/80 hover:scale-105"
+              active === idx ? "bg-white shadow-lg scale-110" : "bg-white/50 hover:bg-white/80 hover:scale-105"
             }`}
           />
         ))}
