@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { MapPin, Calendar, Battery, Clock, Save } from "lucide-react";
+import { X, MapPin, Calendar, Battery, Clock, Save } from "lucide-react";
 import dynamic from "next/dynamic";
 import * as yup from "yup";
 
@@ -232,8 +232,7 @@ const UpdateSensorModal: React.FC<UpdateSensorModalProps> = ({
           : sensor?.lastMaintenance,
       };
 
-      onSave(updatedSensor);
-      onClose();
+      await onSave(updatedSensor);
     } catch (err: any) {
       setSubmitError(err?.message || "Failed to update sensor");
     } finally {
