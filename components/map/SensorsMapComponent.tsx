@@ -224,6 +224,8 @@ const SensorsMapComponent: React.FC<{
                 }
 
                 // Create custom marker icon
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 const markerIcon = window.L.divIcon({
                     html: `
             <div style="position: relative; width: 32px; height: 32px;">
