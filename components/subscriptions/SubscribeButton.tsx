@@ -2,8 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import { BellRing, CheckCircle2 } from "lucide-react";
-import { createSubscription, isSubscribedToSensor } from "@/service/subscriptionApi";
+import { BellRing, CheckCircle2, ArrowRight } from "lucide-react";
+// Assumes you will add a function to delete a subscription by sensor ID
+import { createSubscription, isSubscribedToSensor, unsubscribe } from "@/service/subscriptionApi";
 
 type Props = {
   sensorId: number | string;
@@ -15,6 +16,7 @@ export default function SubscribeButton({ sensorId, className }: Props) {
   const [loading, setLoading] = React.useState(true);
   const [subscribed, setSubscribed] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
+  const [unsubscribing, setUnsubscribing] = React.useState(false); // State for unsubscribe action
 
   React.useEffect(() => {
     let mounted = true;
@@ -43,6 +45,18 @@ export default function SubscribeButton({ sensorId, className }: Props) {
     }
   };
 
+  const onUnsubscribe = async () => {
+    if (!confirm("Are you sure you want to unsubscribe from this sensor?")) return;
+    setUnsubscribing(true);
+    try {
+      // You will need to implement this API function
+      await unsubscribe(idNum); 
+      setSubscribed(false);
+    } finally {
+      setUnsubscribing(false);
+    }
+  };
+
   if (loading) {
     return (
       <button
@@ -57,14 +71,25 @@ export default function SubscribeButton({ sensorId, className }: Props) {
 
   if (subscribed) {
     return (
-      <Link
-        href="/subscriptions"
-        className={`inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm text-emerald-800 hover:bg-emerald-100 transition ${className ?? ""}`}
-        title="Manage subscription"
-      >
-        <CheckCircle2 className="h-4 w-4" />
-        Subscribed
-      </Link>
+      <div className={`flex items-center gap-2 ${className ?? ""}`}>
+        <button
+          type="button"
+          onClick={onUnsubscribe}
+          disabled={unsubscribing}
+          className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm text-emerald-800 hover:bg-emerald-100 transition disabled:opacity-70"
+          title="Unsubscribe from this sensor"
+        >
+          <CheckCircle2 className="h-4 w-4" />
+          {unsubscribing ? "Unsubscribing…" : "Subscribed"}
+        </button>
+        <Link
+          href="/subscriptions"
+          className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 hover:bg-slate-50 transition"
+          title="Manage subscriptions"
+        >
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
     );
   }
 
