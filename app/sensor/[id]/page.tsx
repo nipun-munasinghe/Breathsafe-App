@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { MapPin, Thermometer, Droplets, Wind, ArrowLeft, AlertCircle } from 'lucide-react';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
+import SubscribeButton from "@/components/subscriptions/SubscribeButton";
 import { ProtectedRoute } from '@/components/common/protectedRoute';
 import SensorStatsGrid from '@/components/sensor/SensorStatsGrid';
 import SensorChart from '@/components/sensor/SensorChart';
@@ -138,13 +139,16 @@ export default function SensorDetails() {
           
           {/* Back Button */}
           <div className="mt-20 mb-6">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center text-white hover:text-lime-200 transition-colors group"
-            >
-              <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-              Back
-            </button>
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => router.back()}
+                className="flex items-center text-white hover:text-lime-200 transition-colors group"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+                Back
+              </button>
+              <SubscribeButton sensorId={sensorId} />
+            </div>
           </div>
 
           {/* Sensor Header */}
