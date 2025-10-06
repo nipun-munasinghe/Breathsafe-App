@@ -216,7 +216,7 @@ const SensorsMapComponent: React.FC<{
         sensors.forEach(sensor => {
             try {
                 const aqiData = aqiConfig[sensor.aqiCategory];
-                const statusData = statusConfig[sensor.status];
+                const statusData = statusConfig[sensor.sensorStatus];
 
                 if (!aqiData || !statusData) {
                     console.warn('Missing config for sensor:', sensor.sensorId);
@@ -284,7 +284,7 @@ const SensorsMapComponent: React.FC<{
 
                 marker.on('mouseout', () => {
                     // Don't hide immediately to allow interaction with popup
-                    setTimeout(() => onSensorHover(null), 1200);
+                    setTimeout(() => onSensorHover(null), 1700);
                 });
 
                 marker.on('click', () => {

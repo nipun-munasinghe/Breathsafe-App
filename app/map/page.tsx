@@ -1,12 +1,14 @@
 'use client';
 
-import React, {useEffect, useState, useMemo} from 'react';
-import {Activity, Info, Loader, MapPin, RefreshCw, Search} from 'lucide-react';
+import React, {useEffect, useState} from 'react';
+import {Activity, Info, Loader, RefreshCw, Search} from 'lucide-react';
 import SensorsMapComponent from "@/components/map/SensorsMapComponent";
-import {aqiConfig, SensorData, statusConfig} from "@/types/map";
+import {SensorData} from "@/types/map";
 import {SensorPopup} from "@/components/map/SensorPopup";
 import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
+import {getSensorswithLatestData} from "@/service/sensorApi";
+import {useRouter} from "next/navigation";
 
 const SensorsMapPage: React.FC = () => {
     const [sensors, setSensors] = useState<SensorData[]>([]);
@@ -18,62 +20,19 @@ const SensorsMapPage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('ALL');
     const [aqiFilter, setAqiFilter] = useState<string>('ALL');
+    const router = useRouter();
 
-    const mockSensors: SensorData[] = useMemo(() => [
-        {
-            sensorId: 1,
-            name: "Sensor A",
-            location: "Colombo",
-            latitude: 6.9271,
-            longitude: 79.8612,
-            status: "ONLINE",
-            isActive: true,
-            temperature: 27.5,
-            humidity: 65.2,
-            co2Level: 410.0,
-            aqiValue: 45,
-            aqiCategory: "GOOD",
-            dataTimestamp: "2025-09-27T19:30:00"
-        },
-        {
-            sensorId: 2,
-            name: "Sensor B",
-            location: "Kandy",
-            latitude: 7.2906,
-            longitude: 80.6337,
-            status: "ONLINE",
-            isActive: true,
-            temperature: 24.8,
-            humidity: 72.1,
-            co2Level: 425.0,
-            aqiValue: 78,
-            aqiCategory: "MODERATE",
-            dataTimestamp: "2025-09-27T19:28:00"
-        },
-        {
-            sensorId: 3,
-            name: "Sensor C",
-            location: "Galle",
-            latitude: 6.0535,
-            longitude: 80.2210,
-            status: "MAINTENANCE",
-            isActive: false,
-            temperature: 29.2,
-            humidity: 68.9,
-            co2Level: 395.0,
-            aqiValue: 125,
-            aqiCategory: "UNHEALTHY_FOR_SENSITIVE",
-            dataTimestamp: "2025-09-27T18:45:00"
-        },
-    ], []);
-
-    // Fetch sensors data - FIXED: removed mockSensors from dependency array
     useEffect(() => {
         const fetchSensors = async () => {
             setIsLoading(true);
             try {
-                await new Promise(resolve => setTimeout(resolve, 500));
-                setSensors(mockSensors);
+                const response = await getSensorswithLatestData();
+                if (response?.success) {
+                    setSensors(response.data);
+                }
+                if(response?.error){
+                    console.error('Error fetching sensors:', response.error);
+                }
             } catch (error) {
                 console.error('Failed to fetch sensors:', error);
             } finally {
@@ -87,9 +46,9 @@ const SensorsMapPage: React.FC = () => {
     // Filter sensors
     useEffect(() => {
         const filtered = sensors.filter(sensor => {
-            const matchesSearch = sensor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            const matchesSearch = sensor.sensorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 sensor.location.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesStatus = statusFilter === 'ALL' || sensor.status === statusFilter;
+            const matchesStatus = statusFilter === 'ALL' || sensor.sensorStatus === statusFilter;
             const matchesAqi = aqiFilter === 'ALL' || sensor.aqiCategory === aqiFilter;
 
             return matchesSearch && matchesStatus && matchesAqi;
@@ -111,11 +70,11 @@ const SensorsMapPage: React.FC = () => {
 
     // Handle sensor click
     const handleSensorClick = (sensor: SensorData) => {
-        console.log(sensor);
+        router.push(`/sensor/${sensor.sensorId}`);
     };
 
     // Calculate statistics
-    const onlineSensors = sensors.filter(s => s.status === 'ONLINE').length;
+    const onlineSensors = sensors.filter(s => s.sensorStatus === 'ONLINE').length;
     const goodAqi = sensors.filter(s => s.aqiCategory === 'GOOD').length;
     const averageAqi = sensors.length > 0
         ? Math.round(sensors.reduce((sum, s) => sum + s.aqiValue, 0) / sensors.length)
@@ -184,6 +143,7 @@ const SensorsMapPage: React.FC = () => {
                                     <option value="ONLINE">Online</option>
                                     <option value="OFFLINE">Offline</option>
                                     <option value="MAINTENANCE">Maintenance</option>
+                                    <option value="ERROR">Error</option>
                                 </select>
 
                                 <select
@@ -194,7 +154,7 @@ const SensorsMapPage: React.FC = () => {
                                     <option value="ALL">All AQI</option>
                                     <option value="GOOD">Good</option>
                                     <option value="MODERATE">Moderate</option>
-                                    <option value="UNHEALTHY_FOR_SENSITIVE">Unhealthy for Sensitive</option>
+                                    <option value="UNHEALTHY_SENSITIVE">Unhealthy for Sensitive</option>
                                     <option value="UNHEALTHY">Unhealthy</option>
                                     <option value="VERY_UNHEALTHY">Very Unhealthy</option>
                                     <option value="HAZARDOUS">Hazardous</option>
@@ -262,73 +222,6 @@ const SensorsMapPage: React.FC = () => {
                                 </div>
                             )}
                         </div>
-                    </div>
-
-                    {/* Sensor List */}
-                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredSensors.map(sensor => {
-                            const aqiData = aqiConfig[sensor.aqiCategory];
-                            const statusData = statusConfig[sensor.status];
-                            const StatusIcon = statusData.icon;
-
-                            return (
-                                <div
-                                    key={sensor.sensorId}
-                                    onClick={() => handleSensorClick(sensor)}
-                                    className="bg-white rounded-xl shadow-lg border border-gray-100 p-4 hover:shadow-xl transition-shadow cursor-pointer"
-                                >
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div>
-                                            <h3 className="font-semibold text-slate-900">{sensor.name}</h3>
-                                            <div className="flex items-center text-gray-600 text-sm mt-1">
-                                                <MapPin className="w-3 h-3 mr-1"/>
-                                                {sensor.location}
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <StatusIcon className="w-4 h-4 mr-1" style={{color: statusData.color}}/>
-                                            <span className="text-xs font-medium" style={{color: statusData.color}}>
-                                            {statusData.label}
-                                        </span>
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        className="rounded-lg p-3 mb-3"
-                                        style={{backgroundColor: aqiData.bgColor}}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <p className="text-xs font-medium" style={{color: aqiData.textColor}}>
-                                                    AQI
-                                                </p>
-                                                <p className="text-xl font-bold" style={{color: aqiData.color}}>
-                                                    {sensor.aqiValue}
-                                                </p>
-                                            </div>
-                                            <p className="text-xs font-semibold" style={{color: aqiData.textColor}}>
-                                                {aqiData.label}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-3 gap-2 text-xs">
-                                        <div className="text-center">
-                                            <p className="text-gray-500">Temp</p>
-                                            <p className="font-semibold text-slate-900">{sensor.temperature}°C</p>
-                                        </div>
-                                        <div className="text-center">
-                                            <p className="text-gray-500">Humidity</p>
-                                            <p className="font-semibold text-slate-900">{sensor.humidity}%</p>
-                                        </div>
-                                        <div className="text-center">
-                                            <p className="text-gray-500">CO₂</p>
-                                            <p className="font-semibold text-slate-900">{sensor.co2Level}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
                     </div>
                 </div>
                 {/* Sensor Popup */}

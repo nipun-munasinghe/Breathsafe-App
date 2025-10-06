@@ -2,18 +2,16 @@ import {AlertTriangle, CheckCircle, XCircle} from "lucide-react";
 
 export interface SensorData {
     sensorId: number;
-    name: string;
+    sensorName: string;
     location: string;
     latitude: number;
     longitude: number;
-    status: 'ONLINE' | 'OFFLINE' | 'MAINTENANCE';
+    sensorStatus: 'ONLINE' | 'OFFLINE' | 'MAINTENANCE' | 'ERROR';
     isActive: boolean;
-    temperature: number;
-    humidity: number;
     co2Level: number;
     aqiValue: number;
-    aqiCategory: 'GOOD' | 'MODERATE' | 'UNHEALTHY_FOR_SENSITIVE' | 'UNHEALTHY' | 'VERY_UNHEALTHY' | 'HAZARDOUS';
-    dataTimestamp: string;
+    aqiCategory: 'GOOD' | 'MODERATE' | 'UNHEALTHY_SENSITIVE' | 'UNHEALTHY' | 'VERY_UNHEALTHY' | 'HAZARDOUS';
+    timestamp: string;
 }
 
 export const statusConfig = {
@@ -31,6 +29,11 @@ export const statusConfig = {
         color: '#F59E0B',
         icon: AlertTriangle,
         label: 'Maintenance'
+    },
+    ERROR: {
+        color: '#7C2D12',
+        icon: XCircle,
+        label: 'Error'
     }
 };
 
@@ -49,7 +52,7 @@ export const aqiConfig = {
         label: 'Moderate',
         range: '51-100'
     },
-    UNHEALTHY_FOR_SENSITIVE: {
+    UNHEALTHY_SENSITIVE: {
         color: '#F97316',
         bgColor: '#FFEDD5',
         textColor: '#9A3412',

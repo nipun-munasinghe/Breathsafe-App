@@ -1,7 +1,7 @@
 import { apiResponse } from "@/types/common";
 import privateAxios from "@/lib/privateAxios";
 import ToastUtils from "@/utils/toastUtils";
-import { CreateSensorFormData  } from "@/types/sensors/admin";
+import {CreateSensorFormData} from "@/types/sensors/admin";
 
 export const createSensor = async (
   data: CreateSensorFormData
@@ -31,6 +31,16 @@ export const deleteSensor = async (id: number): Promise<apiResponse | null> => {
         return {success: true};
     } catch (error: any) {
         ToastUtils.error("Request delete failed. " + error?.response.data.message);
+        return {success: false, error: error.response.data.message};
+    }
+};
+
+export const getSensorswithLatestData = async (): Promise<apiResponse> => {
+    try {
+        const response = await privateAxios.get<apiResponse>('/sensorData');
+        return {success: true, data: response.data};
+    } catch (error: any) {
+        ToastUtils.error("Data retrieval failed. " + error?.response?.data?.message);
         return {success: false, error: error.response.data.message};
     }
 };

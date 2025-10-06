@@ -1,6 +1,6 @@
 import React from "react";
 import {aqiConfig, SensorData, statusConfig} from "@/types/map";
-import {Clock, Droplets, MapPin, Thermometer, Wind} from "lucide-react";
+import {Clock, MapPin, Wind} from "lucide-react";
 import {useRouter} from "next/navigation";
 
 export const SensorPopup: React.FC<{
@@ -14,7 +14,7 @@ export const SensorPopup: React.FC<{
     if (!isVisible) return null;
 
     const aqiData = aqiConfig[sensor.aqiCategory];
-    const statusData = statusConfig[sensor.status];
+    const statusData = statusConfig[sensor.sensorStatus];
     const StatusIcon = statusData.icon;
 
     const formatTimestamp = (timestamp: string) => {
@@ -42,7 +42,7 @@ export const SensorPopup: React.FC<{
             {/* Header */}
             <div className="flex items-start justify-between mb-4">
                 <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-1">{sensor.name}</h3>
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">{sensor.sensorName}</h3>
                     <div className="flex items-center text-gray-600 text-sm">
                         <MapPin className="w-4 h-4 mr-1"/>
                         {sensor.location}
@@ -85,21 +85,6 @@ export const SensorPopup: React.FC<{
 
             {/* Sensor Readings */}
             <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="bg-slate-50 rounded-lg p-3">
-                    <div className="flex items-center text-gray-600 text-sm mb-1">
-                        <Thermometer className="w-4 h-4 mr-1"/>
-                        Temperature
-                    </div>
-                    <p className="text-lg font-bold text-slate-900">{sensor.temperature}°C</p>
-                </div>
-
-                <div className="bg-slate-50 rounded-lg p-3">
-                    <div className="flex items-center text-gray-600 text-sm mb-1">
-                        <Droplets className="w-4 h-4 mr-1"/>
-                        Humidity
-                    </div>
-                    <p className="text-lg font-bold text-slate-900">{sensor.humidity}%</p>
-                </div>
 
                 <div className="bg-slate-50 rounded-lg p-3 col-span-2">
                     <div className="flex items-center text-gray-600 text-sm mb-1">
@@ -113,7 +98,7 @@ export const SensorPopup: React.FC<{
             {/* Last Updated */}
             <div className="flex items-center text-xs text-gray-500 mb-4">
                 <Clock className="w-3 h-3 mr-1"/>
-                Last updated: {formatTimestamp(sensor.dataTimestamp)}
+                Last updated: {formatTimestamp(sensor.timestamp)}
             </div>
 
             {/* Action Button */}
