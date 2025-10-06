@@ -68,15 +68,14 @@ const updateSensorValidationSchema = yup.object({
     ),
   lastMaintenance: yup
     .string()
-    .nullable()
-    .optional()
+    .required("Last maintenance date is required")
     .test("valid-date", "Please enter a valid date", (value) => {
-      if (!value) return true;
+      if (!value) return false;
       const date = new Date(value);
       return date instanceof Date && !isNaN(date.getTime());
     })
     .test("not-future", "Maintenance date cannot be in the future", (value) => {
-      if (!value) return true;
+      if (!value) return false;
       const date = new Date(value);
       return date <= new Date();
     }),
@@ -222,14 +221,10 @@ const UpdateSensorModal: React.FC<UpdateSensorModalProps> = ({
     try {
       const updatedSensor = {
         ...formData,
-        name: formData.name?.trim(),
-        location: formData.location?.trim(),
-        installationDate: formData.installationDate
-          ? new Date(formData.installationDate).toISOString()
-          : sensor?.installationDate,
-        lastMaintenance: formData.lastMaintenance
-          ? new Date(formData.lastMaintenance).toISOString()
-          : sensor?.lastMaintenance,
+        name: formData.name?.trim() || sensor?.name || "",
+        location: formData.location?.trim() || sensor?.location || "",
+        installationDate: new Date(formData.installationDate as string).toISOString(),
+        lastMaintenance: new Date(formData.lastMaintenance as string).toISOString(),
       };
 
       await onSave(updatedSensor);
@@ -589,3 +584,4 @@ const UpdateSensorModal: React.FC<UpdateSensorModalProps> = ({
 };
 
 export default UpdateSensorModal;
+

@@ -58,14 +58,15 @@ export default function AllSensorsPage() {
 
     try {
       const updateData = {
-        name: updatedSensor.name,
-        location: updatedSensor.location,
-        latitude: updatedSensor.latitude,
-        longitude: updatedSensor.longitude,
-        status: updatedSensor.status,
-        installationDate: updatedSensor.installationDate,
-        lastMaintenance: updatedSensor.lastMaintenance,
-        isActive: updatedSensor.isActive,
+        name: updatedSensor.name as string,
+        location: updatedSensor.location as string,
+        latitude: updatedSensor.latitude as number,
+        longitude: updatedSensor.longitude as number,
+        status: updatedSensor.status as SensorStatus,
+        installationDate: updatedSensor.installationDate as string,
+        lastMaintenance: updatedSensor.lastMaintenance as string,
+        isActive: updatedSensor.isActive as boolean,
+        batteryLevel: updatedSensor.batteryLevel ?? null,
       };
 
       const response = await updateSensor(editingSensor.id, updateData);
@@ -85,8 +86,9 @@ export default function AllSensorsPage() {
 
         await fetchSensors();
       }
-    } catch (error) {
-      ToastUtils.error("Failed to update sensor:");
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || "Unknown error";
+      ToastUtils.error("Failed to update sensor: " + message);
     }
   };
 
@@ -123,3 +125,4 @@ export default function AllSensorsPage() {
     </div>
   );
 }
+

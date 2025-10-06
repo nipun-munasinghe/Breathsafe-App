@@ -1,7 +1,7 @@
 import { apiResponse } from "@/types/common";
 import privateAxios from "@/lib/privateAxios";
 import ToastUtils from "@/utils/toastUtils";
-import { CreateSensorFormData } from "@/types/sensors/admin";
+import { CreateSensorFormData, UpdateSensorFormData } from "@/types/sensors/admin";
 
 export const createSensor = async (
   data: CreateSensorFormData
@@ -37,7 +37,7 @@ export const deleteSensor = async (id: number): Promise<apiResponse | null> => {
 
 export const updateSensor = async (
   id: number,
-  data: Partial<CreateSensorFormData>
+  data: UpdateSensorFormData
 ): Promise<apiResponse | null> => {
   try {
     await privateAxios.put<void>(`/sensors/${id}`, data);

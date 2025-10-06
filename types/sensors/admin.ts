@@ -163,3 +163,16 @@ export interface CreateSensorFormData {
     longitude: number | null;
     location: string;
 }
+
+// Payload required by backend's SensorUpdateDTO (extends upsert + requires lastMaintenance)
+export interface UpdateSensorFormData {
+  name: string;
+  installationDate: string; // ISO string
+  isActive: boolean;
+  status: SensorStatus;
+  latitude: number;
+  longitude: number;
+  location: string;
+  lastMaintenance: string; // ISO string (required by backend)
+  batteryLevel?: number | null; // optional on server entity
+}
