@@ -1,5 +1,5 @@
 import privateAxios from '@/lib/privateAxios';
-import { AdminSensor, SensorListResponse, SensorFormData, SensorReadingsFormData, SensorStatus, SensorDataDisplayDTO } from '@/types/sensors/admin';
+import { AdminSensor, SensorListResponse, SensorFormData, SensorReadingsFormData, SensorDataDisplayDTO } from '@/types/sensors/admin';
 import ToastUtils from '@/utils/toastUtils';
 
 //interface for sensor data update request
@@ -9,7 +9,6 @@ interface SensorDataUpdateRequest {
   co2Level: number;
 }
 
-//API calls
 //fetch sensor data for display in table
 export const getSensorDisplayData = async (): Promise<SensorDataDisplayDTO[]> => {
   try {
@@ -27,7 +26,6 @@ export const updateSensorDataReadings = async (
   readingsData: SensorReadingsFormData
 ): Promise<SensorDataDisplayDTO> => {
   try {
-    //validate that at least one reading is provided
     if (readingsData.lastCO2Reading === null && readingsData.lastAQIReading === null) {
       throw new Error('At least one reading (CO₂ or AQI) must be provided');
     }
