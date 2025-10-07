@@ -1,8 +1,10 @@
 import React, {forwardRef, useEffect, useImperativeHandle, useState} from "react";
 import {CardPendingRequestsRef, CommunityRequest} from "@/types/request";
-import {Calendar, CheckCircle, Clock, ExternalLink, MapPin, RefreshCw, Search, XCircle} from "lucide-react";
+import {Calendar, CheckCircle, Clock, ExternalLink, FileText, MapPin, RefreshCw, Search, XCircle} from "lucide-react";
 import {getAllRequests} from "@/service/requestApi";
 import {apiResponse} from "@/types/common";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export const CardPendingRequests = forwardRef<CardPendingRequestsRef, {
     onApprove: (request: CommunityRequest) => void;
@@ -67,6 +69,33 @@ export const CardPendingRequests = forwardRef<CardPendingRequestsRef, {
         onReject(request);
     };
 
+    const generateReport = () => {
+        const doc = new jsPDF();
+
+        doc.setFontSize(16);
+        doc.text(isPending ? "Pending Requests Report" : "Approved Requests Report", 14, 20);
+
+        doc.setFontSize(10);
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 28);
+
+        const tableData = filteredRequests.map(req => [
+            req.id,
+            req.requesterName,
+            req.requestedLocation,
+            `${req.latitude.toFixed(4)}, ${req.longitude.toFixed(4)}`,
+            req.justification.slice(0, 40) + (req.justification.length > 40 ? "..." : ""),
+            formatDate(req.createdAt),
+        ]);
+
+        autoTable(doc, {
+            head: [["ID", "Requester", "Location", "Coordinates", "Justification", "Created At"]],
+            body: tableData,
+            startY: 35,
+        });
+
+        doc.save(isPending ? "pending-requests.pdf" : "approved-requests.pdf");
+    };
+
     return (
         <div
             className="relative flex flex-col break-words bg-white w-full mb-6 shadow-lg rounded-2xl border border-gray-100">
@@ -108,6 +137,13 @@ export const CardPendingRequests = forwardRef<CardPendingRequestsRef, {
                                 >
                                     <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`}/>
                                     Refresh
+                                </button>
+                                <button
+                                    onClick={() => generateReport()}
+                                    className="bg-lime-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-950 transition-colors flex items-center"
+                                >
+                                    <FileText className={`w-4 h-4 mr-2`}/>
+                                    Download
                                 </button>
                             </div>
                         </div>
