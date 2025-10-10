@@ -226,8 +226,8 @@ const SensorChart: React.FC<SensorChartProps> = ({
       const pageHeight = pdf.internal.pageSize.getHeight();
       
       // Colors
-      const primaryColor = '#064e3b';
-      const secondaryColor = '#84cc16';
+      // const primaryColor = '#064e3b';
+      // const secondaryColor = '#84cc16';
       const textColor = '#374151';
       
       // Add header
@@ -349,13 +349,13 @@ const SensorChart: React.FC<SensorChartProps> = ({
       
       // CO2 Assessment
       let co2Status = 'Good';
-      let co2Color = '#22c55e';
+      // let co2Color = '#22c55e';
       if (avgCO2 > 1000) {
         co2Status = 'Poor - Ventilation Needed';
-        co2Color = '#ef4444';
+        // co2Color = '#ef4444';
       } else if (avgCO2 > 800) {
         co2Status = 'Moderate - Consider Ventilation';
-        co2Color = '#f59e0b';
+        // co2Color = '#f59e0b';
       }
       
       pdf.text(`CO₂ Level Status: ${co2Status}`, 20, yPosition);
