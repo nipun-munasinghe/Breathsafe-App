@@ -234,6 +234,51 @@ const Sidebar: React.FC = () => {
 
             {/* Divider */}
             <hr className="my-4 md:min-w-full" />
+            {/* No Layout Pages */}
+            <h6 className="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">
+              User Management
+            </h6>
+            <ul className="md:flex-col md:min-w-full flex flex-col list-none md:mb-4">
+              <li className="items-center">
+                <Link
+                  className={`text-xs uppercase py-3 font-bold block ${
+                    isActive("/admin/create-user")
+                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      : "text-blueGray-700 hover:text-blueGray-500"
+                  }`}
+                  href="/admin/create-user"
+                >
+                  <i
+                    className={`fas fa-plus-circle mr-2 text-sm ${
+                      isActive("/admin/create-user")
+                        ? "opacity-75"
+                        : "text-blueGray-400"
+                    }`}
+                  ></i>{" "}
+                  Add User
+                </Link>
+              </li>
+
+              <li className="items-center">
+                <Link
+                  className={`text-xs uppercase py-3 font-bold block ${
+                    isActive("/admin/manage-user")
+                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      : "text-blueGray-700 hover:text-blueGray-500"
+                  }`}
+                  href="/admin/manage-user"
+                >
+                  <i
+                    className={`fas fa-list mr-2 text-sm ${
+                      isActive("/admin/manage-user")
+                        ? "opacity-75"
+                        : "text-blueGray-400"
+                    }`}
+                  ></i>{" "}
+                  Manage User
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
       </nav>
