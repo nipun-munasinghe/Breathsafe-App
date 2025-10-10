@@ -9,21 +9,21 @@ import { updateSensorReadings } from '@/service/admin/sensorDataApi';
 import { Search, RefreshCw, Activity, Edit, RotateCcw, MapPin, ExternalLink, Wifi, WifiOff, Eye, AlertCircle, Settings } from 'lucide-react';
 import Link from 'next/link';
 
-//convert SensorDataDisplayDTO to AdminSensor format with correct field names
+//convert SensorDataDisplayDTO to AdminSensor format with correct field names and null safety
 const convertToAdminSensor = (displayData: SensorDataDisplayDTO): AdminSensor => {
   return {
-    id: displayData.sensorId,
-    name: displayData.name,
-    location: displayData.location,
-    latitude: displayData.latitude,
-    longitude: displayData.longitude,
+    id: displayData.sensorId || 0,
+    name: displayData.name || 'Unknown Sensor',
+    location: displayData.location || 'Unknown Location',
+    latitude: displayData.latitude || 0,
+    longitude: displayData.longitude || 0,
     lastCO2Reading: displayData.co2Level,
     lastAQIReading: displayData.aqiValue,
-    status: displayData.status,
+    status: displayData.status || 'UNKNOWN',
     lastReadingTime: displayData.timestamp,
     isOnline: displayData.status === 'ONLINE',
-    createdAt: displayData.createdAt,
-    updatedAt: displayData.createdAt
+    createdAt: displayData.createdAt || new Date().toISOString(),
+    updatedAt: displayData.createdAt || new Date().toISOString()
   };
 };
 
@@ -145,7 +145,24 @@ export const CardSensorList: React.FC = () => {
       setSensorDisplayData(displayData);
       const convertedSensors = displayData.map(convertToAdminSensor);
       setSensors(convertedSensors);
-      setFilteredSensors(convertedSensors);
+      
+      // apply search filter to new data with null safety
+      if (searchTerm.trim() === '') {
+        setFilteredSensors(convertedSensors);
+      } else {
+        const searchLower = searchTerm.toLowerCase();
+        const filtered = convertedSensors.filter(sensor => {
+          // Add null safety checks
+          const name = sensor.name || '';
+          const location = sensor.location || '';
+          const status = sensor.status || '';
+          
+          return name.toLowerCase().includes(searchLower) ||
+                 location.toLowerCase().includes(searchLower) ||
+                 status.toLowerCase().includes(searchLower);
+        });
+        setFilteredSensors(filtered);
+      }
     } catch (error) {
       console.error('Error loading sensors:', error);
       setSensors([]);
@@ -154,26 +171,43 @@ export const CardSensorList: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [searchTerm]);
 
   useEffect(() => {
     loadSensors();
   }, [loadSensors]);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearchTerm(value);
-    if (value.trim() === '') {
+  //apply filter whenever sensors data changes with NULL SAFETY
+  useEffect(() => {
+    if (!sensors || sensors.length === 0) {
+      setFilteredSensors([]);
+      return;
+    }
+
+    if (searchTerm.trim() === '') {
       setFilteredSensors(sensors);
     } else {
-      const searchLower = value.toLowerCase();
-      const filtered = sensors.filter(sensor =>
-        sensor.name.toLowerCase().includes(searchLower) ||
-        sensor.location.toLowerCase().includes(searchLower) ||
-        sensor.status.toLowerCase().includes(searchLower)
-      );
+      const searchLower = searchTerm.toLowerCase();
+      const filtered = sensors.filter(sensor => {
+        // add null safety checks
+        if (!sensor) return false;
+        
+        const name = (sensor.name || '').toString().toLowerCase();
+        const location = (sensor.location || '').toString().toLowerCase();
+        const status = (sensor.status || '').toString().toLowerCase();
+        
+        return name.includes(searchLower) ||
+               location.includes(searchLower) ||
+               status.includes(searchLower);
+      });
       setFilteredSensors(filtered);
     }
-  }, [sensors]);
+  }, [sensors, searchTerm]);
+
+  //Updated search handler
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchTerm(value);
+  }, []);
 
   const handleRefresh = () => {
     loadSensors();
@@ -217,12 +251,6 @@ export const CardSensorList: React.FC = () => {
       
       //update local state
       setSensors(prevSensors => 
-        prevSensors.map(sensor => 
-          sensor.id === updatedSensor.id ? updatedSensor : sensor
-        )
-      );
-      
-      setFilteredSensors(prevSensors => 
         prevSensors.map(sensor => 
           sensor.id === updatedSensor.id ? updatedSensor : sensor
         )
@@ -283,7 +311,8 @@ export const CardSensorList: React.FC = () => {
 
   //status Badge
   const getStatusBadge = useCallback((status: string) => {
-    switch (status) {
+    const safeStatus = status || 'UNKNOWN';
+    switch (safeStatus) {
       case 'ONLINE':
         return (
           <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center">
@@ -373,8 +402,12 @@ export const CardSensorList: React.FC = () => {
           ) : filteredSensors.length === 0 ? (
             <div className="text-center py-12">
               <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Sensors Found</h3>
-              <p className="text-gray-500">No sensors match your search criteria</p>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                {searchTerm ? 'No Sensors Found' : 'No Sensors Available'}
+              </h3>
+              <p className="text-gray-500">
+                {searchTerm ? `No sensors match "${searchTerm}"` : 'No sensors available to display'}
+              </p>
             </div>
           ) : (
             <>
