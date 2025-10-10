@@ -93,11 +93,6 @@ export interface SensorDataDisplayDTO {
   timestamp: string | null;
 }
 
-//delete response interface
-export interface DeleteSensorDataResponse {
-  message: string;
-}
-
 export const statusOptions: SensorStatus[] = [
     "ONLINE",
     "OFFLINE", 
@@ -163,3 +158,87 @@ export interface CreateSensorFormData {
     longitude: number | null;
     location: string;
 }
+
+export interface UpdateSensorFormData {
+  name: string;
+  installationDate: string; // ISO string
+  isActive: boolean;
+  status: SensorStatus;
+  latitude: number;
+  longitude: number;
+  location: string;
+  lastMaintenance: string; // ISO string (required by backend)
+  batteryLevel?: number | null; // optional on server entity
+}
+
+export const updateSensorValidationSchema = yup.object({
+    name: yup
+        .string()
+        .required("Sensor name is required")
+        .min(3, "Sensor name must be at least 3 characters")
+        .max(100, "Sensor name must be less than 100 characters")
+        .trim(),
+    installationDate: yup
+        .string()
+        .required("Installation date is required")
+        .test("valid-date", "Please enter a valid date", (value) => {
+            if (!value) return false;
+            const date = new Date(value);
+            return !isNaN(date.getTime());
+        })
+        .test(
+            "not-future",
+            "Installation date cannot be in the future",
+            (value) => {
+                if (!value) return true;
+                const date = new Date(value);
+                return date <= new Date();
+            }
+        ),
+    lastMaintenance: yup
+        .string()
+        .required("Last maintenance date is required")
+        .test("valid-date", "Please enter a valid date", (value) => {
+            if (!value) return false;
+            const date = new Date(value);
+            return date instanceof Date && !isNaN(date.getTime());
+        })
+        .test("not-future", "Maintenance date cannot be in the future", (value) => {
+            if (!value) return false;
+            const date = new Date(value);
+            return date <= new Date();
+        }),
+    status: yup
+        .string()
+        .required("Status is required")
+        .oneOf(statusOptions, "Please select a valid status"),
+    batteryLevel: yup
+        .number()
+        .nullable()
+        .optional()
+        .min(0, "Battery level must be between 0 and 100")
+        .max(100, "Battery level must be between 0 and 100")
+        .integer("Battery level must be a whole number")
+        .typeError("Battery level must be a valid number"),
+    latitude: yup
+        .number()
+        .nullable()
+        .required("Latitude is required")
+        .min(-90, "Latitude must be between -90 and 90")
+        .max(90, "Latitude must be between -90 and 90")
+        .typeError("Latitude must be a valid number"),
+    longitude: yup
+        .number()
+        .nullable()
+        .required("Longitude is required")
+        .min(-180, "Longitude must be between -180 and 180")
+        .max(180, "Longitude must be between -180 and 180")
+        .typeError("Longitude must be a valid number"),
+    location: yup
+        .string()
+        .required("Location is required")
+        .min(5, "Location must be at least 5 characters")
+        .max(200, "Location must be less than 200 characters")
+        .trim(),
+    isActive: yup.boolean().required("Active status is required"),
+});
