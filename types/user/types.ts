@@ -37,3 +37,12 @@ export interface UserProfile {
     profileImage: string;
     bio: string;
 }
+
+export type FormData = {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+}

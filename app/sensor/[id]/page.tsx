@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { MapPin, Thermometer, Droplets, Wind, ArrowLeft, AlertCircle } from 'lucide-react';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
+import SubscribeButton from "@/components/subscriptions/SubscribeButton";
 import { ProtectedRoute } from '@/components/common/protectedRoute';
 import SensorStatsGrid from '@/components/sensor/SensorStatsGrid';
 import SensorChart from '@/components/sensor/SensorChart';
@@ -22,8 +23,7 @@ export default function SensorDetails() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // API calls
-  /*
+  // API calls with dummy data for now
   useEffect(() => {
     const fetchSensorData = async () => {
       if (!sensorId) return;
@@ -32,6 +32,7 @@ export default function SensorDetails() {
       setError(null);
 
       try {
+        // Simulate API calls - replace with real API when available
         const [sensorData, weekData, statsData] = await Promise.all([
           getSensorById(sensorId),
           getSensorDataByWeek(sensorId),
@@ -52,56 +53,6 @@ export default function SensorDetails() {
 
     fetchSensorData();
   }, [sensorId]);
-  */
-
-  // Dummy data
-  useEffect(() => {
-    const fetchSensorData = async () => {
-      if (!sensorId) return;
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const [sensorData, weekData, statsData] = await Promise.all([
-          getSensorById(sensorId),
-          getSensorDataByWeek(sensorId),
-          getSensorStats(sensorId)
-        ]);
-
-        setSensor(sensorData);
-        setChartData(weekData);
-        setStats(statsData);
-      } catch (error: any) {
-        console.error('Error fetching sensor data:', error);
-        setError(error.message || 'Failed to load sensor data');
-        ToastUtils.error('Failed to load sensor data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSensorData();
-  }, [sensorId]);
-
-  /*const getAQIColor = (category: AQICategory) => {
-    switch (category) {
-      case AQICategory.GOOD:
-        return 'text-green-600 bg-green-100';
-      case AQICategory.MODERATE:
-        return 'text-yellow-600 bg-yellow-100';
-      case AQICategory.UNHEALTHY_FOR_SENSITIVE:
-        return 'text-orange-600 bg-orange-100';
-      case AQICategory.UNHEALTHY:
-        return 'text-red-600 bg-red-100';
-      case AQICategory.VERY_UNHEALTHY:
-        return 'text-purple-600 bg-purple-100';
-      case AQICategory.HAZARDOUS:
-        return 'text-gray-800 bg-gray-300';
-      default:
-        return 'text-gray-600 bg-gray-100';
-    }
-  };*/
 
   if (error) {
     return (
@@ -138,13 +89,16 @@ export default function SensorDetails() {
           
           {/* Back Button */}
           <div className="mt-20 mb-6">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center text-white hover:text-lime-200 transition-colors group"
-            >
-              <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-              Back
-            </button>
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => router.back()}
+                className="flex items-center text-white hover:text-lime-200 transition-colors group"
+              >
+                <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+                Back
+              </button>
+              <SubscribeButton sensorId={sensorId} />
+            </div>
           </div>
 
           {/* Sensor Header */}
@@ -178,10 +132,11 @@ export default function SensorDetails() {
             isLoading={isLoading}
           />
 
-          {/* Chart Section */}
+          {/* Enhanced Chart Section with location data */}
           <SensorChart 
             data={chartData || { labels: [], co2Data: [], aqiData: [] }}
             sensorName={sensor?.name || 'Sensor'}
+            sensorLocation={sensor?.location}
             isLoading={isLoading}
           />
 
@@ -197,7 +152,7 @@ export default function SensorDetails() {
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <div className="p-3 bg-green-50 rounded-lg">
                     <div className="font-semibold text-green-800">Good</div>
-                    <div className="text-sm text-green-600"> &lt;400 ppm</div>
+                    <div className="text-sm text-green-600">&lt;400 ppm</div>
                   </div>
                   <div className="p-3 bg-yellow-50 rounded-lg">
                     <div className="font-semibold text-yellow-800">Elevated</div>

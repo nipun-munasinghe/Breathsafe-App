@@ -47,3 +47,13 @@ export const updateSensor = async (
     return { success: false, error: error.response.data.message };
   }
 };
+
+export const getSensorswithLatestData = async (): Promise<apiResponse> => {
+    try {
+        const response = await privateAxios.get<apiResponse>('/sensorData');
+        return {success: true, data: response.data};
+    } catch (error: any) {
+        ToastUtils.error("Data retrieval failed. " + error?.response?.data?.message);
+        return {success: false, error: error.response.data.message};
+    }
+};

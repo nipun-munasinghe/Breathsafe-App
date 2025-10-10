@@ -67,3 +67,15 @@ export const deleteUserAccount = async (): Promise<boolean> => {
     return false;
   }
 };
+
+export const getAllUsers = async (): Promise<apiResponse<UserProfile[]> | null> => {
+  try {
+    const response = await privateAxios.get<UserProfile[]>("/user/all");
+    return { success: true, data: response.data };
+  } catch (error: any) {
+    ToastUtils.error(
+      "Failed to fetch users. " + error.response.data.message
+    );
+    return { success: false, error: error.response.data.message };
+  }
+};

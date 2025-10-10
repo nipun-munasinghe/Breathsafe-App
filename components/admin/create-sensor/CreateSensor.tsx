@@ -1,12 +1,17 @@
 "use client";
 
-import React, {useMemo, useState} from "react";
-import {Check, Clock, MapPin, ToggleLeft, ToggleRight} from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { Check, Clock, MapPin, ToggleLeft, ToggleRight } from "lucide-react";
 import dynamic from "next/dynamic";
 import * as yup from "yup";
 import ToastUtils from "@/utils/toastUtils";
-import {CreateSensorFormData, SensorStatus, sensorValidationSchema, statusOptions} from "@/types/sensors/admin";
-import {createSensor} from "@/service/sensorApi";
+import {
+  CreateSensorFormData,
+  SensorStatus,
+  sensorValidationSchema,
+  statusOptions,
+} from "@/types/sensors/admin";
+import { createSensor } from "@/service/sensorApi";
 
 const MapSelector = dynamic(() => import("@/components/requests/MapSelector"), {
   ssr: false,
@@ -119,7 +124,7 @@ const CreateSensor: React.FC = () => {
     setSubmitting(true);
 
     try {
-      const payload : CreateSensorFormData = {
+      const payload: CreateSensorFormData = {
         name: formData.name.trim(),
         installationDate: new Date(formData.installationDate).toISOString(),
         isActive: formData.isActive,
@@ -131,8 +136,8 @@ const CreateSensor: React.FC = () => {
 
       const response = await createSensor(payload);
       if (response?.success) {
-          ToastUtils.success("Sensor created successfully!");
-          setFormData(initialFormData);
+        ToastUtils.success("Sensor created successfully!");
+        setFormData(initialFormData);
       }
     } catch (err: any) {
       setSubmitError(err?.message || "Failed to submit form!");
