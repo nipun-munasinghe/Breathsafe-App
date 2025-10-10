@@ -1,16 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { X, MapPin, Calendar, Battery, Clock, Save } from "lucide-react";
+import React, {useEffect, useState} from "react";
+import {Battery, Calendar, Clock, MapPin, Save} from "lucide-react";
 import dynamic from "next/dynamic";
 import * as yup from "yup";
+import {SensorStatus, statusOptions, updateSensorValidationSchema} from "@/types/sensors/admin";
 
-// Load MapSelector client-side to avoid SSR issues
 const MapSelector = dynamic(() => import("@/components/requests/MapSelector"), {
   ssr: false,
 });
-
-type SensorStatus = "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR";
 
 interface Sensor {
   id: number;
@@ -33,86 +31,6 @@ interface UpdateSensorModalProps {
   onClose: () => void;
   onSave: (updatedSensor: Partial<Sensor>) => void;
 }
-
-const statusOptions: SensorStatus[] = [
-  "ONLINE",
-  "OFFLINE",
-  "MAINTENANCE",
-  "ERROR",
-];
-
-// Yup validation schema
-const updateSensorValidationSchema = yup.object({
-  name: yup
-    .string()
-    .required("Sensor name is required")
-    .min(3, "Sensor name must be at least 3 characters")
-    .max(100, "Sensor name must be less than 100 characters")
-    .trim(),
-  installationDate: yup
-    .string()
-    .required("Installation date is required")
-    .test("valid-date", "Please enter a valid date", (value) => {
-      if (!value) return false;
-      const date = new Date(value);
-      return date instanceof Date && !isNaN(date.getTime());
-    })
-    .test(
-      "not-future",
-      "Installation date cannot be in the future",
-      (value) => {
-        if (!value) return true;
-        const date = new Date(value);
-        return date <= new Date();
-      }
-    ),
-  lastMaintenance: yup
-    .string()
-    .required("Last maintenance date is required")
-    .test("valid-date", "Please enter a valid date", (value) => {
-      if (!value) return false;
-      const date = new Date(value);
-      return date instanceof Date && !isNaN(date.getTime());
-    })
-    .test("not-future", "Maintenance date cannot be in the future", (value) => {
-      if (!value) return false;
-      const date = new Date(value);
-      return date <= new Date();
-    }),
-  status: yup
-    .string()
-    .required("Status is required")
-    .oneOf(statusOptions, "Please select a valid status"),
-  batteryLevel: yup
-    .number()
-    .nullable()
-    .optional()
-    .min(0, "Battery level must be between 0 and 100")
-    .max(100, "Battery level must be between 0 and 100")
-    .integer("Battery level must be a whole number")
-    .typeError("Battery level must be a valid number"),
-  latitude: yup
-    .number()
-    .nullable()
-    .required("Latitude is required")
-    .min(-90, "Latitude must be between -90 and 90")
-    .max(90, "Latitude must be between -90 and 90")
-    .typeError("Latitude must be a valid number"),
-  longitude: yup
-    .number()
-    .nullable()
-    .required("Longitude is required")
-    .min(-180, "Longitude must be between -180 and 180")
-    .max(180, "Longitude must be between -180 and 180")
-    .typeError("Longitude must be a valid number"),
-  location: yup
-    .string()
-    .required("Location is required")
-    .min(5, "Location must be at least 5 characters")
-    .max(200, "Location must be less than 200 characters")
-    .trim(),
-  isActive: yup.boolean().required("Active status is required"),
-});
 
 const UpdateSensorModal: React.FC<UpdateSensorModalProps> = ({
   sensor,
@@ -143,7 +61,6 @@ const UpdateSensorModal: React.FC<UpdateSensorModalProps> = ({
     }
   }, [sensor]);
 
-  // Validate single field
   const validateField = async (fieldName: keyof Sensor, value: any) => {
     try {
       const fieldSchema = yup.reach(
@@ -166,7 +83,6 @@ const UpdateSensorModal: React.FC<UpdateSensorModalProps> = ({
     }
   };
 
-  // Validate entire form
   const validateForm = async (): Promise<boolean> => {
     try {
       await updateSensorValidationSchema.validate(formData, {

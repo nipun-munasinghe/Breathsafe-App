@@ -26,10 +26,8 @@ export default function AllSensorsPage() {
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [editingSensor, setEditingSensor] = useState<Sensor | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   const fetchSensors = async () => {
-    setLoading(true);
     try {
       const response = await getAllSensors();
       if (response?.success && response.data) {
@@ -40,7 +38,6 @@ export default function AllSensorsPage() {
     } catch (error) {
       console.error("Failed to fetch sensors:", error);
     } finally {
-      setLoading(false);
     }
   };
 
