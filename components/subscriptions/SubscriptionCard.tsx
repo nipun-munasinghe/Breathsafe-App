@@ -1,114 +1,190 @@
 "use client";
 
 import React, { useState } from "react";
-import { Bell, MapPin, Settings2, Trash2 } from "lucide-react";
-import { SubscriptionItem } from "@/types/subscription";
+import { Bell, MapPin, Settings2, Trash2, Power } from "lucide-react";
+import { SubscriptionResponse } from "@/types/subscription";
+import {
+  updateAlertThreshold,
+  updateEmailNotifications,
+  toggleSubscriptionStatus,
+} from "@/service/subscriptionApi";
+import { useDebouncedCallback } from "use-debounce";
+
+// A reusable toggle switch component for a cleaner UI
+const ToggleSwitch = ({
+  checked,
+  onChange,
+  disabled,
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+}) => (
+  <label className="relative inline-flex cursor-pointer items-center">
+    <input
+      type="checkbox"
+      checked={checked}
+      onChange={(e) => onChange(e.target.checked)}
+      className="peer sr-only"
+      disabled={disabled}
+    />
+    <div className="peer h-6 w-11 rounded-full bg-slate-200 after:absolute after:start-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-emerald-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rtl:peer-checked:after:-translate-x-full"></div>
+  </label>
+);
 
 type Props = {
-  item: SubscriptionItem;
-  onUpdate: (id: number, updates: Partial<SubscriptionItem>) => Promise<void>;
+  item: SubscriptionResponse;
+  onStateChange: (updatedItem: SubscriptionResponse) => void;
   onUnsubscribe: (id: number) => Promise<void>;
 };
 
-export default function SubscriptionCard({ item, onUpdate, onUnsubscribe }: Props) {
-  const [threshold, setThreshold] = useState<number>(item.alertThreshold ?? 100);
-  const [email, setEmail] = useState<boolean>(!!item.emailNotifications);
-  const [saving, setSaving] = useState(false);
-  const [removing, setRemoving] = useState(false);
+export default function SubscriptionCard({
+  item,
+  onStateChange,
+  onUnsubscribe,
+}: Props) {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
 
-  const save = async () => {
-    setSaving(true);
-    try {
-      await onUpdate(item.id, { alertThreshold: threshold, emailNotifications: email });
-    } finally {
-      setSaving(false);
-    }
-  };
-
+  // Unsubscribe handler
   const handleUnsub = async () => {
     if (!confirm(`Unsubscribe from ${item.sensorName}?`)) return;
-    setRemoving(true);
-    try {
-      await onUnsubscribe(item.id);
-    } finally {
-      setRemoving(false);
+    setIsRemoving(true);
+    await onUnsubscribe(item.subscriptionId);
+    // No need to set isRemoving to false, as the component will unmount.
+  };
+
+  // Handler for email notification toggle
+  const handleEmailChange = async (enabled: boolean) => {
+    setIsUpdating(true);
+    const response = await updateEmailNotifications(item.subscriptionId, {
+      enable: enabled,
+    });
+    if (response.success && response.data) {
+      onStateChange(response.data);
     }
+    setIsUpdating(false);
+  };
+
+  // Debounced handler for alert threshold to avoid too many API calls while sliding
+  const debouncedThresholdUpdate = useDebouncedCallback(
+    async (newThreshold: number) => {
+      setIsUpdating(true);
+      const response = await updateAlertThreshold(item.subscriptionId, {
+        alertThreshold: newThreshold,
+      });
+      if (response.success && response.data) {
+        onStateChange(response.data);
+      }
+      setIsUpdating(false);
+    },
+    500 // 500ms debounce delay
+  );
+
+  // Handler for active status toggle
+  const handleStatusChange = async (isActive: boolean) => {
+    setIsUpdating(true);
+    const response = await toggleSubscriptionStatus(item.subscriptionId, {
+      isActive,
+    });
+    if (response.success && response.data) {
+      onStateChange(response.data);
+    }
+    setIsUpdating(false);
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div
+      className={`rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-opacity ${
+        !item.isActive ? "opacity-60" : ""
+      }`}
+    >
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">{item.sensorName}</h3>
+          <h3 className="text-lg font-semibold text-slate-900">
+            {item.sensorName}
+          </h3>
           <div className="mt-1 flex items-center text-sm text-slate-600">
             <MapPin className="mr-1 h-4 w-4 text-lime-600" />
             <span>{item.sensorLocation}</span>
           </div>
-          <div className="mt-1 text-xs text-slate-500">
-            Status: <span className="font-medium">{item.sensorStatus ?? "UNKNOWN"}</span>
-          </div>
         </div>
         <button
-          className="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+          className="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
           onClick={handleUnsub}
-          disabled={removing}
+          disabled={isUpdating || isRemoving}
           title="Unsubscribe"
         >
           <div className="flex items-center gap-1">
             <Trash2 className="h-4 w-4" />
-            {removing ? "Removing..." : "Unsubscribe"}
+            {isRemoving ? "Removing..." : "Unsubscribe"}
           </div>
         </button>
       </div>
 
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+        {/* Active Status Control */}
+        <div className="rounded-lg border border-slate-200 p-3">
+          <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-800">
+            <Power
+              className={`h-4 w-4 ${
+                item.isActive ? "text-emerald-600" : "text-slate-400"
+              }`}
+            />
+            Subscription Status
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-slate-700">
+              {item.isActive ? "Active" : "Inactive"}
+            </span>
+            <ToggleSwitch
+              checked={item.isActive}
+              onChange={handleStatusChange}
+              disabled={isUpdating || isRemoving}
+            />
+          </div>
+        </div>
+
+        {/* Email Notifications Control */}
         <div className="rounded-lg border border-slate-200 p-3">
           <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-800">
             <Bell className="h-4 w-4 text-amber-600" />
             Email notifications
           </div>
-          <div className="flex items-center gap-3">
-            <label className="inline-flex cursor-pointer items-center">
-              <input
-                type="checkbox"
-                className="h-4 w-4 accent-lime-600"
-                checked={email}
-                onChange={(e) => setEmail(e.target.checked)}
-              />
-              <span className="ml-2 text-sm text-slate-700">Enable</span>
-            </label>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-slate-700">
+              {item.emailNotifications ? "Enabled" : "Disabled"}
+            </span>
+            <ToggleSwitch
+              checked={item.emailNotifications}
+              onChange={handleEmailChange}
+              disabled={isUpdating || isRemoving}
+            />
           </div>
         </div>
 
+        {/* Alert Threshold Control */}
         <div className="rounded-lg border border-slate-200 p-3">
           <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-800">
-            <Settings2 className="h-4 w-4 text-emerald-600" />
+            <Settings2 className="h-4 w-4 text-blue-600" />
             Alert threshold (AQI)
           </div>
           <div className="flex items-center gap-3">
             <input
               type="range"
               min={0}
-              max={300}
+              max={500}
               step={5}
-              value={threshold}
-              onChange={(e) => setThreshold(Number(e.target.value))}
+              defaultValue={item.alertThreshold}
+              onChange={(e) => debouncedThresholdUpdate(Number(e.target.value))}
               className="w-full accent-lime-600"
+              disabled={isUpdating || isRemoving}
             />
-            <span className="w-12 text-right text-sm font-medium text-slate-800">{threshold}</span>
+            <span className="w-12 text-right text-sm font-medium text-slate-800">
+              {item.alertThreshold}
+            </span>
           </div>
-          <div className="mt-1 text-xs text-slate-500">Get alerts when AQI reaches or exceeds this value.</div>
         </div>
-      </div>
-
-      <div className="mt-4 flex justify-end">
-        <button
-          className="rounded-lg bg-gradient-to-br from-emerald-600 to-lime-600 px-4 py-2 text-sm font-medium text-white hover:from-emerald-500 hover:to-lime-500 disabled:opacity-60"
-          onClick={save}
-          disabled={saving}
-        >
-          {saving ? "Saving..." : "Save changes"}
-        </button>
       </div>
     </div>
   );

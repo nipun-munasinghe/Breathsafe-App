@@ -1,55 +1,105 @@
+import { apiResponse } from "@/types/common";
+import {
+  SubscriptionRequest,
+  SubscriptionResponse,
+  UpdateActiveStatus,
+  UpdateAlertThreshold,
+  UpdateEmailNotification,
+} from "@/types/subscription";
 import privateAxios from "@/lib/privateAxios";
 import ToastUtils from "@/utils/toastUtils";
-import { SubscriptionCreatePayload, SubscriptionItem, SubscriptionUpdatePayload } from "@/types/subscription";
 
-export const getMySubscriptions = async (): Promise<SubscriptionItem[]> => {
+const API_BASE_URL = "/subscriptions";
+
+export const subscribeToSensor = async (
+  data: SubscriptionRequest
+): Promise<apiResponse<SubscriptionResponse>> => {
   try {
-    const res = await privateAxios.get<SubscriptionItem[]>("/subscriptions/my");
-    return res.data;
+    const response = await privateAxios.post<SubscriptionResponse>(API_BASE_URL, data);
+    ToastUtils.success("Successfully subscribed to the sensor!");
+    return { success: true, data: response.data };
   } catch (error: any) {
-    ToastUtils.error("Failed to load subscriptions. " + (error?.response?.data?.message ?? ""));
-    throw error;
+    const errorMessage = error?.response?.data?.message || "Subscription failed.";
+    ToastUtils.error(errorMessage);
+    return { success: false, error: errorMessage };
   }
 };
 
-export const createSubscription = async (payload: SubscriptionCreatePayload): Promise<SubscriptionItem> => {
+export const getMySubscriptions = async (): Promise<apiResponse<SubscriptionResponse[]>> => {
   try {
-    const res = await privateAxios.post<SubscriptionItem>("/subscriptions", payload);
-    ToastUtils.success("Subscribed successfully.");
-    return res.data;
+    const response = await privateAxios.get<SubscriptionResponse[]>(API_BASE_URL);
+    return { success: true, data: response.data };
   } catch (error: any) {
-    ToastUtils.error("Subscription failed. " + (error?.response?.data?.message ?? ""));
-    throw error;
+    const errorMessage = error?.response?.data?.message || "Failed to fetch subscriptions.";
+    ToastUtils.error(errorMessage);
+    return { success: false, error: errorMessage };
   }
 };
 
-export const updateSubscription = async (id: number, payload: SubscriptionUpdatePayload): Promise<SubscriptionItem> => {
+export const updateAlertThreshold = async (
+  subscriptionId: number,
+  data: UpdateAlertThreshold
+): Promise<apiResponse<SubscriptionResponse>> => {
   try {
-    const res = await privateAxios.patch<SubscriptionItem>(`/subscriptions/${id}`, payload);
-    ToastUtils.success("Subscription updated.");
-    return res.data;
+    const response = await privateAxios.patch<SubscriptionResponse>(
+      `${API_BASE_URL}/${subscriptionId}/alert-threshold`,
+      data
+    );
+    ToastUtils.success("Alert threshold updated successfully.");
+    return { success: true, data: response.data };
   } catch (error: any) {
-    ToastUtils.error("Update failed. " + (error?.response?.data?.message ?? ""));
-    throw error;
+    const errorMessage = error?.response?.data?.message || "Failed to update alert threshold.";
+    ToastUtils.error(errorMessage);
+    return { success: false, error: errorMessage };
   }
 };
 
-export const unsubscribe = async (id: number): Promise<void> => {
+export const updateEmailNotifications = async (
+  subscriptionId: number,
+  data: UpdateEmailNotification
+): Promise<apiResponse<SubscriptionResponse>> => {
   try {
-    await privateAxios.delete<void>(`/subscriptions/${id}`);
-    ToastUtils.success("Unsubscribed.");
+    const response = await privateAxios.patch<SubscriptionResponse>(
+      `${API_BASE_URL}/${subscriptionId}/email-notifications`,
+      data
+    );
+    ToastUtils.success("Email notification settings updated.");
+    return { success: true, data: response.data };
   } catch (error: any) {
-    ToastUtils.error("Unsubscribe failed. " + (error?.response?.data?.message ?? ""));
-    throw error;
+    const errorMessage = error?.response?.data?.message || "Failed to update notification settings.";
+    ToastUtils.error(errorMessage);
+    return { success: false, error: errorMessage };
   }
 };
 
-export const isSubscribedToSensor = async (sensorId: number): Promise<boolean> => {
+export const toggleSubscriptionStatus = async (
+  subscriptionId: number,
+  data: UpdateActiveStatus
+): Promise<apiResponse<SubscriptionResponse>> => {
   try {
-    const res = await privateAxios.get<boolean>(`/subscriptions/check`, { params: { sensorId } });
-    return res.data;
+    const response = await privateAxios.patch<SubscriptionResponse>(
+      `${API_BASE_URL}/${subscriptionId}/toggle-active`,
+      data
+    );
+    ToastUtils.success(`Subscription has been ${data.isActive ? 'activated' : 'deactivated'}.`);
+    return { success: true, data: response.data };
   } catch (error: any) {
-    ToastUtils.error("Failed to check subscription. " + (error?.response?.data?.message ?? ""));
-    throw error;
+    const errorMessage = error?.response?.data?.message || "Failed to change subscription status.";
+    ToastUtils.error(errorMessage);
+    return { success: false, error: errorMessage };
+  }
+};
+
+export const unsubscribe = async (
+  subscriptionId: number
+): Promise<apiResponse> => {
+  try {
+    await privateAxios.delete(`${API_BASE_URL}/${subscriptionId}`);
+    ToastUtils.success("Successfully unsubscribed.");
+    return { success: true };
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || "Unsubscribe request failed.";
+    ToastUtils.error(errorMessage);
+    return { success: false, error: errorMessage };
   }
 };
