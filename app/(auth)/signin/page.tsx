@@ -1,13 +1,13 @@
 "use client";
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Button from "@/components/common/Button";
 import Link from "next/link";
 import { FaGoogle, FaFacebookF, FaApple } from "react-icons/fa";
+import Button from "@/components/common/Button";
 import { loginUser } from "@/service/userApi";
-import { useAuthStore } from "@/store/authStore"
+import { useAuthStore } from "@/store/authStore";
+import { signIn } from "next-auth/react";
 
 interface FormData {
   username: string;
@@ -15,43 +15,39 @@ interface FormData {
 }
 
 const Page = () => {
-
   const login = useAuthStore((s) => s.login);
-
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
   });
-  const router = useRouter();
   const [message, setMessage] = useState<string>("");
 
+  // Username/password login
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-      try {
-          const result = await loginUser(formData);
+    try {
+      const result = await loginUser(formData);
 
-          if (result?.success && result.data) {
-              const { token, ...userData } = result.data;
-              login(token, userData);
-              router.push("/");
-          } else {
-              setMessage("Invalid email or password.");
-              console.log(message);
-          }
-      } catch (err) {
-          setMessage("Something went wrong.");
-          console.error(err);
+      if (result?.success && result.data) {
+        const { token, ...userData } = result.data;
+        login(token, userData);
+        router.push("/");
+      } else {
+        setMessage("Invalid email or password.");
+        console.log(message);
       }
-  }
-
-
+    } catch (err) {
+      setMessage("Something went wrong.");
+      console.error(err);
+    }
+  };
 
   return (
     <div className="flex justify-center bg-emerald-950 min-h-screen py-12 px-4">
       {/* Main Container */}
       <div className="flex flex-col lg:flex-row items-center justify-center w-full max-w-6xl bg-gradient-to-br from-green-100 to-orange-100 rounded-3xl shadow-2xl overflow-hidden animate-fade-in">
-        
         {/* Left Section */}
         <div className="flex flex-col items-center lg:items-start p-6 lg:p-10 w-full lg:w-1/2">
           <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-emerald-950 text-center lg:text-left">
@@ -59,10 +55,10 @@ const Page = () => {
           </h1>
           <p className="text-sm lg:text-lg font-normal mb-6 text-gray-500 text-center lg:text-left">
             Access your{" "}
-            <span className="text-lime-600 font-semibold">BreathSafe</span> dashboard to monitor air quality and ensure a healthier environment.
+            <span className="text-lime-600 font-semibold">BreathSafe</span>{" "}
+            dashboard to monitor air quality and ensure a healthier environment.
           </p>
 
-          {/* Image only on desktop */}
           <div className="hidden lg:block mt-4 lg:mt-0">
             <Image
               src="/login-image.png"
@@ -73,7 +69,6 @@ const Page = () => {
             />
           </div>
 
-          {/* Right reserved text only on desktop */}
           <p className="text-xs lg:text-md opacity-70 text-gray-500 mt-6 hidden lg:block text-center lg:text-left">
             &copy; 2025 BreathSafe. All rights reserved.
           </p>
@@ -89,9 +84,16 @@ const Page = () => {
           </p>
 
           {/* Sign-in Form */}
-          <form action="post" className="animate-fade-in-up mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
+          <form
+            action="post"
+            className="animate-fade-in-up mt-6 flex flex-col gap-4"
+            onSubmit={handleSubmit}
+          >
             <div className="flex flex-col">
-              <label htmlFor="email" className="font-normal text-sm lg:text-lg mb-1">
+              <label
+                htmlFor="username"
+                className="font-normal text-sm lg:text-lg mb-1"
+              >
                 Email
               </label>
               <input
@@ -99,14 +101,19 @@ const Page = () => {
                 id="username"
                 name="username"
                 value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, username: e.target.value })
+                }
                 className="border p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition duration-300"
                 placeholder="Enter your username"
               />
             </div>
 
             <div className="flex flex-col">
-              <label htmlFor="password" className="font-normal text-sm lg:text-lg mb-1">
+              <label
+                htmlFor="password"
+                className="font-normal text-sm lg:text-lg mb-1"
+              >
                 Password
               </label>
               <input
@@ -114,7 +121,9 @@ const Page = () => {
                 id="password"
                 name="password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 className="border p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent transition duration-300"
                 placeholder="Enter your password"
               />
@@ -123,7 +132,10 @@ const Page = () => {
             <div className="flex justify-between items-center">
               <div className="flex items-center mb-2 sm:mb-0">
                 <input type="checkbox" id="rememberMe" />
-                <label htmlFor="rememberMe" className="text-sm text-gray-500 ml-2">
+                <label
+                  htmlFor="rememberMe"
+                  className="text-sm text-gray-500 ml-2"
+                >
                   Remember Me
                 </label>
               </div>
@@ -147,12 +159,19 @@ const Page = () => {
 
           {/* Social Buttons */}
           <div className="flex justify-center gap-4 animate-fade-in-up">
-            <button className="border border-gray-300 rounded-md p-2 hover:bg-gray-100 transition">
+            {/* Google Sign-in */}
+            <button
+              type="button"
+              onClick={() => signIn("google", { callbackUrl: "/" })}
+              className="border border-gray-300 rounded-md p-2 hover:bg-gray-100 transition"
+            >
               <FaGoogle className="text-red-500 w-5 h-5" />
             </button>
+
             <button className="border border-gray-300 rounded-md p-2 hover:bg-gray-100 transition">
               <FaFacebookF className="text-blue-500 w-5 h-5" />
             </button>
+
             <button className="border border-gray-300 rounded-md p-2 hover:bg-gray-100 transition">
               <FaApple className="w-5 h-5" />
             </button>
