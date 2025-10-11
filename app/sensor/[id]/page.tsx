@@ -1,15 +1,16 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { MapPin, Thermometer, Droplets, Wind, ArrowLeft, AlertCircle } from 'lucide-react';
+import { MapPin, Thermometer, Droplets, Wind, ArrowLeft, AlertCircle, Bell, BellOff, ArrowRight } from 'lucide-react';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
-import SubscribeButton from "@/components/subscriptions/SubscribeButton";
 import { ProtectedRoute } from '@/components/common/protectedRoute';
 import SensorStatsGrid from '@/components/sensor/SensorStatsGrid';
 import SensorChart from '@/components/sensor/SensorChart';
 import { getSensorById, getSensorDataByWeek, getSensorStats } from '@/service/admin/sensorChartApi';
+import { getMySubscriptions, subscribeToSensor, unsubscribe } from '@/service/subscriptionApi';
 import { Sensor, ChartData, SensorStats } from '@/types/sensors/admin';
+import { SubscriptionResponse } from '@/types/subscription';
 import ToastUtils from '@/utils/toastUtils';
 
 export default function SensorDetails() {
@@ -20,10 +21,11 @@ export default function SensorDetails() {
   const [sensor, setSensor] = useState<Sensor | null>(null);
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [stats, setStats] = useState<SensorStats | null>(null);
+  const [currentSubscription, setCurrentSubscription] = useState<SubscriptionResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubscribing, setIsSubscribing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // API calls with dummy data for now
   useEffect(() => {
     const fetchSensorData = async () => {
       if (!sensorId) return;
@@ -32,20 +34,27 @@ export default function SensorDetails() {
       setError(null);
 
       try {
-        // Simulate API calls - replace with real API when available
-        const [sensorData, weekData, statsData] = await Promise.all([
+        const [sensorResult, weekResult, statsResult, subscriptionsResult] = await Promise.all([
           getSensorById(sensorId),
           getSensorDataByWeek(sensorId),
-          getSensorStats(sensorId)
+          getSensorStats(sensorId),
+          getMySubscriptions()
         ]);
 
-        setSensor(sensorData);
-        setChartData(weekData);
-        setStats(statsData);
-      } catch (error: any) {
-        console.error('Error fetching sensor data:', error);
-        setError(error.message || 'Failed to load sensor data');
-        ToastUtils.error('Failed to load sensor data');
+        setSensor(sensorResult);
+        setChartData(weekResult);
+        setStats(statsResult);
+        
+        if (subscriptionsResult.success && subscriptionsResult.data) {
+          const subscription = subscriptionsResult.data.find(sub => sub.sensorId === Number(sensorId));
+          setCurrentSubscription(subscription || null);
+        }
+
+      } catch (err: any) {
+        console.error('Error fetching sensor data:', err);
+        const errorMessage = err.message || 'Failed to load sensor data';
+        setError(errorMessage);
+        ToastUtils.error(errorMessage);
       } finally {
         setIsLoading(false);
       }
@@ -54,11 +63,30 @@ export default function SensorDetails() {
     fetchSensorData();
   }, [sensorId]);
 
+  const handleSubscribe = async () => {
+    setIsSubscribing(true);
+    const response = await subscribeToSensor({ sensorId: Number(sensorId) });
+    if (response.success && response.data) {
+      setCurrentSubscription(response.data);
+    }
+    setIsSubscribing(false);
+  };
+
+  const handleUnsubscribe = async () => {
+    if (!currentSubscription) return;
+    setIsSubscribing(true);
+    const response = await unsubscribe(currentSubscription.subscriptionId);
+    if (response.success) {
+      setCurrentSubscription(null);
+    }
+    setIsSubscribing(false);
+  };
+
   if (error) {
     return (
       <ProtectedRoute>
         <Header />
-        <main className="min-h-screen" style={{ background: "linear-gradient(to bottom, #064E3B 0%, #0F172A 30%, #FFFFFF 50%, #FFFFFF 100%)" }}>
+        <main className="min-h-screen bg-slate-50">
           <div className="container mx-auto px-4 py-8 max-w-7xl">
             <div className="mt-20 text-center">
               <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
@@ -87,7 +115,6 @@ export default function SensorDetails() {
       <main className="min-h-screen" style={{ background: "linear-gradient(to bottom, #064E3B 0%, #0F172A 30%, #FFFFFF 50%, #FFFFFF 100%)" }}>
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           
-          {/* Back Button */}
           <div className="mt-20 mb-6">
             <div className="flex justify-between items-center">
               <button
@@ -97,11 +124,40 @@ export default function SensorDetails() {
                 <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
                 Back
               </button>
-              <SubscribeButton sensorId={sensorId} />
+
+              {/* --- ACTION BUTTONS GROUP --- */}
+              <div className="flex items-center gap-2">
+                {currentSubscription ? (
+                   <button
+                      onClick={handleUnsubscribe}
+                      disabled={isSubscribing}
+                      className="flex items-center justify-center px-4 py-2 text-sm font-medium text-red-700 bg-red-100 border border-transparent rounded-lg hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <BellOff className="w-4 h-4 mr-2" />
+                      {isSubscribing ? 'Processing...' : 'Unsubscribe'}
+                    </button>
+                ) : (
+                  <button
+                      onClick={handleSubscribe}
+                      disabled={isSubscribing}
+                      className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-lime-600 border border-transparent rounded-lg hover:bg-lime-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-lime-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Bell className="w-4 h-4 mr-2" />
+                      {isSubscribing ? 'Processing...' : 'Subscribe'}
+                  </button>
+                )}
+                {/* --- NAVIGATION BUTTON TO SUBSCRIPTIONS PAGE --- */}
+                <button
+                  onClick={() => router.push('/subscriptions')}
+                  title="Go to My Subscriptions"
+                  className="p-2 text-white bg-white/10 rounded-lg hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-lime-500"
+                >
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Sensor Header */}
           <div className="text-center mb-12">
             <div className="bg-white rounded-2xl shadow-xl p-8 border-t-4 border-lime-600">
               <div className="flex flex-col lg:flex-row items-center justify-center mb-6">
@@ -126,22 +182,19 @@ export default function SensorDetails() {
             </div>
           </div>
 
-          {/* Stats Grid */}
           <SensorStatsGrid 
             stats={stats || { todaysReadings: 0, sensorStatus: '0', lastAQIReading: 0, monitoring: '...' }}
             isLoading={isLoading}
           />
 
-          {/* Enhanced Chart Section with location data */}
           <SensorChart 
             data={chartData || { labels: [], co2Data: [], aqiData: [] }}
             sensorName={sensor?.name || 'Sensor'}
             sensorLocation={sensor?.location}
             isLoading={isLoading}
           />
-
-          {/* Additional Info */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
             <div className="bg-white/80 backdrop-blur rounded-2xl p-6 shadow-lg border border-lime-200/50">
               <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center">
                 <Thermometer className="w-5 h-5 mr-2 text-lime-600" />
