@@ -1,15 +1,17 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { MapPin, Thermometer, Droplets, Wind, ArrowLeft, AlertCircle } from 'lucide-react';
+import { MapPin, Thermometer, Droplets, Wind, ArrowLeft, AlertCircle, Bell, BellOff, ArrowRight } from 'lucide-react';
 import Header from '@/components/common/Header';
 import Footer from '@/components/common/Footer';
-import SubscribeButton from "@/components/subscriptions/SubscribeButton";
 import { ProtectedRoute } from '@/components/common/protectedRoute';
 import SensorStatsGrid from '@/components/sensor/SensorStatsGrid';
 import SensorChart from '@/components/sensor/SensorChart';
 import { getSensorChartData, transformSensorData } from '@/service/admin/sensorChartApi';
+import { getSensorById, getSensorDataByWeek, getSensorStats } from '@/service/admin/sensorChartApi';
+import { getMySubscriptions, subscribeToSensor, unsubscribe } from '@/service/subscriptionApi';
 import { Sensor, ChartData, SensorStats } from '@/types/sensors/admin';
+import { SubscriptionResponse } from '@/types/subscription';
 import ToastUtils from '@/utils/toastUtils';
 
 export default function SensorDetails() {
@@ -20,70 +22,139 @@ export default function SensorDetails() {
   const [sensor, setSensor] = useState<Sensor | null>(null);
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [stats, setStats] = useState<SensorStats | null>(null);
+  const [currentSubscription, setCurrentSubscription] = useState<SubscriptionResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubscribing, setIsSubscribing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   //Single API call to get all data
-  useEffect(() => {
-    const fetchSensorData = async () => {
-      if (!sensorId) {
-        setError('Invalid sensor ID');
-        setIsLoading(false);
-        return;
+  const fetchSensorData = useCallback(async () => {
+    if (!sensorId) {
+      setError('Invalid sensor ID');
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      console.log(`Fetching data for sensor ID: ${sensorId}`);
+      
+      // Try the new unified API first
+      const backendData = await getSensorChartData(sensorId);
+      console.log('Received backend data:', backendData);
+      
+      // validate response
+      if (!backendData || !backendData.sensorDetails) {
+        throw new Error('Invalid response from server');
       }
 
-      setIsLoading(true);
-      setError(null);
+      //transform data to frontend format
+      const { sensor: sensorData, chartData: chartDataTransformed, stats: statsData } = transformSensorData(backendData);
 
+      console.log('Transformed data:', { sensorData, chartDataTransformed, statsData });
+
+      setSensor(sensorData);
+      setChartData(chartDataTransformed);
+      setStats(statsData);
+
+      // Fetch subscription data separately
       try {
-        console.log(`Fetching data for sensor ID: ${sensorId}`);
+        const subscriptionsResult = await getMySubscriptions();
+        if (subscriptionsResult.success && subscriptionsResult.data) {
+          const subscription = subscriptionsResult.data.find(sub => sub.sensorId === Number(sensorId));
+          setCurrentSubscription(subscription || null);
+        }
+      } catch (subscriptionError) {
+        console.error('Error fetching subscription data:', subscriptionError);
+        // Don't throw here - subscription is optional
+      }
+
+    } catch (primaryError: any) {
+      console.error('Error with unified API, trying fallback:', primaryError);
+      
+      // Fallback to individual API calls
+      try {
+        const [sensorResult, weekResult, statsResult, subscriptionsResult] = await Promise.all([
+          getSensorById(sensorId),
+          getSensorDataByWeek(sensorId),
+          getSensorStats(sensorId),
+          getMySubscriptions()
+        ]);
+
+        setSensor(sensorResult);
+        setChartData(weekResult);
+        setStats(statsResult);
         
-        //single API call to backend
-        const backendData = await getSensorChartData(sensorId);
-        console.log('Received backend data:', backendData);
-        
-        // validate response
-        if (!backendData || !backendData.sensorDetails) {
-          throw new Error('Invalid response from server');
+        if (subscriptionsResult.success && subscriptionsResult.data) {
+          const subscription = subscriptionsResult.data.find(sub => sub.sensorId === Number(sensorId));
+          setCurrentSubscription(subscription || null);
         }
 
-        //transform data to frontend format
-        const { sensor: sensorData, chartData: chartDataTransformed, stats: statsData } = transformSensorData(backendData);
-
-        console.log('Transformed data:', { sensorData, chartDataTransformed, statsData });
-
-        setSensor(sensorData);
-        setChartData(chartDataTransformed);
-        setStats(statsData);
-
-      } catch (error: any) {
-        console.error('Error fetching sensor data:', error);
+      } catch (fallbackError: any) {
+        console.error('Error with fallback APIs:', fallbackError);
         
         // specific error messages
-        if (error?.response?.status === 403) {
+        if (fallbackError?.response?.status === 403) {
           setError('Access denied. Please check your authentication.');
-        } else if (error?.response?.status === 404) {
+        } else if (fallbackError?.response?.status === 404) {
           setError('Sensor not found. Please check the sensor ID.');
-        } else if (error?.response?.status === 500) {
+        } else if (fallbackError?.response?.status === 500) {
           setError('Server error. Please try again later.');
         } else {
-          setError(error.message || 'Failed to load sensor data');
+          setError(fallbackError.message || 'Failed to load sensor data');
         }
         
-        ToastUtils.error(error.message || 'Failed to load sensor data');
-      } finally {
-        setIsLoading(false);
+        ToastUtils.error(fallbackError.message || 'Failed to load sensor data');
       }
-    };
+    } finally {
+      setIsLoading(false);
+    }
+  }, [sensorId]); // Add sensorId as dependency
 
+  useEffect(() => {
     fetchSensorData();
+  }, [fetchSensorData]); // Use the memoized callback
+
+  const handleSubscribe = useCallback(async () => {
+    setIsSubscribing(true);
+    try {
+      const response = await subscribeToSensor({ sensorId: Number(sensorId) });
+      if (response.success && response.data) {
+        setCurrentSubscription(response.data);
+        ToastUtils.success('Successfully subscribed to sensor notifications');
+      }
+    } catch (subscribeError) {
+      console.error('Subscribe error:', subscribeError);
+      ToastUtils.error('Failed to subscribe to sensor');
+    } finally {
+      setIsSubscribing(false);
+    }
   }, [sensorId]);
+
+  const handleUnsubscribe = useCallback(async () => {
+    if (!currentSubscription) return;
+    setIsSubscribing(true);
+    try {
+      const response = await unsubscribe(currentSubscription.subscriptionId);
+      if (response.success) {
+        setCurrentSubscription(null);
+        ToastUtils.success('Successfully unsubscribed from sensor notifications');
+      }
+    } catch (unsubscribeError) {
+      console.error('Unsubscribe error:', unsubscribeError);
+      ToastUtils.error('Failed to unsubscribe from sensor');
+    } finally {
+      setIsSubscribing(false);
+    }
+  }, [currentSubscription]);
 
   if (error) {
     return (
       <ProtectedRoute>
         <Header />
-        <main className="min-h-screen" style={{ background: "linear-gradient(to bottom, #064E3B 0%, #0F172A 30%, #FFFFFF 50%, #FFFFFF 100%)" }}>
+        <main className="min-h-screen bg-slate-50">
           <div className="container mx-auto px-4 py-8 max-w-7xl">
             <div className="mt-20 text-center">
               <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
@@ -119,7 +190,7 @@ export default function SensorDetails() {
       
       <main className="min-h-screen" style={{ background: "linear-gradient(to bottom, #064E3B 0%, #0F172A 30%, #FFFFFF 50%, #FFFFFF 100%)" }}>
         <div className="container mx-auto px-4 py-8 max-w-7xl">
-          
+        
           {/* Back button */}
           <div className="mt-20 mb-6">
             <div className="flex justify-between items-center">
@@ -130,7 +201,37 @@ export default function SensorDetails() {
                 <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
                 Back
               </button>
-              <SubscribeButton sensorId={sensorId} />
+
+              {/* --- ACTION BUTTONS GROUP --- */}
+              <div className="flex items-center gap-2">
+                {currentSubscription ? (
+                   <button
+                      onClick={handleUnsubscribe}
+                      disabled={isSubscribing}
+                      className="flex items-center justify-center px-4 py-2 text-sm font-medium text-red-700 bg-red-100 border border-transparent rounded-lg hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <BellOff className="w-4 h-4 mr-2" />
+                      {isSubscribing ? 'Processing...' : 'Unsubscribe'}
+                    </button>
+                ) : (
+                  <button
+                      onClick={handleSubscribe}
+                      disabled={isSubscribing}
+                      className="flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-lime-600 border border-transparent rounded-lg hover:bg-lime-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-lime-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <Bell className="w-4 h-4 mr-2" />
+                      {isSubscribing ? 'Processing...' : 'Subscribe'}
+                  </button>
+                )}
+                {/* --- NAVIGATION BUTTON TO SUBSCRIPTIONS PAGE --- */}
+                <button
+                  onClick={() => router.push('/subscriptions')}
+                  title="Go to My Subscriptions"
+                  className="p-2 text-white bg-white/10 rounded-lg hover:bg-white/20 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-lime-500"
+                >
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -159,7 +260,6 @@ export default function SensorDetails() {
             </div>
           </div>
 
-          {/* Stats Grid */}
           <SensorStatsGrid 
             stats={stats || { todaysReadings: 0, sensorStatus: 'Loading...', lastAQIReading: 0, monitoring: 'Loading...' }}
             isLoading={isLoading}
