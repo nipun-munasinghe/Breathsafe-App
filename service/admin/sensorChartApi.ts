@@ -1,71 +1,100 @@
 import privateAxios from '@/lib/privateAxios';
 import { Sensor, SensorStats, ChartData } from '@/types/sensors/admin';
 
-// Original API calls
-/*
-export const getSensorById = async (id: string): Promise<Sensor> => {
+//backend response types to match your DTOs
+interface SensorChartDTO {
+  timestamp: string;
+  co2Level: number;
+  aqiValue: number;
+}
+
+interface SensorDetailsDTO {
+  id: number;
+  location: string;
+  name: string;
+}
+
+interface SensorChartResponseDTO {
+  sensorDetails: SensorDetailsDTO;
+  chartData: SensorChartDTO[];
+  totalRecords: number;
+}
+
+//single API call to returns all data
+export const getSensorChartData = async (sensorId: string): Promise<SensorChartResponseDTO> => {
   try {
-    const response = await privateAxios.get<Sensor>(`/sensors/${id}`);
+    const response = await privateAxios.get<SensorChartResponseDTO>(
+      `/sensorData/${sensorId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    
+    console.log('Chart data response:', response.data);
     return response.data;
   } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Failed to fetch sensor data');
+    console.error('API Error:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || 'Failed to fetch sensor chart data');
   }
 };
 
-export const getSensorDataByWeek = async (id: string): Promise<ChartData> => {
-  try {
-    const response = await privateAxios.get<ChartData>(`/sensors/${id}/data/week`);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Failed to fetch sensor week data');
+//transform backend data to frontend format
+export const transformSensorData = (backendData: SensorChartResponseDTO) => {
+  //Validate data exists
+  if (!backendData || !backendData.sensorDetails) {
+    throw new Error('Invalid sensor data received');
   }
-};
 
-export const getSensorStats = async (id: string): Promise<SensorStats> => {
-  try {
-    const response = await privateAxios.get<SensorStats>(`/sensors/${id}/stats`);
-    return response.data;
-  } catch (error: any) {
-    throw new Error(error.response?.data?.message || 'Failed to fetch sensor stats');
-  }
-};
-*/
-
-// Dummy data
-export const getSensorById = async (id: string): Promise<Sensor> => {
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  return {
-    id: parseInt(id),
-    name: `Air Quality Sensor ${id}`,
-    location: "Dummalakotuwa, Dankotuwa",
-    latitude: 40.7829,
-    longitude: -73.9654,
+  //Transform to Sensor type
+  const sensor: Sensor = {
+    id: backendData.sensorDetails.id,
+    name: backendData.sensorDetails.name,
+    location: backendData.sensorDetails.location,
+    latitude: 0,
+    longitude: 0,
     isActive: true
   };
+
+  //Transform to ChartData type
+  const chartData: ChartData = {
+    labels: (backendData.chartData || []).map(item => {
+      const date = new Date(item.timestamp);
+      return date.toLocaleDateString('en-US', { 
+        weekday: 'short',
+        month: 'short', 
+        day: 'numeric'
+      });
+    }),
+    co2Data: (backendData.chartData || []).map(item => Number(item.co2Level) || 0),
+    aqiData: (backendData.chartData || []).map(item => Number(item.aqiValue) || 0)
+  };
+
+  //transform to SensorStats type
+  const stats: SensorStats = {
+    todaysReadings: backendData.totalRecords || 0,
+    sensorStatus: "Active",
+    lastAQIReading: backendData.chartData && backendData.chartData.length > 0 
+      ? backendData.chartData[backendData.chartData.length - 1].aqiValue 
+      : 0,
+    monitoring: "24/7 Real-time"
+  };
+
+  return { sensor, chartData, stats };
+};
+
+export const getSensorById = async (id: string): Promise<Sensor> => {
+  const backendData = await getSensorChartData(id);
+  return transformSensorData(backendData).sensor;
 };
 
 export const getSensorDataByWeek = async (id: string): Promise<ChartData> => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  const generateWeekData = () => {
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const co2Data = [420, 385, 456, 392, 478, 401, 423];
-    const aqiData = [45, 38, 52, 41, 47, 35, 49];
-    
-    return { labels: days, co2Data, aqiData };
-  };
-  
-  return generateWeekData();
+  const backendData = await getSensorChartData(id);
+  return transformSensorData(backendData).chartData;
 };
 
 export const getSensorStats = async (id: string): Promise<SensorStats> => {
-  await new Promise(resolve => setTimeout(resolve, 600));
-  
-  return {
-    todaysReadings: 1247,
-    sensorStatus: "Active",
-    lastAQIReading: 47,
-    monitoring: "24/7 Real-time"
-  };
+  const backendData = await getSensorChartData(id);
+  return transformSensorData(backendData).stats;
 };
