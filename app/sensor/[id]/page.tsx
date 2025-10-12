@@ -111,11 +111,11 @@ export default function SensorDetails() {
     } finally {
       setIsLoading(false);
     }
-  }, [sensorId]); // Add sensorId as dependency
+  }, [sensorId]);
 
   useEffect(() => {
     fetchSensorData();
-  }, [fetchSensorData]); // Use the memoized callback
+  }, [fetchSensorData]);
 
   const handleSubscribe = useCallback(async () => {
     setIsSubscribing(true);
@@ -190,7 +190,7 @@ export default function SensorDetails() {
       
       <main className="min-h-screen" style={{ background: "linear-gradient(to bottom, #064E3B 0%, #0F172A 30%, #FFFFFF 50%, #FFFFFF 100%)" }}>
         <div className="container mx-auto px-4 py-8 max-w-7xl">
-        
+          
           {/* Back button */}
           <div className="mt-20 mb-6">
             <div className="flex justify-between items-center">
