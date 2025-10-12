@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { MapPin, Thermometer, Droplets, Wind, ArrowLeft, AlertCircle, Bell, BellOff, ArrowRight } from 'lucide-react';
 import Header from '@/components/common/Header';
@@ -7,6 +7,7 @@ import Footer from '@/components/common/Footer';
 import { ProtectedRoute } from '@/components/common/protectedRoute';
 import SensorStatsGrid from '@/components/sensor/SensorStatsGrid';
 import SensorChart from '@/components/sensor/SensorChart';
+import { getSensorChartData, transformSensorData } from '@/service/admin/sensorChartApi';
 import { getSensorById, getSensorDataByWeek, getSensorStats } from '@/service/admin/sensorChartApi';
 import { getMySubscriptions, subscribeToSensor, unsubscribe } from '@/service/subscriptionApi';
 import { Sensor, ChartData, SensorStats } from '@/types/sensors/admin';
@@ -26,13 +27,54 @@ export default function SensorDetails() {
   const [isSubscribing, setIsSubscribing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchSensorData = async () => {
-      if (!sensorId) return;
+  //Single API call to get all data
+  const fetchSensorData = useCallback(async () => {
+    if (!sensorId) {
+      setError('Invalid sensor ID');
+      setIsLoading(false);
+      return;
+    }
 
-      setIsLoading(true);
-      setError(null);
+    setIsLoading(true);
+    setError(null);
 
+    try {
+      console.log(`Fetching data for sensor ID: ${sensorId}`);
+      
+      // Try the new unified API first
+      const backendData = await getSensorChartData(sensorId);
+      console.log('Received backend data:', backendData);
+      
+      // validate response
+      if (!backendData || !backendData.sensorDetails) {
+        throw new Error('Invalid response from server');
+      }
+
+      //transform data to frontend format
+      const { sensor: sensorData, chartData: chartDataTransformed, stats: statsData } = transformSensorData(backendData);
+
+      console.log('Transformed data:', { sensorData, chartDataTransformed, statsData });
+
+      setSensor(sensorData);
+      setChartData(chartDataTransformed);
+      setStats(statsData);
+
+      // Fetch subscription data separately
+      try {
+        const subscriptionsResult = await getMySubscriptions();
+        if (subscriptionsResult.success && subscriptionsResult.data) {
+          const subscription = subscriptionsResult.data.find(sub => sub.sensorId === Number(sensorId));
+          setCurrentSubscription(subscription || null);
+        }
+      } catch (subscriptionError) {
+        console.error('Error fetching subscription data:', subscriptionError);
+        // Don't throw here - subscription is optional
+      }
+
+    } catch (primaryError: any) {
+      console.error('Error with unified API, trying fallback:', primaryError);
+      
+      // Fallback to individual API calls
       try {
         const [sensorResult, weekResult, statsResult, subscriptionsResult] = await Promise.all([
           getSensorById(sensorId),
@@ -50,37 +92,63 @@ export default function SensorDetails() {
           setCurrentSubscription(subscription || null);
         }
 
-      } catch (err: any) {
-        console.error('Error fetching sensor data:', err);
-        const errorMessage = err.message || 'Failed to load sensor data';
-        setError(errorMessage);
-        ToastUtils.error(errorMessage);
-      } finally {
-        setIsLoading(false);
+      } catch (fallbackError: any) {
+        console.error('Error with fallback APIs:', fallbackError);
+        
+        // specific error messages
+        if (fallbackError?.response?.status === 403) {
+          setError('Access denied. Please check your authentication.');
+        } else if (fallbackError?.response?.status === 404) {
+          setError('Sensor not found. Please check the sensor ID.');
+        } else if (fallbackError?.response?.status === 500) {
+          setError('Server error. Please try again later.');
+        } else {
+          setError(fallbackError.message || 'Failed to load sensor data');
+        }
+        
+        ToastUtils.error(fallbackError.message || 'Failed to load sensor data');
       }
-    };
-
-    fetchSensorData();
+    } finally {
+      setIsLoading(false);
+    }
   }, [sensorId]);
 
-  const handleSubscribe = async () => {
-    setIsSubscribing(true);
-    const response = await subscribeToSensor({ sensorId: Number(sensorId) });
-    if (response.success && response.data) {
-      setCurrentSubscription(response.data);
-    }
-    setIsSubscribing(false);
-  };
+  useEffect(() => {
+    fetchSensorData();
+  }, [fetchSensorData]);
 
-  const handleUnsubscribe = async () => {
+  const handleSubscribe = useCallback(async () => {
+    setIsSubscribing(true);
+    try {
+      const response = await subscribeToSensor({ sensorId: Number(sensorId) });
+      if (response.success && response.data) {
+        setCurrentSubscription(response.data);
+        ToastUtils.success('Successfully subscribed to sensor notifications');
+      }
+    } catch (subscribeError) {
+      console.error('Subscribe error:', subscribeError);
+      ToastUtils.error('Failed to subscribe to sensor');
+    } finally {
+      setIsSubscribing(false);
+    }
+  }, [sensorId]);
+
+  const handleUnsubscribe = useCallback(async () => {
     if (!currentSubscription) return;
     setIsSubscribing(true);
-    const response = await unsubscribe(currentSubscription.subscriptionId);
-    if (response.success) {
-      setCurrentSubscription(null);
+    try {
+      const response = await unsubscribe(currentSubscription.subscriptionId);
+      if (response.success) {
+        setCurrentSubscription(null);
+        ToastUtils.success('Successfully unsubscribed from sensor notifications');
+      }
+    } catch (unsubscribeError) {
+      console.error('Unsubscribe error:', unsubscribeError);
+      ToastUtils.error('Failed to unsubscribe from sensor');
+    } finally {
+      setIsSubscribing(false);
     }
-    setIsSubscribing(false);
-  };
+  }, [currentSubscription]);
 
   if (error) {
     return (
@@ -93,12 +161,20 @@ export default function SensorDetails() {
                 <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Sensor</h2>
                 <p className="text-gray-600 mb-6">{error}</p>
-                <button
-                  onClick={() => router.back()}
-                  className="bg-lime-600 text-white px-6 py-2 rounded-lg hover:bg-lime-700 transition"
-                >
-                  Go Back
-                </button>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="w-full bg-lime-600 text-white px-6 py-2 rounded-lg hover:bg-lime-700 transition"
+                  >
+                    Retry
+                  </button>
+                  <button
+                    onClick={() => router.back()}
+                    className="w-full bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
+                  >
+                    Go Back
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -115,6 +191,7 @@ export default function SensorDetails() {
       <main className="min-h-screen" style={{ background: "linear-gradient(to bottom, #064E3B 0%, #0F172A 30%, #FFFFFF 50%, #FFFFFF 100%)" }}>
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           
+          {/* Back button */}
           <div className="mt-20 mb-6">
             <div className="flex justify-between items-center">
               <button
@@ -158,6 +235,7 @@ export default function SensorDetails() {
             </div>
           </div>
 
+          {/* Sensor header */}
           <div className="text-center mb-12">
             <div className="bg-white rounded-2xl shadow-xl p-8 border-t-4 border-lime-600">
               <div className="flex flex-col lg:flex-row items-center justify-center mb-6">
@@ -166,12 +244,12 @@ export default function SensorDetails() {
                 </div>
                 <div className="text-center lg:text-left">
                   <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-2">
-                    {isLoading ? 'Loading...' : sensor?.name}
+                    {isLoading ? 'Loading...' : sensor?.name || 'Unknown Sensor'}
                   </h1>
                   <div className="h-1 w-20 bg-gradient-to-r from-lime-600 to-emerald-600 rounded-full mx-auto lg:mx-0 mb-3"></div>
                   <div className="flex items-center justify-center lg:justify-start text-gray-600">
                     <MapPin className="w-4 h-4 mr-2" />
-                    <span>{isLoading ? 'Loading location...' : sensor?.location}</span>
+                    <span>{isLoading ? 'Loading location...' : sensor?.location || 'Unknown Location'}</span>
                   </div>
                 </div>
               </div>
@@ -183,18 +261,20 @@ export default function SensorDetails() {
           </div>
 
           <SensorStatsGrid 
-            stats={stats || { todaysReadings: 0, sensorStatus: '0', lastAQIReading: 0, monitoring: '...' }}
+            stats={stats || { todaysReadings: 0, sensorStatus: 'Loading...', lastAQIReading: 0, monitoring: 'Loading...' }}
             isLoading={isLoading}
           />
 
+          {/* chart section */}
           <SensorChart 
             data={chartData || { labels: [], co2Data: [], aqiData: [] }}
             sensorName={sensor?.name || 'Sensor'}
             sensorLocation={sensor?.location}
             isLoading={isLoading}
           />
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+
+          {/* additional Info */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-white/80 backdrop-blur rounded-2xl p-6 shadow-lg border border-lime-200/50">
               <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center">
                 <Thermometer className="w-5 h-5 mr-2 text-lime-600" />
