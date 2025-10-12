@@ -8,7 +8,7 @@ import SubscribeButton from "@/components/subscriptions/SubscribeButton";
 import { ProtectedRoute } from '@/components/common/protectedRoute';
 import SensorStatsGrid from '@/components/sensor/SensorStatsGrid';
 import SensorChart from '@/components/sensor/SensorChart';
-import { getSensorById, getSensorDataByWeek, getSensorStats } from '@/service/admin/sensorChartApi';
+import { getSensorChartData, transformSensorData } from '@/service/admin/sensorChartApi';
 import { Sensor, ChartData, SensorStats } from '@/types/sensors/admin';
 import ToastUtils from '@/utils/toastUtils';
 
@@ -23,29 +23,54 @@ export default function SensorDetails() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // API calls with dummy data for now
+  //Single API call to get all data
   useEffect(() => {
     const fetchSensorData = async () => {
-      if (!sensorId) return;
+      if (!sensorId) {
+        setError('Invalid sensor ID');
+        setIsLoading(false);
+        return;
+      }
 
       setIsLoading(true);
       setError(null);
 
       try {
-        // Simulate API calls - replace with real API when available
-        const [sensorData, weekData, statsData] = await Promise.all([
-          getSensorById(sensorId),
-          getSensorDataByWeek(sensorId),
-          getSensorStats(sensorId)
-        ]);
+        console.log(`Fetching data for sensor ID: ${sensorId}`);
+        
+        //single API call to backend
+        const backendData = await getSensorChartData(sensorId);
+        console.log('Received backend data:', backendData);
+        
+        // validate response
+        if (!backendData || !backendData.sensorDetails) {
+          throw new Error('Invalid response from server');
+        }
+
+        //transform data to frontend format
+        const { sensor: sensorData, chartData: chartDataTransformed, stats: statsData } = transformSensorData(backendData);
+
+        console.log('Transformed data:', { sensorData, chartDataTransformed, statsData });
 
         setSensor(sensorData);
-        setChartData(weekData);
+        setChartData(chartDataTransformed);
         setStats(statsData);
+
       } catch (error: any) {
         console.error('Error fetching sensor data:', error);
-        setError(error.message || 'Failed to load sensor data');
-        ToastUtils.error('Failed to load sensor data');
+        
+        // specific error messages
+        if (error?.response?.status === 403) {
+          setError('Access denied. Please check your authentication.');
+        } else if (error?.response?.status === 404) {
+          setError('Sensor not found. Please check the sensor ID.');
+        } else if (error?.response?.status === 500) {
+          setError('Server error. Please try again later.');
+        } else {
+          setError(error.message || 'Failed to load sensor data');
+        }
+        
+        ToastUtils.error(error.message || 'Failed to load sensor data');
       } finally {
         setIsLoading(false);
       }
@@ -65,12 +90,20 @@ export default function SensorDetails() {
                 <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Sensor</h2>
                 <p className="text-gray-600 mb-6">{error}</p>
-                <button
-                  onClick={() => router.back()}
-                  className="bg-lime-600 text-white px-6 py-2 rounded-lg hover:bg-lime-700 transition"
-                >
-                  Go Back
-                </button>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="w-full bg-lime-600 text-white px-6 py-2 rounded-lg hover:bg-lime-700 transition"
+                  >
+                    Retry
+                  </button>
+                  <button
+                    onClick={() => router.back()}
+                    className="w-full bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
+                  >
+                    Go Back
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -87,7 +120,7 @@ export default function SensorDetails() {
       <main className="min-h-screen" style={{ background: "linear-gradient(to bottom, #064E3B 0%, #0F172A 30%, #FFFFFF 50%, #FFFFFF 100%)" }}>
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           
-          {/* Back Button */}
+          {/* Back button */}
           <div className="mt-20 mb-6">
             <div className="flex justify-between items-center">
               <button
@@ -101,7 +134,7 @@ export default function SensorDetails() {
             </div>
           </div>
 
-          {/* Sensor Header */}
+          {/* Sensor header */}
           <div className="text-center mb-12">
             <div className="bg-white rounded-2xl shadow-xl p-8 border-t-4 border-lime-600">
               <div className="flex flex-col lg:flex-row items-center justify-center mb-6">
@@ -110,12 +143,12 @@ export default function SensorDetails() {
                 </div>
                 <div className="text-center lg:text-left">
                   <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-2">
-                    {isLoading ? 'Loading...' : sensor?.name}
+                    {isLoading ? 'Loading...' : sensor?.name || 'Unknown Sensor'}
                   </h1>
                   <div className="h-1 w-20 bg-gradient-to-r from-lime-600 to-emerald-600 rounded-full mx-auto lg:mx-0 mb-3"></div>
                   <div className="flex items-center justify-center lg:justify-start text-gray-600">
                     <MapPin className="w-4 h-4 mr-2" />
-                    <span>{isLoading ? 'Loading location...' : sensor?.location}</span>
+                    <span>{isLoading ? 'Loading location...' : sensor?.location || 'Unknown Location'}</span>
                   </div>
                 </div>
               </div>
@@ -128,11 +161,11 @@ export default function SensorDetails() {
 
           {/* Stats Grid */}
           <SensorStatsGrid 
-            stats={stats || { todaysReadings: 0, sensorStatus: '0', lastAQIReading: 0, monitoring: '...' }}
+            stats={stats || { todaysReadings: 0, sensorStatus: 'Loading...', lastAQIReading: 0, monitoring: 'Loading...' }}
             isLoading={isLoading}
           />
 
-          {/* Enhanced Chart Section with location data */}
+          {/* chart section */}
           <SensorChart 
             data={chartData || { labels: [], co2Data: [], aqiData: [] }}
             sensorName={sensor?.name || 'Sensor'}
@@ -140,7 +173,7 @@ export default function SensorDetails() {
             isLoading={isLoading}
           />
 
-          {/* Additional Info */}
+          {/* additional Info */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-white/80 backdrop-blur rounded-2xl p-6 shadow-lg border border-lime-200/50">
               <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center">
