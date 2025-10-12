@@ -17,7 +17,6 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas-pro';
 import { ChartData } from '@/types/sensors/admin';
 
-// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -54,7 +53,7 @@ const SensorChart: React.FC<SensorChartProps> = ({
     plugins: {
       title: {
         display: true,
-        text: `${sensorName} - Air Quality Data (Past Week)`,
+        text: `${sensorName} - Air Quality Data`,
         color: '#064e3b',
         font: { size: 18, weight: 700 as const },
         padding: 20
@@ -79,7 +78,7 @@ const SensorChart: React.FC<SensorChartProps> = ({
       x: { 
         title: {
           display: true,
-          text: 'Days of Week',
+          text: 'Days',
           color: '#4b5563',
           font: { size: 14, weight: 600 as const }
         },
@@ -163,23 +162,20 @@ const SensorChart: React.FC<SensorChartProps> = ({
     ],
   };
 
-  // Create chart
   useEffect(() => {
     if (!chartRef.current || isLoading) return;
 
-    // Destroy existing chart if it exists
+    //destroy existing chart if it exists
     if (chartInstanceRef.current) {
       chartInstanceRef.current.destroy();
     }
 
-    // Create new chart instance
     chartInstanceRef.current = new ChartJS(chartRef.current, {
       type: 'line',
       data: chartData,
       options: options,
     });
 
-    // Cleanup function
     return () => {
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
@@ -188,7 +184,6 @@ const SensorChart: React.FC<SensorChartProps> = ({
     };
   }, [data, sensorName, isLoading]);
 
-  // Update chart data when props change
   useEffect(() => {
     if (chartInstanceRef.current && !isLoading) {
       chartInstanceRef.current.data = chartData;
@@ -196,14 +191,12 @@ const SensorChart: React.FC<SensorChartProps> = ({
     }
   }, [data, isLoading]);
 
-  // Enhanced PDF generation with comprehensive report
   const downloadPDF = async () => {
     if (!chartContainerRef.current) return;
     
     setIsGeneratingPDF(true);
     
     try {
-      // Capture the chart with high quality
       const canvas = await html2canvas(chartContainerRef.current, {
         scale: 2,
         backgroundColor: '#ffffff',
@@ -213,25 +206,19 @@ const SensorChart: React.FC<SensorChartProps> = ({
         width: chartContainerRef.current.offsetWidth,
         height: chartContainerRef.current.offsetHeight,
       });
-      
-      // Create PDF in landscape mode for better chart visibility
+
       const pdf = new jsPDF({
         orientation: 'landscape',
         unit: 'mm',
         format: 'a4'
       });
 
-      // Page dimensions
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      
-      // Colors
-      // const primaryColor = '#064e3b';
-      // const secondaryColor = '#84cc16';
+
       const textColor = '#374151';
       
-      // Add header
-      pdf.setFillColor(6, 78, 59); // Primary green
+      pdf.setFillColor(6, 78, 59);
       pdf.rect(0, 0, pageWidth, 25, 'F');
       
       pdf.setTextColor(255, 255, 255);
@@ -239,13 +226,13 @@ const SensorChart: React.FC<SensorChartProps> = ({
       pdf.setFont('helvetica', 'bold');
       pdf.text('BreathSafe - Air Quality Report', 15, 17);
       
-      // Add report generation timestamp
+      //report generation timestamp
       const currentDate = new Date().toLocaleString();
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       pdf.text(`Generated on: ${currentDate}`, pageWidth - 60, 17);
 
-      // Sensor Information Section
+      //Sensor info section
       let yPosition = 35;
       pdf.setTextColor(textColor);
       pdf.setFontSize(16);
@@ -268,22 +255,19 @@ const SensorChart: React.FC<SensorChartProps> = ({
       yPosition += 8;
       pdf.text(`Report Type: Air Quality Data Analysis`, 15, yPosition);
 
-      // Add chart image
+      //add chart image
       yPosition += 15;
       const imgData = canvas.toDataURL('image/png');
-      const imgWidth = pageWidth - 30; // 15mm margin on each side
+      const imgWidth = pageWidth - 30;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      // Ensure chart fits on page
-      const maxHeight = pageHeight - yPosition - 30; // Leave space for footer
+
+      const maxHeight = pageHeight - yPosition - 30;
       const finalHeight = Math.min(imgHeight, maxHeight);
       const finalWidth = (canvas.width * finalHeight) / canvas.height;
       
-      // Center the image
       const xPosition = (pageWidth - finalWidth) / 2;
       pdf.addImage(imgData, 'PNG', xPosition, yPosition, finalWidth, finalHeight);
 
-      // Calculate data statistics
       const avgCO2 = data.co2Data.length > 0 
         ? Math.round(data.co2Data.reduce((a, b) => a + b, 0) / data.co2Data.length)
         : 0;
@@ -296,10 +280,8 @@ const SensorChart: React.FC<SensorChartProps> = ({
       const maxAQI = data.aqiData.length > 0 ? Math.max(...data.aqiData) : 0;
       const minAQI = data.aqiData.length > 0 ? Math.min(...data.aqiData) : 0;
 
-      // Add second page for detailed statistics
       pdf.addPage();
       
-      // Header for second page
       pdf.setFillColor(6, 78, 59);
       pdf.rect(0, 0, pageWidth, 25, 'F');
       pdf.setTextColor(255, 255, 255);
@@ -307,7 +289,6 @@ const SensorChart: React.FC<SensorChartProps> = ({
       pdf.setFont('helvetica', 'bold');
       pdf.text('Data Analysis & Statistics', 15, 17);
 
-      // Statistics Section
       yPosition = 40;
       pdf.setTextColor(textColor);
       pdf.setFontSize(16);
@@ -337,7 +318,6 @@ const SensorChart: React.FC<SensorChartProps> = ({
       yPosition += 8;
       pdf.text(`Minimum AQI: ${minAQI}`, 20, yPosition);
 
-      // Add recommendations section
       yPosition += 20;
       pdf.setFontSize(16);
       pdf.setFont('helvetica', 'bold');
@@ -347,21 +327,18 @@ const SensorChart: React.FC<SensorChartProps> = ({
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'normal');
       
-      // CO2 Assessment
+      //CO2
       let co2Status = 'Good';
-      // let co2Color = '#22c55e';
       if (avgCO2 > 1000) {
         co2Status = 'Poor - Ventilation Needed';
-        // co2Color = '#ef4444';
       } else if (avgCO2 > 800) {
         co2Status = 'Moderate - Consider Ventilation';
-        // co2Color = '#f59e0b';
       }
       
       pdf.text(`CO₂ Level Status: ${co2Status}`, 20, yPosition);
       
       yPosition += 10;
-      // AQI Assessment
+      // AQI
       let aqiStatus = 'Good';
       if (avgAQI > 100) {
         aqiStatus = 'Unhealthy for Sensitive Groups';
@@ -371,29 +348,25 @@ const SensorChart: React.FC<SensorChartProps> = ({
       
       pdf.text(`Air Quality Status: ${aqiStatus}`, 20, yPosition);
 
-      // Footer for all pages
       const addFooter = (pageNum: number, totalPages: number) => {
         pdf.setFontSize(8);
         pdf.setTextColor(textColor);
         pdf.setFont('helvetica', 'normal');
-        
-        // Footer line
+
         pdf.setDrawColor(200, 200, 200);
         pdf.line(15, pageHeight - 15, pageWidth - 15, pageHeight - 15);
-        
-        // Footer text
+
         pdf.text('Generated by BreathSafe Air Quality Monitoring System', 15, pageHeight - 8);
         pdf.text(`Page ${pageNum} of ${totalPages}`, pageWidth - 30, pageHeight - 8);
       };
 
-      // Add footers to all pages
-      const totalPages = pdf.internal.pages.length - 1; // Subtract 1 because pages array includes a blank first element
+      const totalPages = pdf.internal.pages.length - 1;
       for (let i = 1; i <= totalPages; i++) {
         pdf.setPage(i);
         addFooter(i, totalPages);
       }
 
-      // Save the PDF
+      //save PDF
       const fileName = `${sensorName.replace(/\s+/g, '_')}_Air_Quality_Report_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
       
