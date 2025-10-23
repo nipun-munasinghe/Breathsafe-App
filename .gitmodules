@@ -1,0 +1,3 @@
+[submodule "breathsafe-backend"]
+	path = breathsafe-backend
+	url = https://github.com/ModithaM/Breathsafe-Server
