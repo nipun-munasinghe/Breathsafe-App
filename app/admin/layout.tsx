@@ -6,6 +6,7 @@ const Sidebar = dynamic(() => import("@/components/admin/SideBar"), { ssr: false
 import HeaderStats from "@/components/admin/HeaderStats"
 import FooterAdmin from "@/components/admin/FooterAdmin";
 import dynamic from "next/dynamic";
+import {ProtectedRoute} from "@/components/common/protectedRoute";
 
 export default function AdminLayout({
                                         children,
@@ -13,7 +14,7 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     return (
-        <>
+        <ProtectedRoute requiredRole={"ADMIN"}>
             <Sidebar />
             <div className="relative md:ml-64 bg-gradient-to-br from-green-100 to-orange-100 min-h-screen">
                 <AdminNavbar />
@@ -24,6 +25,6 @@ export default function AdminLayout({
                     <FooterAdmin />
                 </div>
             </div>
-        </>
+        </ProtectedRoute>
     );
 }

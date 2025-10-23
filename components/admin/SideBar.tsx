@@ -9,7 +9,6 @@ import UserDropdown from "@/components/admin/dropdown/UserDropdown";
 const Sidebar: React.FC = () => {
   const [collapseShow, setCollapseShow] = useState("hidden");
 
-  // helper to check if link is active
   const isActive = (path: string) =>
     typeof window !== "undefined" && window.location.pathname === path;
 
@@ -228,7 +227,6 @@ const Sidebar: React.FC = () => {
                   <i className="fas fa-list text-blueGray-400 mr-2 text-sm"></i>{" "}
                   Sensor Data
                 </Link>
-                           
               </li>
             </ul>
 
