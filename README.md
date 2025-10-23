@@ -21,7 +21,7 @@ BreathSafe is an intuitive air quality monitoring and health management platform
 
 ## Technologies Used
 
-- **Framework:** Next.js 15+
+- **Framework:** Next.js 15+ with TypeScript
 
 - **State Management:** Zustand
 
